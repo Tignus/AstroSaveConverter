@@ -1,2 +1,5 @@
 # AstroSaveConverter
 Astroneer save converter
+
+USE AT YOUR OWN RISK
+PREFERABLY LAUNCH THE .EXE ON COPIES OF YOUR SAVES

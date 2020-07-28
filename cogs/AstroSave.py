@@ -75,7 +75,7 @@ class AstroSave():
                     steam_save.write(chunk_file.read())
 
         AstroLogging.logPrint(
-            f"Save {self.save_name} has been exported succesfully.")
+            f"\nSave {self.save_name} has been exported succesfully.")
 
     def rename(self):
         """
@@ -97,8 +97,8 @@ class AstroSave():
             None
         """
         old_name = self.save_name
-        new_name = ''
-        while new_name == '':
+        new_name = None
+        while new_name == None:
             try:
                 new_name = input(
                     f'\nNew name for {old_name.split("$")[0]}: [ENTER = unchanged] > ').upper()
@@ -110,6 +110,6 @@ class AstroSave():
                     self.save_name = new_name + \
                         '$' + old_name.split("$")[1]
             except ValueError:
-                new_name = ''
+                new_name = None
                 AstroLogging.logPrint(
                     f'Please use only alphanum and a length < 30')

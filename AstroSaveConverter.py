@@ -89,24 +89,26 @@ def choose_save_to_export(container):
         None
     """
     save_numbers_list = []
-    min_save_number = 1
     max_save_number = len(container.save_list)
     while save_numbers_list == []:
         AstroLogging.logPrint(
-            '\nWhich saves would you like to convert ?')
+            '\nWhich saves would you like to convert ? (Choose 0 for all of them)')
         AstroLogging.logPrint(
             '(Multi-convert is supported. Ex: "1,2,4")')
         save_numbers = input()
         try:
             for number in save_numbers.split(','):
                 number = int(number)
-                if (number < min_save_number or number > max_save_number):
+                if (number < 1 or number > max_save_number):
                     raise ValueError
                 save_numbers_list.append(number)
+            AstroLogging.logPrint(save_numbers_list)
+            if 0 in save_numbers_list and len(save_numbers_list) != 1:
+                raise ValueError
         except ValueError:
             save_numbers_list = []
             AstroLogging.logPrint(
-                f'Please use only values between {min_save_number} and {max_save_number}')
+                f'Please use only values between 1 and {max_save_number} or 0 alone')
     return save_numbers_list
 
 

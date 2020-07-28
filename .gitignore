@@ -1,3 +1,7 @@
+#AstroSaveConverter specific ignores
+test_data/*
+
+
 #VScode
 .vscode/*
 !.vscode/settings.json

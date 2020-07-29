@@ -1,4 +1,5 @@
 """Minimalistic PySciter sample for Windows."""
+import sys
 
 import sciter
 import os
@@ -21,11 +22,21 @@ class Frame(sciter.Window):
         #print("Container: " + fileContainer)
         return fileContainer
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 if __name__ == '__main__':
     sciter.runtime_features(file_io=True, allow_sysinfo=True)
 
     #frame = sciter.Window(ismain=True, uni_theme=True)
     frame = Frame()
-    frame.load_file("assets/gui/main.htm")
+    frame.load_file(resource_path("./assets/gui/main.htm"))
     frame.run_app()

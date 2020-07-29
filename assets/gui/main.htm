@@ -1,8 +1,13 @@
 <html window-icon="icon.png" window-frame="transparent">
   <head>
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="flatBtn.css">
+    <link rel="stylesheet" href="selectFolder/selectFolder.css">
+
     <title>AstroSaveConverter</title>
     <script type="text/tiscript" src="main.tis"></script>
+    <script type="text/tiscript" src="selectFolder/selectFolder.tis"></script>
+    <script type="text/tiscript" src="selectSave/selectSave.tis"></script>
     <script type="text/tiscript">
       const DEFAULT_WIDTH = 800dip;
       const DEFAULT_HEIGHT = 500dip;
@@ -20,5 +25,10 @@
       <h1>AstroSaveConverter</h1>
       <a href="#" class="close" id="closeBtn"></a>
     </header>
+
+    <div id="content">
+      <include src="selectFolder/selectFolder.htm"/>
+      <include src="selectSave/selectSave.htm"/>
+    </div>
   </body>
 </html>

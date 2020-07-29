@@ -1,0 +1,13 @@
+event click $(#btnSelectFolder) {
+    var fn = view.selectFolder(#open,
+          "HTML Files (*.htm,*.html)|*.HTM;*.HTML|All Files (*.*)|*.*" , "html" );
+
+    $(#selectedFolder).text = fn;
+}
+
+event click $(#btnSelectFolderNext) {
+    $(#selectFolder).attributes.addClass("d-none");
+    $(#selectSave).attributes.removeClass("d-none");
+
+    showContainerList($(#selectedFolder).text)
+}

@@ -9,6 +9,9 @@ body {
     margin: 0;
     border: 5px solid #3a3c41;
 }
+.d-none {
+    display:none;
+}
 
 /* HEADER */
 header {
@@ -24,6 +27,20 @@ header h1 {
 }
 header #closeBtn {
     background-color:red;
+}
+
+/* Content */
+#content {
+    color: white;
+}
+
+/* Step */
+.step {
+    padding:10px;
+    text-align:center;
+}
+.step > h2 {
+    text-align:left;
 }
 
 /* Close Button */
@@ -54,4 +71,12 @@ header #closeBtn {
 }
 .close::after {
   transform: rotate(-45deg);
+}
+
+/* Select Button */
+.selectBtn {
+ border: 0;
+ background: none;
+ box-shadow: none;
+ border-radius: 0px;
 }

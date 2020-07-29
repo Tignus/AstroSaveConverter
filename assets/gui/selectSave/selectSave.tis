@@ -1,0 +1,15 @@
+function showContainerList(path) {
+    var list = view.GetContainerList(path);
+    //stdout.println("Output container list: " + list);
+
+    if(list.length == 0) {
+        $(#selectSave).$append(<span class="noContainerFound>No container found</span>);
+    }
+    for(var container in list) {
+        $(#containerList).$append(<div class="container-item"><button class="btnSelectSave flat__btns flat__btns--raised">{container}</button></span>);
+    }
+}
+
+event click $(.btnSelectSave) {
+    stdout.println("SELECTED SAVE: " + this.text);
+}

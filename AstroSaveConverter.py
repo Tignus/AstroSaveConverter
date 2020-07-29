@@ -19,6 +19,35 @@ Exception:
 """
 
 
+def get_container_list(path):
+    """
+    List all containers in a folder
+
+    Arguments:
+        path -- path for search containers
+
+    Returns:
+        Returns a list of all containers found (only filename of container)
+
+    Exception:
+        None
+    """
+    list_containers = []
+
+    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+        if file.rfind("container") != -1:
+            list_containers.append(file)
+
+    if len(list_containers) > 0:
+        AstroLogging.logPrint('\nContainers found:')
+        for i, container in enumerate(list_containers):
+            AstroLogging.logPrint(f'\t {str(i + 1)}) {container}')
+    else:
+        AstroLogging.logPrint('\nNo container found in path: ' + path)
+
+    return list_containers
+
+
 def check_container_path(path):
     """
     Defines the container to use
@@ -39,16 +68,10 @@ def check_container_path(path):
     list_containers = []
 
     if path == '' or path == None:
-        for file in os.listdir():
-            if file.rfind("container") != -1:
-                list_containers.append(file)
+        list_containers = get_container_list(os.getcwd())
 
         if len(list_containers) == 0:
             raise FileNotFoundError
-
-        AstroLogging.logPrint('\nContainers found:')
-        for i, container in enumerate(list_containers):
-            AstroLogging.logPrint(f'\t {str(i+1)}) {container}')
 
     min_container_number = 1
     max_container_number = len(list_containers)

@@ -1,0 +1,97 @@
+/* https://github.com/gokulkrishh/flat-btns */
+
+.flat__btns {
+  min-width: 60px;
+  border: 1px solid;
+  background: #fff;
+  color: #000;
+  padding: 10px;
+  border-radius: 2px;
+  font-weight: 500;
+  outline: 0;
+}
+
+a.flat__btns {
+  text-decoration: none;
+  line-height: 15px;
+  font-size: 12px;
+}
+
+.flat__btns:hover {
+  cursor: pointer;
+  background-color: #eee;
+}
+
+.flat__btns--success {
+  color: #4caf50;
+}
+
+.flat__btns--success:hover {
+  border-color: #4caf50;
+  background-color: #43A047;
+  color: #fff;
+}
+
+.flat__btns--info {
+  color: #2196f3;
+}
+
+.flat__btns--info:hover {
+  border-color: #2196f3;
+  background-color: #1E88E5;
+  color: #fff;
+}
+
+.flat__btns--danger {
+  color: #FF5722;
+}
+
+.flat__btns--danger:hover {
+  border-color: #FF5722;
+  background-color: #F4511E;
+  color: #fff;
+}
+
+.flat__btns.flat__btns--disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.flat__btns--raised {
+  box-shadow: 1px 2px 5px  rgba(0, 0, 0, 0.29);
+  border: none;
+}
+
+.flat__btns--raised:active,
+.flat__btns--fill:active {
+  box-shadow: none;
+}
+
+.flat__btns--fill {
+  box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.29);
+  border: none;
+  color: #fff;
+}
+
+.flat__btns--success.flat__btns--fill {
+  background-color: #4caf50;
+}
+
+.flat__btns--info.flat__btns--fill {
+  background-color: #2196f3;
+}
+
+.flat__btns--danger.flat__btns--fill {
+  background-color: #FF5722;
+}
+
+.flat__btns--dark {
+  color: #fff;
+  background: #212121;
+  border-color: #222222;
+}
+
+.flat__btns--dark:hover {
+  background: #212121;
+  border-color: #222222;
+}

@@ -1,6 +1,8 @@
 #AstroSaveConverter specific ignores
 test_data/*
 
+#PyCharm
+.idea/*
 
 #VScode
 .vscode/*

@@ -1,0 +1,57 @@
+/* GENERAL */
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: #4d5057;
+    padding: 0;
+    margin: 0;
+    border: 5px solid #3a3c41;
+}
+
+/* HEADER */
+header {
+    margin:0;
+    height:50px;
+    color: white;
+    background-color: #3a3c41;
+}
+header h1 {
+    display: inline-block;
+    line-height:30px;
+    padding: 8px;
+}
+header #closeBtn {
+    background-color:red;
+}
+
+/* Close Button */
+.close {
+  position: absolute;
+  right: 10px;
+  top: 12.5px;
+  width: 32px;
+  height: 32px;
+  opacity: 1.0;
+}
+.close:hover {
+  opacity: 0.8;
+}
+.close:active {
+  opacity: 0.6;
+}
+.close::before, .close::after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 33px;
+  width: 2px;
+  background-color: #333;
+}
+.close::before {
+  transform: rotate(45deg);
+}
+.close::after {
+  transform: rotate(-45deg);
+}

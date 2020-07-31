@@ -6,7 +6,7 @@ event click $(#btnNext) {
 }
 
 class Step {
-    var _state = ["step_select-folder", "step_select-container", "step_rename-container", "step_verify", "step_convert"];
+    const _state = ["step_select-folder", "step_select-container", "step_rename-container", "step_verify", "step_convert"];
 
     property current_step(v) {
         get { return this._current_step; }
@@ -56,9 +56,7 @@ class Step {
     }
 
     function updateStep() {
-        for(var s in _state) {
-            $(#{s}).attributes.addClass("d-none");
-        }
+        hideAllStep();
         $(#{_state[current_step]}).attributes.removeClass("d-none");
     }
 
@@ -67,6 +65,24 @@ class Step {
     }
     function setNextEnable(enable) {
         $(#btnNext).state.disabled = !enable;
+    }
+
+    static function hideAllStep() {
+        for(var s in _state) {
+            $(#{s}).attributes.addClass("d-none");
+        }
+    }
+
+    static function showStep() {
+        $(#{_state[current_step]}).attributes.removeClass("d-none");
+    }
+
+    static function setProgressVisible(visible) {
+        if(visible) {
+            $(#step-progress).attributes.removeClass("d-none");
+        }else{
+            $(#step-progress).attributes.addClass("d-none");
+        }
     }
 }
 

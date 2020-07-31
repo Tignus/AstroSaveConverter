@@ -1,3 +1,14 @@
 event click $(a#closeBtn) {
     view.close();
 }
+
+event click $(a#nav-about) {
+    Step.hideAllStep();
+    Step.setProgressVisible(false);
+    $(#page-about).attributes.removeClass("d-none");
+}
+event click $(a.nav-back) {
+    Step.showStep();
+    Step.setProgressVisible(true);
+    $(#page-about).attributes.addClass("d-none");
+}

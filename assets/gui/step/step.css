@@ -1,0 +1,292 @@
+/*
+    Created on : 11/02/2016, 14:11:50
+    Author     : tcavalin
+*/
+/* Mixins */
+/* Copyright 2013-2015 etc Chris Tabor. See https://github.com/christabor/css-progress-wizard/blob/master/LICENSE for details. */
+#step {
+}
+
+
+.flexer, .progress-indicator {
+  //display: flex;
+  flow: horizontal;
+}
+
+.no-flexer-element {
+  flex: 0;
+}
+
+.flexer-element, .progress-indicator > li {
+  //flex: 1;
+  width:1*;
+}
+
+.progress-indicator {
+  margin-bottom: 1em;
+
+  //margin: 0;
+  //padding: 0;
+  //font-size: 80%;
+  //text-transform: uppercase;
+}
+.progress-indicator > li {
+  list-style: none;
+  text-align: center;
+  position: relative;
+  text-overflow: ellipsis;
+  color: white;
+  display: block;
+
+  //padding: 0;
+  //margin: 0;
+  //width: auto;
+}
+.progress-indicator > li:hover {
+  color: yellow;
+}
+.progress-indicator > li .bubble {
+  border-radius: 1000px;
+  width: 36px;
+  height: 36px;
+  display: block;
+  margin: 0 auto 0.5em auto;
+  border-bottom: 2px solid black;
+}
+.progress-indicator > li .bubble::before,
+.progress-indicator > li .bubble::after {
+  display: block;
+  position: absolute;
+  top: 15px;
+  width: 0.5*;
+  height: 5px;
+  content: "";
+  z-index: -1;
+
+  //width: 300%;
+}
+.progress-indicator > li .bubble::before {
+  //background-color: yellow !important;
+}
+.progress-indicator > li .bubble::after {
+  left: 0.5*;
+  //background-color: blue !important;
+}
+
+.progress-indicator > li:first-child .bubble::before,
+.progress-indicator > li:last-child .bubble::after {
+  width:0;
+}
+
+
+
+
+/* COLOR */
+
+/* To come */
+.progress-indicator > li .bubble,
+.progress-indicator > li .bubble::before,
+.progress-indicator > li .bubble::after {
+    background-color: #ecf2f7;
+}
+
+/* Completed */
+.progress-indicator > li.completed,
+.progress-indicator > li.completed .bubble,
+.progress-indicator > li.completed .bubble::before,
+.progress-indicator > li.completed .bubble::after{
+  color: white;
+}
+.progress-indicator > li.completed .bubble,
+.progress-indicator > li.completed .bubble::before,
+.progress-indicator > li.completed .bubble::after,
+.progress-indicator > li.active .bubble::before {
+    background-color: cyan;
+}
+
+/*
+.progress-indicator > li.completed .bubble {
+  background-color: cyan;
+  color: cyan;
+}*/
+/*.progress-indicator > li.completed .bubble::before, .progress-indicator > li.completed .bubble::after {
+  background-color: cyan;
+  border-color: white;
+}*/
+/*.progress-indicator > li.active .bubble::before {
+  background-color: cyan;
+}*/
+
+/* Active */
+.progress-indicator > li.active {
+  //color: cyan;
+}
+.progress-indicator > li.active .bubble {
+  background-color: #4d5057;
+  //color: cyan;
+  border: 10px solid #ecf2f7;
+  //border-color:white;
+  //margin-top: -4px;
+  width: 16px;
+  height: 16px;
+}
+
+/*
+.progress-indicator > li a:hover .bubble {
+  background-color: white;
+  color: white;
+  border-color: white;
+}
+.progress-indicator > li a:hover .bubble::before, .progress-indicator > li a:hover .bubble::after {
+  background-color: white;
+  border-color: white;
+}
+.progress-indicator > li.danger .bubble {
+  background-color: white;
+  color: white;
+  border-color: white;
+}
+.progress-indicator > li.danger .bubble::before, .progress-indicator > li.danger .bubble::after {
+  background-color: white;
+  border-color: white;
+}
+.progress-indicator > li.warning .bubble {
+  background-color: white;
+  color: white;
+  border-color: white;
+}
+.progress-indicator > li.warning .bubble::before, .progress-indicator > li.warning .bubble::after {
+  background-color: white;
+  border-color: white;
+}
+.progress-indicator > li.info .bubble {
+  background-color: white;
+  color: white;
+  border-color: white;
+}
+.progress-indicator > li.info .bubble::before, .progress-indicator > li.info .bubble::after {
+  background-color: white;
+  border-color: white;
+}*/
+
+
+/* STACKED */
+
+
+/*.no-flexer, .progress-indicator.stacked {
+  display: block;
+}*/
+
+/*.progress-indicator.stacked > li {
+  text-indent: -10px;
+  text-align: center;
+  display: block;
+}
+.progress-indicator.stacked > li .bubble::before,
+.progress-indicator.stacked > li .bubble::after {
+  left: 50%;
+  margin-left: -1.5px;
+  width: 3px;
+  height: 100%;
+}
+.progress-indicator.stacked .stacked-text {
+  position: relative;
+  z-index: 10;
+  top: 0;
+  margin-left: 60% !important;
+  width: 45% !important;
+  display: inline-block;
+  text-align: left;
+  line-height: 1.2em;
+}
+.progress-indicator.stacked > li a {
+  border: none;
+}
+.progress-indicator.stacked.nocenter > li .bubble {
+  margin-left: 0;
+  margin-right: 0;
+}
+.progress-indicator.stacked.nocenter > li .bubble::before,
+.progress-indicator.stacked.nocenter > li .bubble::after {
+  left: 10px;
+}
+.progress-indicator.stacked.nocenter .stacked-text {
+  width: auto !important;
+  display: block;
+  margin-left: 40px !important;
+}*/
+
+
+/* STEPS */
+
+
+/*
+.steps {
+  min-height: 90px;
+  padding: 30px 0 0 0;
+  font-family: "Open Sans", sans-serif;
+  position: relative;
+}
+.steps .steps-container {
+  background: #DDD;
+  height: 10px;
+  width: 100%;
+  border-radius: 10px;
+  margin: 0;
+  list-style: none;
+}
+.steps .steps-container li {
+  text-align: center;
+  list-style: none;
+  float: left;
+}
+.steps .steps-container li .step {
+  padding: 0 50px;
+}
+.steps .steps-container li .step .step-image {
+  margin: -14px 0 0 0;
+}
+.steps .steps-container li .step .step-image span {
+  background-color: white;
+  display: block;
+  width: 37px;
+  height: 37px;
+  margin: 0 auto;
+  border-radius: 37px;
+}
+.steps .steps-container li .step .step-current {
+  font-size: 11px;
+  font-style: italic;
+  color: white;
+  margin: 8px 0 0 0;
+}
+.steps .steps-container li .step .step-description {
+  font-size: 13px;
+  font-style: italic;
+  color: white;
+}
+.steps .steps-container li.activated .step .step-image span {
+  background-color: white;
+}
+.steps .steps-container li.activated .step .step-image span::after {
+  background-color: #FFF;
+  display: block;
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 27px;
+  height: 27px;
+  margin: 5px;
+  border-radius: 27px;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.15);
+}
+.steps .step-bar {
+  background-color: white;
+  height: 10px;
+  position: absolute;
+  top: 30px;
+  border-radius: 10px 0 0 10px;
+}
+.steps .step-bar.last {
+  border-radius: 10px;
+}*/

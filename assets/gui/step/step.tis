@@ -1,0 +1,5 @@
+event click $(#btnSelectFolderNext) {
+    $(#step_select-folder).attributes.addClass("completed");
+    $(#step_select-folder).attributes.removeClass("active");
+    $(#step_select-container).attributes.addClass("active");
+}

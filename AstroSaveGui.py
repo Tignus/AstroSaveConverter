@@ -36,7 +36,6 @@ def resource_path(relative_path):
 if __name__ == '__main__':
     sciter.runtime_features(file_io=True, allow_sysinfo=True)
 
-    #frame = sciter.Window(ismain=True, uni_theme=True)
     frame = Frame()
     frame.load_file(resource_path("./assets/gui/main.htm"))
     frame.run_app()

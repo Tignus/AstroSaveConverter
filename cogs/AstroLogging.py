@@ -37,7 +37,7 @@ class AstroLogging():
         # console = logging.StreamHandler()
         # console.setFormatter(formatter)
 
-        logsPath = os.path.join(astroPath, 'logs\\')
+        logsPath = os.path.join(astroPath, 'logs')
         if not os.path.exists(logsPath):
             os.makedirs(logsPath)
 

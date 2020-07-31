@@ -3,11 +3,15 @@ event click $(a#closeBtn) {
 }
 
 event click $(a#nav-about) {
+    $(#step-content).attributes.addClass("d-none");
+
     Step.hideAllStep();
     Step.setProgressVisible(false);
     $(#page-about).attributes.removeClass("d-none");
 }
 event click $(a.nav-back) {
+    $(#step-content).attributes.removeClass("d-none");
+
     Step.showStep();
     Step.setProgressVisible(true);
     $(#page-about).attributes.addClass("d-none");

@@ -31,7 +31,8 @@ header #closeBtn {
 
 /* NAV */
 nav {
-    float: right;
+    position:absolute;
+    right:0;
     padding: 10px;
 }
 nav a {
@@ -58,13 +59,14 @@ footer {
     position: relative;
     min-height: calc(100vh-10px);
 }
-#wrapper {
-    padding-bottom: 130px;
-}
 
 /* Content */
-#content {
+#step-content, #page-content {
     color: white;
+    font-size: 1.2em;
+}
+#step-content {
+    padding-bottom: 130px;
 }
 
 /* Step */
@@ -91,7 +93,7 @@ footer {
     text-align: left;
 }
 .page h3 {
-    margin: 10px 0 5px 0;
+    margin: 20px 0 5px 0;
 }
 
 /* Close Button */
@@ -123,12 +125,4 @@ footer {
 }
 .close::after {
   transform: rotate(-45deg);
-}
-
-/* Select Button */
-.selectBtn {
- border: 0;
- background: none;
- box-shadow: none;
- border-radius: 0px;
 }

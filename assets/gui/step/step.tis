@@ -79,9 +79,9 @@ class Step {
 
     static function setProgressVisible(visible) {
         if(visible) {
-            $(#step-progress).attributes.removeClass("d-none");
+            $(footer).attributes.removeClass("d-none");
         }else{
-            $(#step-progress).attributes.addClass("d-none");
+            $(footer).attributes.addClass("d-none");
         }
     }
 }

@@ -24,18 +24,22 @@
     </script>
   </head>
   <body>
-    <header role="window-caption">
-      <h1>AstroSaveConverter</h1>
-      <a href="#" class="close" id="closeBtn"></a>
-    </header>
+    <div id="page-wrapper">
+      <div id="wrapper">
+        <header role="window-caption">
+          <h1>AstroSaveConverter</h1>
+          <a href="#" class="close" id="closeBtn"></a>
+        </header>
 
-    <div id="content">
-      <include src="selectFolder/selectFolder.htm"/>
-      <include src="selectSave/selectSave.htm"/>
+        <div id="content">
+          <include src="selectFolder/selectFolder.htm"/>
+          <include src="selectSave/selectSave.htm"/>
+        </div>
+      </div>
+
+      <footer>
+        <include src="step/step.htm"/>
+      </footer>
     </div>
-
-    <footer>
-      <include src="step/step.htm"/>
-    </footer>
   </body>
 </html>

@@ -29,6 +29,23 @@ header #closeBtn {
     background-color:red;
 }
 
+/* FOOTER */
+footer {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 60px;
+    padding:10px;
+}
+#page-wrapper {
+    position: relative;
+    min-height: calc(100vh-10px);
+}
+#wrapper {
+    padding-bottom: 60px;
+}
+
 /* Content */
 #content {
     color: white;

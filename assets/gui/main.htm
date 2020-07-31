@@ -3,14 +3,14 @@
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="step/step.css">
     <link rel="stylesheet" href="flatBtn.css">
-    <link rel="stylesheet" href="selectFolder/selectFolder.css">
+    <link rel="stylesheet" href="steps/selectFolder/selectFolder.css">
     <meta charset="utf-8">
 
     <title>AstroSaveConverter</title>
     <script type="text/tiscript" src="main.tis"></script>
     <script type="text/tiscript" src="step/step.tis"></script>
-    <script type="text/tiscript" src="selectFolder/selectFolder.tis"></script>
-    <script type="text/tiscript" src="selectSave/selectSave.tis"></script>
+    <script type="text/tiscript" src="steps/selectFolder/selectFolder.tis"></script>
+    <script type="text/tiscript" src="steps/selectContainer/selectContainer.tis"></script>
     <script type="text/tiscript">
       const DEFAULT_WIDTH = 800dip;
       const DEFAULT_HEIGHT = 500dip;
@@ -32,8 +32,11 @@
         </header>
 
         <div id="content">
-          <include src="selectFolder/selectFolder.htm"/>
-          <include src="selectSave/selectSave.htm"/>
+          <include src="steps/selectFolder/selectFolder.htm"/>
+          <include src="steps/selectContainer/selectContainer.htm"/>
+          <include src="steps/renameContainer/renameContainer.htm"/>
+          <include src="steps/verify/verify.htm"/>
+          <include src="steps/convert/convert.htm"/>
         </div>
       </div>
 

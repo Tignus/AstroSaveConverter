@@ -1,5 +1,23 @@
-/* Progress step */
+/* Buttons bar */
+#step-buttons {
+    flow: horizontal;
+    padding: 10px 0;
+}
+#step-buttons > div {
+    width:1*;
+    text-align:center;
+}
+#step-buttons button {
+    min-width:100px;
+    height: 30px;
+    padding:0;
+}
 
+
+/* Progress step */
+#step {
+    padding:10px 0;
+}
 .flexer, .progress-indicator {
   flow: horizontal;
 }
@@ -7,7 +25,7 @@
   width:1*;
 }
 .progress-indicator {
-  margin-bottom: 1em;
+  //margin-bottom: 1em;
 }
 .progress-indicator > li {
   list-style: none;

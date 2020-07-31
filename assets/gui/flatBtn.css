@@ -61,6 +61,9 @@ a.flat__btns {
   box-shadow: 1px 2px 5px  rgba(0, 0, 0, 0.29);
   border: none;
 }
+.flat__btns--raised:disabled {
+  opacity: 0.4;
+}
 
 .flat__btns--raised:active,
 .flat__btns--fill:active {

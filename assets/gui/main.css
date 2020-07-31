@@ -35,7 +35,7 @@ footer {
     bottom: 0;
     right: 0;
     left: 0;
-    height: 60px;
+    height: 130px;
     padding:10px;
 }
 #page-wrapper {
@@ -43,7 +43,7 @@ footer {
     min-height: calc(100vh-10px);
 }
 #wrapper {
-    padding-bottom: 60px;
+    padding-bottom: 130px;
 }
 
 /* Content */

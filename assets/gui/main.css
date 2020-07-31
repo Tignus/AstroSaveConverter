@@ -63,11 +63,12 @@ footer {
 /* Close Button */
 .close {
   position: absolute;
-  right: 10px;
-  top: 12.5px;
+  right: 6.5px;
+  top: 6.5px;
   width: 32px;
   height: 32px;
   opacity: 1.0;
+  color: transparent;
 }
 .close:hover {
   opacity: 0.8;

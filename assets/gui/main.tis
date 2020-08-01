@@ -1,18 +1,38 @@
+// Opens links that start with http in the default browser
+self.on("click", "a[href^=http]", function(evt) {
+  var href = this.attributes["href"];
+  Sciter.launch(href); // will open the url in default browser
+  return true; // consume the event
+});
+
 event click $(a#closeBtn) {
     view.close();
 }
 
 event click $(a#nav-about) {
+    setNavType(true);
+
     $(#step-content).attributes.addClass("d-none");
 
     Step.hideAllStep();
     Step.setProgressVisible(false);
     $(#page-about).attributes.removeClass("d-none");
 }
-event click $(a.nav-back) {
+event click $(a#nav-back) {
+    setNavType(false);
+
     $(#step-content).attributes.removeClass("d-none");
 
     Step.showStep();
     Step.setProgressVisible(true);
     $(#page-about).attributes.addClass("d-none");
+}
+function setNavType(back) {
+    if (back) {
+        $(#home-nav).attributes.addClass("d-none");
+        $(#back-nav).attributes.removeClass("d-none");
+    }else{
+        $(#home-nav).attributes.removeClass("d-none");
+        $(#back-nav).attributes.addClass("d-none");
+    }
 }

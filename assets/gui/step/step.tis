@@ -6,7 +6,8 @@ event click $(#btnNext) {
 }
 
 class Step {
-    const _state = ["step_select-folder", "step_select-container", "step_rename-container", "step_verify", "step_convert"];
+    const _state = ["step_select-folder", "step_select-container", "step_select-saves", "step_rename-saves",
+                    "step_verify", "step_convert"];
 
     property current_step(v) {
         get { return this._current_step; }

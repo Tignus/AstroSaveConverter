@@ -24,9 +24,6 @@
 .flexer-element, .progress-indicator > li {
   width:1*;
 }
-.progress-indicator {
-  //margin-bottom: 1em;
-}
 .progress-indicator > li {
   list-style: none;
   text-align: center;
@@ -34,9 +31,6 @@
   text-overflow: ellipsis;
   color: white;
   display: block;
-}
-.progress-indicator > li:hover {
-  color: yellow;
 }
 .progress-indicator > li .bubble {
   border-radius: 1000px;
@@ -84,7 +78,7 @@
 .progress-indicator > li.completed .bubble::before,
 .progress-indicator > li.completed .bubble::after,
 .progress-indicator > li.active .bubble::before {
-    background-color: cyan;
+    background-color: #e88024;
 }
 
 /* Active */
@@ -93,4 +87,5 @@
   border: 10px solid #ecf2f7;
   width: 16px;
   height: 16px;
+  margin-bottom: calc(0.5em + 2px);
 }

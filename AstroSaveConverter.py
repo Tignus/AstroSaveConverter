@@ -37,8 +37,8 @@ def check_container_path(path):
         Raise FileNotFoundError if no container is found
     """
     list_containers = []
-
-    if not path:
+    
+    if path==' ' or path==None:
         for file in os.listdir():
             if file.rfind("container") != -1:
                 list_containers.append(file)

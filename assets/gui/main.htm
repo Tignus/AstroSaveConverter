@@ -1,5 +1,5 @@
-<html window-icon="icon.png" window-frame="transparent">
-  <head>
+<html window-icon="../astroconverterlogo.ico" window-frame="transparent">
+<head>
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="step/step.css">
     <link rel="stylesheet" href="flatBtn.css">
@@ -21,35 +21,36 @@
       var h = self.toPixels(DEFAULT_HEIGHT, #height);
 
       view.move( sx + (sw - w) / 2, sy + (sh - h) / 2, w,h, true );
+
     </script>
-  </head>
-  <body>
+</head>
+<body>
     <div id="page-wrapper">
-      <div id="wrapper">
-        <header role="window-caption">
-          <h1>AstroSaveConverter</h1>
-          <a href="#" class="close" id="closeBtn"></a>
-        </header>
+        <div id="wrapper">
+            <header role="window-caption">
+                <h1>AstroSaveConverter</h1>
+                <a href="#" class="close" id="closeBtn"></a>
+            </header>
 
-        <nav>
-          <a href="#" id="nav-about">About</a>
-        </nav>
+            <nav>
+                <a href="#" id="nav-about">About</a>
+            </nav>
 
-        <div id="step-content">
-          <include src="steps/selectFolder/selectFolder.htm"/>
-          <include src="steps/selectContainer/selectContainer.htm"/>
-          <include src="steps/renameContainer/renameContainer.htm"/>
-          <include src="steps/verify/verify.htm"/>
-          <include src="steps/convert/convert.htm"/>
+            <div id="step-content">
+                <include src="steps/selectFolder/selectFolder.htm"/>
+                <include src="steps/selectContainer/selectContainer.htm"/>
+                <include src="steps/renameContainer/renameContainer.htm"/>
+                <include src="steps/verify/verify.htm"/>
+                <include src="steps/convert/convert.htm"/>
+            </div>
+            <div id="page-content">
+                <include src="about.htm"/>
+            </div>
         </div>
-        <div id="page-content">
-          <include src="about.htm"/>
-        </div>
-      </div>
 
-      <footer>
-        <include src="step/step.htm"/>
-      </footer>
+        <footer>
+            <include src="step/step.htm"/>
+        </footer>
     </div>
-  </body>
+</body>
 </html>

@@ -1,16 +1,14 @@
-"""Minimalistic PySciter sample for Windows."""
 import sys
-
-import sciter
 import os
+import sciter
 
 from AstroSaveConverter import get_container_list
 from urllib.parse import urlparse
 
+
 class Frame(sciter.Window):
     def __init__(self):
         super().__init__(ismain=True, uni_theme=True)
-        pass
 
     @sciter.script
     def GetContainerList(self, path):
@@ -19,8 +17,8 @@ class Frame(sciter.Window):
 
         fileContainer = get_container_list(path)
 
-        #print("Container: " + fileContainer)
         return fileContainer
+
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """

@@ -38,10 +38,9 @@ def check_container_path(path):
     """
     list_containers = []
 
-    if path == '' or path == None:
-        for file in os.listdir():
-            if file.rfind("container") != -1:
-                list_containers.append(file)
+    for file in os.listdir():
+        if file.rfind("container") != -1:
+            list_containers.append(file)
 
         if len(list_containers) == 0:
             raise FileNotFoundError
@@ -154,7 +153,8 @@ if __name__ == "__main__":
         AstroLogging.setup_logging(path)
 
         try:
-            fileContainer = check_container_path(args.fileContainer)
+            if not args.fileContainer:
+                fileContainer = check_container_path(args.fileContainer)
         except FileNotFoundError as e:
             AstroLogging.logPrint('\nNo container found, press a key to exit')
             input()

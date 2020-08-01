@@ -2,7 +2,7 @@ event click $(#btnSelectFolder) {
     var fn = view.selectFolder(#open,
           "HTML Files (*.htm,*.html)|*.HTM;*.HTML|All Files (*.*)|*.*" , "html" );
 
-    $(#selectedFolder).text = fn;
+    $(#selectedFolder).text = fn.replace(/^file:\/\//, '');
 }
 
 event click $(#btnSelectFolderNext) {

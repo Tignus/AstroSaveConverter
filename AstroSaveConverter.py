@@ -99,12 +99,14 @@ def choose_save_to_export(container):
         try:
             for number in save_numbers.split(','):
                 number = int(number)
-                if (number < 1 or number > max_save_number):
+                if (number < 0 or number > max_save_number):
                     raise ValueError
                 save_numbers_list.append(number)
             AstroLogging.logPrint(save_numbers_list)
             if 0 in save_numbers_list and len(save_numbers_list) != 1:
                 raise ValueError
+            if save_numbers_list==[0]: 
+                save_numbers_list=[i+1 for i in range(max_save_number)]
         except ValueError:
             save_numbers_list = []
             AstroLogging.logPrint(

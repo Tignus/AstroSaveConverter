@@ -6,6 +6,53 @@ from cogs.AstroLogging import AstroLogging
 from cogs.AstroSaveContainer import AstroSaveContainer
 
 
+def get_save_folder():
+    """
+    Obtains the save folder
+
+    Lets the user pick between automatic save retrieving/copying or
+    a custom save folder
+
+    Arguments:
+        None
+
+    Returns:
+        Returns the save folder path
+
+    Exception:
+        None
+    """
+    AstroLogging.logPrint("Which  folder would you like to work with ?")
+    AstroLogging.logPrint(
+        "\t1) Automatically detect and copy my save folder")
+    AstroLogging.logPrint("\t2) Chose a custom folder")
+
+    folder_type = input()
+    while folder_type not in ('1', '2'):
+        AstroLogging.logPrint(f'\nPlease choose 1 or 2')
+        folder_type = input()
+        AstroLogging.logPrint(f"folder_type {folder_type}", "debug")
+
+    if folder_type == '1':
+        AstroLogging.logPrint("This feature does not exist yet :)")
+        AstroLogging.logPrint('\nPress any key to exit')
+        input()
+        exit(0)  # TODO: automatic behaviour
+    elif folder_type == '2':
+        AstroLogging.logPrint(f'\nEnter your custom folder path')
+        save_folder_path = input()
+        AstroLogging.logPrint(f"save_folder_path {save_folder_path}", "debug")
+
+        while not os.path.isdir(save_folder_path):
+            AstroLogging.logPrint(
+                f"\nWrong path for save folder, please enter a valid path : ")
+            save_folder_path = input()
+            AstroLogging.logPrint(
+                f"save_folder_path {save_folder_path}", "debug")
+
+    return save_folder_path
+
+
 def get_container_list(path):
     """
     List all containers in a folder
@@ -22,12 +69,14 @@ def get_container_list(path):
         if file.rfind("container") != -1:
             list_containers.append(file)
 
-    if len(list_containers) > 0:
+    if not list_containers:
+        AstroLogging.logPrint('\nNo container found in path: ' + path)
+    elif len(list_containers) == 1:
+        AstroLogging.logPrint('\nOne container found', 'debug')
+    else:
         AstroLogging.logPrint('\nContainers found:')
         for i, container in enumerate(list_containers):
             AstroLogging.logPrint(f'\t {str(i + 1)}) {container}')
-    else:
-        AstroLogging.logPrint('\nNo container found in path: ' + path)
 
     return list_containers
 
@@ -36,15 +85,14 @@ def check_container_path(path):
     """
     Defines the container to use
 
-    If the path variable is empty, find every *container* file in the
-    current directory and make the user chose one
+    Find every *container* file in the
+    given path and make the user chose one
 
     Arguments:
-        path -- current known path for the container
+        path -- path where to look for the containers
 
     Returns:
-        Returns "path" if it was non-empty
-        Else returns the chosen container
+        Returns the chosen container filename
 
     Exception:
         Raise FileNotFoundError if no container is found
@@ -54,33 +102,29 @@ def check_container_path(path):
 
     if len(list_containers) == 0:
         raise FileNotFoundError
-
     if len(list_containers) == 1:
-        path = list_containers[0]
+        container_name = list_containers[0]
     else:
-        AstroLogging.logPrint('\nContainers found:')
-        for i, container in enumerate(list_containers):
-            AstroLogging.logPrint(f'\t {str(i+1)}) {container}')
 
         min_container_number = 1
         max_container_number = len(list_containers)
-        path_index = 0
+        container_index = 0
 
-        while path_index == 0:
+        while container_index == 0:
             AstroLogging.logPrint(
                 '\nWhich container would you like to convert ?')
-            path_index = input()
+            container_index = input()
             try:
-                path_index = int(path_index)
-                if (path_index < min_container_number or path_index > max_container_number):
+                container_index = int(container_index)
+                if (container_index < min_container_number or container_index > max_container_number):
                     raise ValueError
             except ValueError:
-                path_index = 0
+                container_index = 0
                 AstroLogging.logPrint(
                     f'Please use only values between {min_container_number} and {max_container_number}')
 
-        path = list_containers[path_index-1]
-    return path
+        container_name = list_containers[container_index-1]
+    return container_name
 
 
 def choose_save_to_export(container):
@@ -132,7 +176,7 @@ def manage_rename(container):
         container -- Container from which to rename the saves
 
     Returns:
-        Nothing 
+        Nothing
 
     Exception:
         None
@@ -156,25 +200,23 @@ if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument(
-            "-f", "--fileContainer", help="File container to parse", required=False)
+            "-p", "--savesPath", help="Path from which to read the container and extract the saves", required=False)
 
         args = parser.parse_args()
-
-        path = os.getcwd()
-        # TODO verifier si le dossier courant est un sous-dossier de %appadata% et warning
-        # TODO quelquepart: si qqun rentre "connard" dans un prompt, insulter copieusement EmptyProfile
-        AstroLogging.setup_logging(path)
+        AstroLogging.setup_logging(os.getcwd())
 
         try:
-            if not args.fileContainer:
-                fileContainer = check_container_path(args.fileContainer)
+            if not args.savesPath:
+                save_folder_path = get_save_folder()
+                container_file_name = check_container_path(save_folder_path)
         except FileNotFoundError as e:
             AstroLogging.logPrint(
-                '\nNo container found, press any key to exit')
+                '\nSave folder or container not found, press any key to exit')
             input()
             sys.exit(-1)
 
-        container = AstroSaveContainer(fileContainer)
+        container = AstroSaveContainer(os.path.join(
+            save_folder_path, container_file_name))
 
         AstroLogging.logPrint('Container file loaded successfully !\n')
         container.print_container()

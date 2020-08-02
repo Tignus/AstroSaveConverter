@@ -1,3 +1,4 @@
+import os
 import hexdump
 import re
 
@@ -47,16 +48,18 @@ class AstroSaveContainer():
         Exception:
             None
         """
-        self.path = container_file_path
+        self.full_path = container_file_path
         self.save_list = []
         AstroLogging.logPrint('\nInitializing Astroneer save container...')
-        with open(self.path, "rb") as container:
+        AstroLogging.logPrint('full_path: {self.full_path}', "debug")
+
+        with open(self.full_path, "rb") as container:
             # The Astroneer file type is contained in at least the first 2 bytes of the file
             self.header = container.read(2)
 
             if not self.is_valid_container_header(self.header):
                 raise Exception(
-                    f'The save container {self.path} is not valid (First two bytes:{self.header})')
+                    f'The save container {self.full_path} is not valid (First two bytes:{self.header})')
             # Skipping 2 bytes that may be part of the header
             container.read(2)
 
@@ -120,7 +123,9 @@ class AstroSaveContainer():
             None
         """
         for save in save_to_convert:
-            self.save_list[save-1].export_to_steam()
+            AstroLogging.logPrint(os.path.dirname(self.full_path), "debug")
+            self.save_list[save -
+                           1].export_to_steam(os.path.dirname(self.full_path))
 
     def is_valid_container_header(self, header):
         """

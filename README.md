@@ -1,4 +1,5 @@
 
+
 <br />
 <p align="center">
   <img src="https://raw.githubusercontent.com/Tignus/AstroSaveConverter/master/assets/astroconverterlogo.ico" width="128px">
@@ -21,7 +22,7 @@
 	- [How to use](https://github.com/Tignus/AstroSaveConverter#howtouse)
 - [FAQ](https://github.com/Tignus/AstroSaveConverter#faq)
 - [Contributing](https://github.com/Tignus/AstroSaveConverter#contributing)
-- [Special thanks](https://github.com/Tignus/AstroSaveConverter#specialthanks) 
+- [Special thanks](https://github.com/Tignus/AstroSaveConverter#special-thanks) 
 # AstroSaveConverter
 
 /!\ PLEASE ONLY USE THIS TOOL ON COPIES OF YOUR SAVE FILES. USE AT YOUR OWN RISK /!\\
@@ -47,7 +48,9 @@ It is currently not possible to convert a Steam save into XBOX save
 
  - Please only use this tool with **copies** of your game saves.
  - XBOX saves can be found by pressing the **Windows key** + **R** and pasting this :
-`cmd /c [PowerShell.exe](https://powershell.exe/) "explorer ((Get-ChildItem $env:LOCALAPPDATA\Packages\SystemEraSoftworks*\SystemAppData\wgs\ -Recurse -Filter container.*).FullName | Where-Object { Format-Hex $_ | Select-String '\$\.(\d\.){4}' } | Split-Path)"`
+
+```cmd /c Powershell.exe "explorer ((Get-ChildItem $env:LOCALAPPDATA\Packages\SystemEraSoftworks*\SystemAppData\wgs\ -Recurse -Filter container.*).FullName | Where-Object { ((gc $_) -replace \"`0\",\"\") -match '\$(\d){4}'} | Split-Path)"```<br />
+
  Steam saves can be found here :
     `%LocalAppData%\Astro\Saved\SaveGames`
  - Copy all the files in a new folder on your desktop. Place AstroSaveConverter.exe in that new folder and run it.
@@ -87,3 +90,4 @@ We (Tignus and EmptyProfile) would like to thanks everyone who helped us in the 
 - Ricky Davis and his [AstroLauncher](https://github.com/ricky-davis/AstroLauncher) which we used to start building our own AstroSaveConverter
 - Gina and Cyber for their contribution to the "[Importing and Converting files between Microsoft & Microsoft OR Microsoft & Steam](https://forum.systemera.net/topic/53054-importing-and-converting-files-between-microsoft-microsoft-or-microsoft-steam/)" thread
 - The Twitch chat and in particular WinXaito, AbsoluteVirtue, Zic0h, SyndGame, SamirJap for their help and support during the long hours of (improductive) coding
+

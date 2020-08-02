@@ -4,19 +4,32 @@ import sys
 
 from cogs.AstroLogging import AstroLogging
 from cogs.AstroSaveContainer import AstroSaveContainer
-"""
-D
 
-I
 
-Arguments:
+def get_container_list(path):
+    """
+    List all containers in a folder
+    Arguments:
+        path -- path for search containers
+    Returns:
+        Returns a list of all containers found (only filename of container)
+    Exception:
+        None
+    """
+    list_containers = []
 
-Returns:
-    Returns 
+    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+        if file.rfind("container") != -1:
+            list_containers.append(file)
 
-Exception:
-    None
-"""
+    if len(list_containers) > 0:
+        AstroLogging.logPrint('\nContainers found:')
+        for i, container in enumerate(list_containers):
+            AstroLogging.logPrint(f'\t {str(i + 1)}) {container}')
+    else:
+        AstroLogging.logPrint('\nNo container found in path: ' + path)
+
+    return list_containers
 
 
 def check_container_path(path):
@@ -37,36 +50,36 @@ def check_container_path(path):
         Raise FileNotFoundError if no container is found
     """
     list_containers = []
+    list_containers = get_container_list(path)
 
-    for file in os.listdir():
-        if file.rfind("container") != -1:
-            list_containers.append(file)
+    if len(list_containers) == 0:
+        raise FileNotFoundError
 
-        if len(list_containers) == 0:
-            raise FileNotFoundError
-
+    if len(list_containers) == 1:
+        path = list_containers[0]
+    else:
         AstroLogging.logPrint('\nContainers found:')
         for i, container in enumerate(list_containers):
             AstroLogging.logPrint(f'\t {str(i+1)}) {container}')
 
-    min_container_number = 1
-    max_container_number = len(list_containers)
-    path_index = 0
+        min_container_number = 1
+        max_container_number = len(list_containers)
+        path_index = 0
 
-    while path_index == 0:
-        AstroLogging.logPrint(
-            '\nWhich container would you like to convert ?')
-        path_index = input()
-        try:
-            path_index = int(path_index)
-            if (path_index < min_container_number or path_index > max_container_number):
-                raise ValueError
-        except ValueError:
-            path_index = 0
+        while path_index == 0:
             AstroLogging.logPrint(
-                f'Please use only values between {min_container_number} and {max_container_number}')
+                '\nWhich container would you like to convert ?')
+            path_index = input()
+            try:
+                path_index = int(path_index)
+                if (path_index < min_container_number or path_index > max_container_number):
+                    raise ValueError
+            except ValueError:
+                path_index = 0
+                AstroLogging.logPrint(
+                    f'Please use only values between {min_container_number} and {max_container_number}')
 
-    path = list_containers[path_index-1]
+        path = list_containers[path_index-1]
     return path
 
 
@@ -156,7 +169,8 @@ if __name__ == "__main__":
             if not args.fileContainer:
                 fileContainer = check_container_path(args.fileContainer)
         except FileNotFoundError as e:
-            AstroLogging.logPrint('\nNo container found, press a key to exit')
+            AstroLogging.logPrint(
+                '\nNo container found, press any key to exit')
             input()
             sys.exit(-1)
 

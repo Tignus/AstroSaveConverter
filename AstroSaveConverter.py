@@ -208,7 +208,9 @@ if __name__ == "__main__":
         try:
             if not args.savesPath:
                 save_folder_path = get_save_folder()
-                container_file_name = check_container_path(save_folder_path)
+            else:
+                save_folder_path = args.savesPath
+            container_file_name = check_container_path(save_folder_path)
         except FileNotFoundError as e:
             AstroLogging.logPrint(
                 '\nSave folder or container not found, press any key to exit')

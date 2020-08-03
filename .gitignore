@@ -1,6 +1,6 @@
 #AstroSaveConverter specific ignores
 test_data/*
-
+logs/*
 
 #VScode
 .vscode/*

@@ -156,7 +156,6 @@ def get_save_folder():
 
     return save_folder_path
 
-
 def get_container_list(path):
     """
     List all containers in a folder
@@ -180,7 +179,7 @@ def get_container_list(path):
     else:
         AstroLogging.logPrint('\nContainers found:')
         for i, container in enumerate(list_containers):
-            AstroLogging.logPrint(f'\t {str(i + 1)}) {container}')
+            AstroLogging.logPrint(f'\t {i+1}) {container}')
 
     return list_containers
 
@@ -226,7 +225,6 @@ def check_container_path(path):
                 container_index = 0
                 AstroLogging.logPrint(
                     f'Please use only values between {min_container_number} and {max_container_number}')
-
         container_name = list_containers[container_index-1]
     return container_name
 
@@ -250,7 +248,7 @@ def choose_save_to_export(container):
     """
     save_numbers_list = []
     max_save_number = len(container.save_list)
-    while save_numbers_list == []:
+    while not save_numbers_list :
         AstroLogging.logPrint(
             '\nWhich saves would you like to convert ? (Choose 0 for all of them)')
         AstroLogging.logPrint(
@@ -259,16 +257,20 @@ def choose_save_to_export(container):
         try:
             for number in save_numbers.split(','):
                 number = int(number)
-                if (number < 1 or number > max_save_number):
+                if (number < 0 or number > max_save_number):
                     raise ValueError
                 save_numbers_list.append(number)
-            AstroLogging.logPrint(save_numbers_list)
+            
             if 0 in save_numbers_list and len(save_numbers_list) != 1:
                 raise ValueError
+            if save_numbers_list==[0]: 
+                save_numbers_list=[i+1 for i in range(max_save_number)]
         except ValueError:
             save_numbers_list = []
             AstroLogging.logPrint(
                 f'Please use only values between 1 and {max_save_number} or 0 alone')
+    
+    AstroLogging.logPrint(save_numbers_list)
     return save_numbers_list
 
 
@@ -286,7 +288,7 @@ def manage_rename(container):
         None
     """
     is_rename = None
-    while is_rename != 'y' and is_rename != 'n':
+    while is_rename not in ('y','n'):
         AstroLogging.logPrint('\nWould you like to rename a save ? (y/n)')
         is_rename = input().lower()
 

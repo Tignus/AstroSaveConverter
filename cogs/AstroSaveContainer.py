@@ -109,12 +109,13 @@ class AstroSaveContainer():
         for i, save in enumerate(self.save_list):
             AstroLogging.logPrint(f'\t {str(i+1)}) {save.save_name}')
 
-    def xbox_to_steam(self, save_to_convert):
+    def xbox_to_steam(self, save_to_convert, export_path):
         """
         Exports saves to steam file
 
         Arguments:
             save_to_convert -- List of saves number to export
+            export_path -- Path where to export the steam saves
 
         Returns:
             None 
@@ -123,9 +124,10 @@ class AstroSaveContainer():
             None
         """
         for save in save_to_convert:
-            AstroLogging.logPrint(os.path.dirname(self.full_path), "debug")
+            AstroLogging.logPrint(
+                f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
             self.save_list[save -
-                           1].export_to_steam(os.path.dirname(self.full_path))
+                           1].export_to_steam(os.path.dirname(self.full_path), export_path)
 
     def is_valid_container_header(self, header):
         """

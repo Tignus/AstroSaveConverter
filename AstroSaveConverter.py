@@ -1,9 +1,70 @@
 import argparse
 import os
 import sys
+import shutil
+from datetime import datetime
+import re
+import glob
+import winpath
 
 from cogs.AstroLogging import AstroLogging
 from cogs.AstroSaveContainer import AstroSaveContainer
+
+
+def get_microsoft_save_folder():
+    """
+    Retrieves the microsoft save folders from %appdata%
+
+    We know that the saves are stored along with a container.* file.
+    We look for that specific container by checking if it contains a
+    save date in order to return the whole path
+
+    Arguments:
+        None
+
+    Returns:
+        Returns the list of the microsoft save folder path found in %appdata%
+
+    Exception:
+        FileNotFoundError if no save folder is found
+    """
+    # glob is used to get the path using the wildcard *
+    for result in glob.iglob(os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'):
+        AstroLogging.logPrint(f'SES path found in appadata: {result}', 'debug')
+        SES_appdata_path = result
+
+    microsoft_save_folders = []
+
+    for root, _, files in os.walk(SES_appdata_path):
+        # Seeking every file in the SES folder
+        for file in files:
+            if re.search(r'^container\.', file):
+                # We matched a container.* file
+                container_full_path = os.path.join(root, file)
+                AstroLogging.logPrint(
+                    f'Container file found:{container_full_path}', 'debug')
+
+                with open(container_full_path, 'rb') as container:
+                    # Decoding the container to check for a date string
+                    container_binary_content = container.read()
+                    container_text = container_binary_content.decode(
+                        'utf-16le', errors='ignore')
+
+                    # Save date matches $YYYY.MM.dd
+                    if re.search(r'\$\d{4}\.\d{2}\.\d{2}', container_text):
+                        AstroLogging.logPrint(
+                            f'Matching save folder {root}', 'debug')
+                        microsoft_save_folders.append(root)
+
+    if not microsoft_save_folders:
+        AstroLogging.logPrint(f'No save folder found.', 'debug')
+        raise FileNotFoundError
+    elif len(microsoft_save_folders) != 1:
+        # We are not supposed to have more than one save folder
+        AstroLogging.logPrint(
+            f'More than one save folders was found:\n {microsoft_save_folders}', 'debug')
+
+    return microsoft_save_folders
 
 
 def get_save_folder():
@@ -24,31 +85,74 @@ def get_save_folder():
     """
     AstroLogging.logPrint("Which  folder would you like to work with ?")
     AstroLogging.logPrint(
-        "\t1) Automatically detect and copy my save folder")
+        "\t1) Automatically detect and copy my save folder (Please close Astroneer first)")
     AstroLogging.logPrint("\t2) Chose a custom folder")
 
     folder_type = input()
     while folder_type not in ('1', '2'):
         AstroLogging.logPrint(f'\nPlease choose 1 or 2')
         folder_type = input()
-        AstroLogging.logPrint(f"folder_type {folder_type}", "debug")
+        AstroLogging.logPrint(f'folder_type {folder_type}', 'debug')
 
     if folder_type == '1':
-        AstroLogging.logPrint("This feature does not exist yet :)")
-        AstroLogging.logPrint('\nPress any key to exit')
-        input()
-        exit(0)  # TODO: automatic behaviour
+        microsoft_save_folders = get_microsoft_save_folder()
+
+        if len(microsoft_save_folders) != 1:
+            AstroLogging.logPrint(
+                f'\nToo many save folders found ! Please use custom folder mode.')
+            AstroLogging.logPrint('\nPress any key to exit')
+            input()
+            exit(-1)
+
+        AstroLogging.logPrint(
+            'Where would you like to copy your save folder ?')
+        AstroLogging.logPrint(
+            '\t1) New folder on my desktop')
+        AstroLogging.logPrint("\t2) New folder in a custom path")
+
+        copy_choice = input()
+        while copy_choice not in ('1', '2'):
+            AstroLogging.logPrint(f'\nPlease choose 1 or 2')
+            copy_choice = input()
+            AstroLogging.logPrint(f'copy_choice {copy_choice}', 'debug')
+
+        # Using date and time to create a unique folder name
+        now = datetime.now().strftime('%Y.%m.%d-%H.%M')
+        astrosave_folder_name = f'AstroSaveFolder_{now}'
+
+        if copy_choice == '1':
+            # Winpath is needed here because Windows user can have a custom Desktop location
+            astrosave_folder_path = winpath.get_desktop()
+        elif copy_choice == '2':
+            AstroLogging.logPrint(f'\nEnter your custom folder path:')
+            astrosave_folder_path = input()
+            AstroLogging.logPrint(
+                f'astrosave_folder_path {astrosave_folder_path}', 'debug')
+
+        save_folder_path = os.path.join(
+            astrosave_folder_path, astrosave_folder_name)
+
+        AstroLogging.logPrint(
+            f'Microsoft folder path: {microsoft_save_folders[0]}', 'debug')
+        AstroLogging.logPrint(
+            f'Save files copied to: {save_folder_path}')
+
+        # Creating the new folder and copying the saves and container into it
+        if os.path.isdir(save_folder_path):
+            shutil.rmtree(save_folder_path)
+        shutil.copytree(microsoft_save_folders[0], save_folder_path)
+
     elif folder_type == '2':
-        AstroLogging.logPrint(f'\nEnter your custom folder path')
+        AstroLogging.logPrint(f'\nEnter your custom folder path:')
         save_folder_path = input()
-        AstroLogging.logPrint(f"save_folder_path {save_folder_path}", "debug")
+        AstroLogging.logPrint(f'save_folder_path {save_folder_path}', 'debug')
 
         while not os.path.isdir(save_folder_path):
             AstroLogging.logPrint(
-                f"\nWrong path for save folder, please enter a valid path : ")
+                f'\nWrong path for save folder, please enter a valid path : ')
             save_folder_path = input()
             AstroLogging.logPrint(
-                f"save_folder_path {save_folder_path}", "debug")
+                f'save_folder_path {save_folder_path}', 'debug')
 
     return save_folder_path
 
@@ -214,6 +318,7 @@ if __name__ == "__main__":
         except FileNotFoundError as e:
             AstroLogging.logPrint(
                 '\nSave folder or container not found, press any key to exit')
+            AstroLogging.logPrint(e, 'exception')
             input()
             sys.exit(-1)
 

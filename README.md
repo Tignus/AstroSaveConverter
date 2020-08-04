@@ -27,12 +27,12 @@
 
 /!\ PLEASE ONLY USE THIS TOOL ON COPIES OF YOUR SAVE FILES. USE AT YOUR OWN RISK /!\\
 
-This tool is in alpha release and is still being developped. We aren't confident it will work in every case, please give us your feedback !
+This tool is still being developped. We aren't confident it will work in every case, please give us your feedback !
 
 Be warned : content of your backpack may disappear. Please make sure you empty it before saving your game.
 
-We can't afford to authenticate our software with a licence (waaaay too expensive) so you will have a Windows prompt if you try to run the .exe file. No worries, it's safe !
-You must click on "more info" in order to be able to run the software:
+We can't afford to authenticate our software with a licence (waaaay too expensive) so you will have a Windows prompt if you try to run the .exe file. No worries, it's safe ! <br />
+You must click on "More info" in order to be able to run the software:
 
 <br />
 <p align="center">
@@ -57,18 +57,17 @@ It is currently not possible to convert a Steam save into XBOX save
 ## How to use
 
  - Please only use this tool with **copies** of your game saves.
- - XBOX saves can be found by pressing the **Windows key** + **R** and pasting this :
+ - XBOX saves will be retrieved automatically by the tool. If you need them, they can be found by pressing the **Windows key** + **R** and pasting this :
 
 ```cmd /c Powershell.exe "explorer ((Get-ChildItem $env:LOCALAPPDATA\Packages\SystemEraSoftworks*\SystemAppData\wgs\ -Recurse -Filter container.*).FullName | Where-Object { ((gc $_) -replace \"`0\",\"\") -match '\$(\d){4}'} | Split-Path)"```<br />
 
  Steam saves can be found here :
     `%LocalAppData%\Astro\Saved\SaveGames`
- - Copy all the files in a new folder on your desktop. Place AstroSaveConverter.exe in that new folder and run it.
- - The tool will automatically detect the container file(s) and ask you to chose one.
+ - Run the software and pick choices as they are prompted to you.
  - It will then ask you to choose wich save(s) you want to convert. Select one or several.
  - You will be able to rename the save. Saves can only contain alphanumeric characters and must be less than 30 characters long.
  - If the save already exists, you will be able to rename or overwrite the existing file.
- - Congratulations, you're done ! AstroSaveConverter will now generate your new save file.
+ - Congratulations, you're done ! AstroSaveConverter will now generate your new save file in a dedicated "Steam save" folder.
 
 # FAQ
 - **I really don't understand "save files", "chunk"...*** <br />
@@ -99,5 +98,5 @@ We (Tignus and EmptyProfile) would like to thanks everyone who helped us in the 
 
 - Ricky Davis and his [AstroLauncher](https://github.com/ricky-davis/AstroLauncher) which we used to start building our own AstroSaveConverter
 - Gina and Cyber for their contribution to the "[Importing and Converting files between Microsoft & Microsoft OR Microsoft & Steam](https://forum.systemera.net/topic/53054-importing-and-converting-files-between-microsoft-microsoft-or-microsoft-steam/)" thread
-- The Twitch chat and in particular WinXaito, AbsoluteVirtue, Zic0h, SyndGame, SamirJap for their help and support during the long hours of (improductive) coding
+- The Twitch chat and in particular WinXaito, AbsoluteVirtue, Zic0h, SyndGame, SamirJap for their help and support during the long hours of (improductive) coding ♥
 

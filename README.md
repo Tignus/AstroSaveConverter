@@ -6,7 +6,7 @@
   <h3 align="center">AstroSaveConverter - Switch from XBOX to Steam</h3>
 
   <p align="center">
-    <a href="https://github.com/Tignus/AstroSaveConverter/releases">Last release</a>
+    <a href="https://github.com/Tignus/AstroSaveConverter/releases">Latest release</a>
     ·
     <a href="https://github.com/Tignus/AstroSaveConverter/issues">Post an issue</a>
   </p>
@@ -30,6 +30,16 @@
 This tool is in alpha release and is still being developped. We aren't confident it will work in every case, please give us your feedback !
 
 Be warned : content of your backpack may disappear. Please make sure you empty it before saving your game.
+
+We can't afford to authenticate our software with a licence (waaaay too expensive) so you will have a Windows prompt if you try to run the .exe file. No worries, it's safe !
+You must click on "more info" in order to be able to run the software:
+
+<br />
+<p align="center">
+	<img src="https://i.imgur.com/ZB7sROM.png" width="450px">
+	<img src="https://i.imgur.com/43J4E5R.png" width="450px">
+</p>
+  <br />
 
 # Convert your game saves
 

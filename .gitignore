@@ -2,6 +2,9 @@
 test_data/*
 logs/*
 
+#PyCharm
+.idea/*
+
 #VScode
 .vscode/*
 !.vscode/settings.json

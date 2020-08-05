@@ -18,6 +18,9 @@ event click $(a#nav-about) {
     Step.setProgressVisible(false);
     $(#page-about).attributes.removeClass("d-none");
 }
+event click $(a#nav-logs) {
+    view.OpenTempPath();
+}
 event click $(a#nav-back) {
     setNavType(false);
 

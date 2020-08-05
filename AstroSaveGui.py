@@ -1,6 +1,7 @@
 import sys
 import os
 import sciter
+import tempfile
 
 from AstroSaveConverter import get_container_list
 from urllib.parse import urlparse
@@ -11,6 +12,10 @@ from cogs.AstroSaveContainer import AstroSaveContainer
 class Frame(sciter.Window):
     def __init__(self):
         super().__init__(ismain=True, uni_theme=True)
+
+    @sciter.script
+    def OpenTempPath(self):
+        os.startfile(tempfile.gettempdir())
 
     @sciter.script
     def GetContainerList(self, path):

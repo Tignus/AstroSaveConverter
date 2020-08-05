@@ -38,7 +38,7 @@ class AstroSave():
         self.save_name = save_name  # User-defined save name + YYYY.MM.dd-HH.mm.ss
         self.chunks_names = chunks_names  # Names of the all the chunks composing the save
 
-    def export_to_steam(self):
+    def export_to_steam(self, path_from, path_to):
         """
         Exports a save to the disk in its Steam file format
 
@@ -46,7 +46,8 @@ class AstroSave():
         obtained by concatenating all its chunks
 
         Arguments:
-            None
+            path_from -- Where to read the chunks of the save
+            path_to -- Where to save the steam save
 
         Returns:
             None 
@@ -56,7 +57,7 @@ class AstroSave():
         """
         file_name = self.save_name+'.savegame'
 
-        while os.path.exists(f'./{file_name}'):
+        while os.path.exists(os.path.join(path_to, file_name)):
             is_overwrite = None
             while is_overwrite != 'y' and is_overwrite != 'n':
                 AstroLogging.logPrint(
@@ -69,9 +70,9 @@ class AstroSave():
             elif is_overwrite == 'y':
                 break
 
-        with open(file_name, "wb") as steam_save:
+        with open(os.path.join(path_to, file_name), "wb") as steam_save:
             for chunk_name in self.chunks_names:
-                with open(chunk_name, 'rb') as chunk_file:
+                with open(os.path.join(path_from, chunk_name), 'rb') as chunk_file:
                     steam_save.write(chunk_file.read())
 
         AstroLogging.logPrint(

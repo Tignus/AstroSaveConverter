@@ -1,3 +1,4 @@
 hexdump==3.3
 PyInstaller==3.6
 PySciter==0.4.30
+winpath==202002.2

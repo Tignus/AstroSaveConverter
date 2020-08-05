@@ -25,9 +25,6 @@ header h1 {
     line-height:30px;
     padding: 8px;
 }
-header #closeBtn {
-    background-color:red;
-}
 
 /* NAV */
 nav {
@@ -112,11 +109,11 @@ footer {
   opacity: 1.0;
   color: transparent;
 }
-.close:hover {
-  opacity: 0.8;
+.close::before:hover, .close::after:hover {
+    background-color: #e88024;
 }
 .close:active {
-  opacity: 0.6;
+  opacity: 0.8;
 }
 .close::before, .close::after {
   position: absolute;
@@ -124,7 +121,7 @@ footer {
   content: ' ';
   height: 33px;
   width: 2px;
-  background-color: #333;
+  background-color: #bbb;
 }
 .close::before {
   transform: rotate(45deg);

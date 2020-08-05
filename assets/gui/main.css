@@ -16,14 +16,15 @@ body {
 /* HEADER */
 header {
     margin:0;
-    height:50px;
+    height:26px;
     color: white;
     background-color: #3a3c41;
 }
 header h1 {
     display: inline-block;
-    line-height:30px;
-    padding: 8px;
+    line-height:20px;
+    padding: 2px;
+    font-size:1.2em;
 }
 
 /* NAV */
@@ -102,10 +103,10 @@ footer {
 /* Close Button */
 .close {
   position: absolute;
-  right: 6.5px;
-  top: 6.5px;
-  width: 32px;
-  height: 32px;
+  right: 5px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
   opacity: 1.0;
   color: transparent;
 }
@@ -117,9 +118,9 @@ footer {
 }
 .close::before, .close::after {
   position: absolute;
-  left: 15px;
+  left: 5px;
   content: ' ';
-  height: 33px;
+  height: 16px;
   width: 2px;
   background-color: #bbb;
 }

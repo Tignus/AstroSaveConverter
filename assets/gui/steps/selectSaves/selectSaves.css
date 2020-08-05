@@ -1,0 +1,11 @@
+#saveList {
+    text-align: left;
+    list-style-type: none;
+    margin:10px;
+}
+#saveList .item {
+    padding: 5px;
+}
+#saveList .item input {
+    margin-right: 5px;
+}

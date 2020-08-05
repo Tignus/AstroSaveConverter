@@ -8,6 +8,8 @@ event click $(#btnNext) {
 class Step {
     const _state = ["step_select-folder", "step_select-container", "step_select-saves", "step_rename-saves",
                     "step_verify", "step_convert"];
+    const _stateMethods = ["stepSelectFolder", "", "stepSelectSaves", "stepRenameSaves",
+                           "stepVerify", "stepConvert"];
 
     property current_step(v) {
         get { return this._current_step; }
@@ -16,30 +18,32 @@ class Step {
 
     function this() {
         current_step = 0;
-        setPreviousEnable(false);
+        setPreviousVisible(false);
+        setNextEnable(false);
     }
 
     function previous() {
         current_step--;
 
         if(current_step == 0) {
-            setPreviousEnable(false);
+            setPreviousVisible(false);
         }
         if(current_step < this._state.length) {
-            setNextEnable(true);
+            setNextVisible(true);
         }
 
         updateStep();
         updateStepperPrevious(_state[current_step], _state[current_step + 1]);
     }
     function next() {
+        setNextEnable(false);
         current_step++;
 
         if(current_step > 0) {
-            setPreviousEnable(true);
+            setPreviousVisible(true);
         }
         if(current_step >= this._state.length - 1) {
-            setNextEnable(false);
+            setNextVisible(false);
         }
 
         updateStep();
@@ -59,13 +63,31 @@ class Step {
     function updateStep() {
         hideAllStep();
         $(#{_state[current_step]}).attributes.removeClass("d-none");
+
+        if(_stateMethods[current_step] != '') {
+            self.ns[_stateMethods[current_step]]();
+        }
     }
 
     function setPreviousEnable(enable) {
         $(#btnPrevious).state.disabled = !enable;
     }
+    function setPreviousVisible(visible) {
+        if(visible) {
+            $(#btnPrevious).attributes.removeClass("d-none");
+        }else{
+            $(#btnPrevious).attributes.addClass("d-none");
+        }
+    }
     function setNextEnable(enable) {
         $(#btnNext).state.disabled = !enable;
+    }
+    function setNextVisible(visible) {
+        if(visible) {
+            $(#btnNext).attributes.removeClass("d-none");
+        }else{
+            $(#btnNext).attributes.addClass("d-none");
+        }
     }
 
     static function hideAllStep() {
@@ -84,6 +106,10 @@ class Step {
         }else{
             $(footer).attributes.addClass("d-none");
         }
+    }
+
+    function setCanNext(can) {
+        setNextEnable(can);
     }
 }
 

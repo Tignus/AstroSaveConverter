@@ -1,13 +1,24 @@
+var folder_path = null;
+
+function stepSelectFolder() {
+    if(folder_path != null) {
+        $(#selectedFolder).text = folder_path;
+        showContainerList(folder_path);
+
+        step.setCanNext(true);
+    }
+}
+
 event click $(#btnSelectFolder) {
     var fn = view.selectFolder(#open,
           "HTML Files (*.htm,*.html)|*.HTM;*.HTML|All Files (*.*)|*.*" , "html" );
 
-    $(#selectedFolder).text = fn.replace(/^file:\/\//, '');
-}
+    if(fn != null) {
+        folder_path = fn.replace(/^file:\/\//, '');
 
-event click $(#btnSelectFolderNext) {
-    $(#selectFolder).attributes.addClass("d-none");
-    $(#selectSave).attributes.removeClass("d-none");
+        $(#selectedFolder).text = folder_path;
+        showContainerList(folder_path);
 
-    showContainerList($(#selectedFolder).text)
+        step.setCanNext(true);
+    }
 }

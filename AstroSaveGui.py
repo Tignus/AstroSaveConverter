@@ -5,6 +5,8 @@ import sciter
 from AstroSaveConverter import get_container_list
 from urllib.parse import urlparse
 
+from cogs.AstroSaveContainer import AstroSaveContainer
+
 
 class Frame(sciter.Window):
     def __init__(self):
@@ -18,6 +20,15 @@ class Frame(sciter.Window):
         fileContainer = get_container_list(path)
 
         return fileContainer
+
+    @sciter.script
+    def GetSavesFromContainer(self, container_path):
+        out_save_list = []
+        save_list = AstroSaveContainer(container_path).save_list
+        for save in save_list:
+            out_save_list.append(save.save_name)
+
+        return out_save_list
 
 
 def resource_path(relative_path):

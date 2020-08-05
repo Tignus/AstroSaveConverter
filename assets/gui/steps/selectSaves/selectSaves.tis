@@ -1,0 +1,54 @@
+function stepSelectSaves() {
+    if(hasSelectedSave()) {
+        step.setCanNext(true);
+    }else{
+        step.setCanNext(false);
+    }
+
+    showRenameSave(getSelectedSaves());
+}
+
+function showSaveList(path) {
+    $(#saveList).clear();
+    var saves = view.GetSavesFromContainer(path);
+
+    if(saves.length == 0) {
+        $(#saveList).$append(<span class="noContainerFound>No save found</span>);
+    }
+    for(var save in saves) {
+        $(#saveList).$append(<li class="item"><label><input type="checkbox"><span>{save}</span></label></li>);
+    }
+}
+
+event change $(#saveList .item) {
+    if(hasSelectedSave()) {
+        step.setCanNext(true);
+    }else{
+        step.setCanNext(false);
+    }
+
+    showRenameSave(getSelectedSaves());
+}
+
+function hasSelectedSave() {
+    var children = $$(#saveList input);
+    for(var child in children) {
+        if(child.state.checked) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function getSelectedSaves() {
+    var out = [];
+    var children = $$(#saveList input);
+    for(var child in children) {
+        if(child.state.checked) {
+            out.push(child.$p(label).$(span).text);
+        }
+    }
+
+    return out;
+}

@@ -1,0 +1,116 @@
+event click $(#btnPrevious) {
+    step.previous();
+}
+event click $(#btnNext) {
+    step.next();
+}
+
+class Step {
+    const _state = ["step_select-folder", "step_select-container", "step_select-saves", "step_rename-saves",
+                    "step_verify", "step_convert"];
+    const _stateMethods = ["stepSelectFolder", "", "stepSelectSaves", "stepRenameSaves",
+                           "stepVerify", "stepConvert"];
+
+    property current_step(v) {
+        get { return this._current_step; }
+        set { this._current_step = v; }
+    }
+
+    function this() {
+        current_step = 0;
+        setPreviousVisible(false);
+        setNextEnable(false);
+    }
+
+    function previous() {
+        current_step--;
+
+        if(current_step == 0) {
+            setPreviousVisible(false);
+        }
+        if(current_step < this._state.length) {
+            setNextVisible(true);
+        }
+
+        updateStep();
+        updateStepperPrevious(_state[current_step], _state[current_step + 1]);
+    }
+    function next() {
+        setNextEnable(false);
+        current_step++;
+
+        if(current_step > 0) {
+            setPreviousVisible(true);
+        }
+        if(current_step >= this._state.length - 1) {
+            setNextVisible(false);
+        }
+
+        updateStep();
+        updateStepperNext(_state[current_step - 1], _state[current_step]);
+    }
+    function updateStepperNext(previousId, activeId) {
+        $(#progress-{previousId}).attributes.addClass("completed");
+        $(#progress-{previousId}).attributes.removeClass("active");
+        $(#progress-{activeId}).attributes.addClass("active");
+    }
+    function updateStepperPrevious(activeId, nextId) {
+        $(#progress-{activeId}).attributes.addClass("active");
+        $(#progress-{activeId}).attributes.removeClass("completed");
+        $(#progress-{nextId}).attributes.removeClass("active");
+    }
+
+    function updateStep() {
+        hideAllStep();
+        $(#{_state[current_step]}).attributes.removeClass("d-none");
+
+        if(_stateMethods[current_step] != '') {
+            self.ns[_stateMethods[current_step]]();
+        }
+    }
+
+    function setPreviousEnable(enable) {
+        $(#btnPrevious).state.disabled = !enable;
+    }
+    function setPreviousVisible(visible) {
+        if(visible) {
+            $(#btnPrevious).attributes.removeClass("d-none");
+        }else{
+            $(#btnPrevious).attributes.addClass("d-none");
+        }
+    }
+    function setNextEnable(enable) {
+        $(#btnNext).state.disabled = !enable;
+    }
+    function setNextVisible(visible) {
+        if(visible) {
+            $(#btnNext).attributes.removeClass("d-none");
+        }else{
+            $(#btnNext).attributes.addClass("d-none");
+        }
+    }
+
+    static function hideAllStep() {
+        for(var s in _state) {
+            $(#{s}).attributes.addClass("d-none");
+        }
+    }
+
+    static function showStep() {
+        $(#{_state[current_step]}).attributes.removeClass("d-none");
+    }
+
+    static function setProgressVisible(visible) {
+        if(visible) {
+            $(footer).attributes.removeClass("d-none");
+        }else{
+            $(footer).attributes.addClass("d-none");
+        }
+    }
+
+    function setCanNext(can) {
+        setNextEnable(can);
+    }
+}
+
+var step = new Step();

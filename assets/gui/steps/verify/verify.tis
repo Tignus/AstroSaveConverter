@@ -1,0 +1,3 @@
+function stepVerify() {
+    step.setCanNext(true);
+}

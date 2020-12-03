@@ -1,0 +1,22 @@
+#renameList {
+    text-align: left;
+    list-style-type: none;
+    margin:10px;
+}
+#renameBlock {
+    height:240px;
+    overflow: auto;
+}
+#renameList .item {
+    padding: 5px;
+}
+#renameList .item label {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    display:inline-block;
+}
+#renameList .item input {
+    padding: 2px;
+    width: calc(100% - 10px);
+    font-size: 0.9em;
+}

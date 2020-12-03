@@ -1,0 +1,91 @@
+/* Buttons bar */
+#step-buttons {
+    flow: horizontal;
+    padding: 10px 0;
+}
+#step-buttons > div {
+    width:1*;
+    text-align:center;
+}
+#step-buttons button {
+    min-width:100px;
+    height: 30px;
+    padding:0;
+}
+
+
+/* Progress step */
+#step {
+    padding:10px 0;
+}
+.flexer, .progress-indicator {
+  flow: horizontal;
+}
+.flexer-element, .progress-indicator > li {
+  width:1*;
+}
+.progress-indicator > li {
+  list-style: none;
+  text-align: center;
+  position: relative;
+  text-overflow: ellipsis;
+  color: white;
+  display: block;
+}
+.progress-indicator > li .bubble {
+  border-radius: 1000px;
+  width: 36px;
+  height: 36px;
+  display: block;
+  margin: 0 auto 0.5em auto;
+  border-bottom: 2px solid black;
+}
+.progress-indicator > li .bubble::before,
+.progress-indicator > li .bubble::after {
+  display: block;
+  position: absolute;
+  top: 15px;
+  width: 0.5*;
+  height: 5px;
+  content: "";
+  z-index: -1;
+}
+.progress-indicator > li .bubble::after {
+  left: 0.5*;
+}
+.progress-indicator > li:first-child .bubble::before,
+.progress-indicator > li:last-child .bubble::after {
+  width:0;
+}
+
+/* COLOR */
+
+/* To come */
+.progress-indicator > li .bubble,
+.progress-indicator > li .bubble::before,
+.progress-indicator > li .bubble::after {
+    background-color: #ecf2f7;
+}
+
+/* Completed */
+.progress-indicator > li.completed,
+.progress-indicator > li.completed .bubble,
+.progress-indicator > li.completed .bubble::before,
+.progress-indicator > li.completed .bubble::after{
+  color: white;
+}
+.progress-indicator > li.completed .bubble,
+.progress-indicator > li.completed .bubble::before,
+.progress-indicator > li.completed .bubble::after,
+.progress-indicator > li.active .bubble::before {
+    background-color: #e88024;
+}
+
+/* Active */
+.progress-indicator > li.active .bubble {
+  background-color: #4d5057;
+  border: 10px solid #ecf2f7;
+  width: 16px;
+  height: 16px;
+  margin-bottom: calc(0.5em + 2px);
+}

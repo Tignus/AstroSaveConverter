@@ -1,0 +1,132 @@
+/* GENERAL */
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: #4d5057;
+    padding: 0;
+    margin: 0;
+    border: 5px solid #3a3c41;
+}
+.d-none {
+    display:none;
+}
+
+/* HEADER */
+header {
+    margin:0;
+    height:26px;
+    color: white;
+    background-color: #3a3c41;
+}
+header h1 {
+    display: inline-block;
+    line-height:20px;
+    padding: 2px;
+    font-size:1.2em;
+}
+
+/* NAV */
+nav {
+    position:absolute;
+    right:0;
+    padding: 10px;
+}
+nav a {
+    color: white;
+    margin: 0 10px;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+nav a:hover {
+    color: #bbb;
+}
+
+/* FOOTER */
+footer {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 130px;
+    padding:10px;
+}
+#page-wrapper {
+    position: relative;
+    min-height: calc(100vh-10px);
+}
+
+/* Content */
+#step-content, #page-content {
+    color: white;
+    font-size: 1.2em;
+}
+#step-content {
+    padding-bottom: 130px;
+}
+
+/* Big centered button */
+.centeredButton {
+    margin : 50px 0;
+    font-size: 1.15em;
+}
+
+/* Step */
+.step, .page {
+    padding:10px;
+    text-align:center;
+}
+.step > h2, .page > h2 {
+    text-align:left;
+}
+.step > h2 a, .page a {
+    text-decoration: none;
+    color: white;
+    font-weight: 0;
+    font-style: italic;
+    font-size: 0.9em;
+}
+.step > h2 a:hover, .page a:hover {
+    color: #bbb;
+}
+
+/* Page */
+.page {
+    text-align: left;
+}
+.page h3 {
+    margin: 20px 0 5px 0;
+}
+
+/* Close Button */
+.close {
+  position: absolute;
+  right: 5px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+  opacity: 1.0;
+  color: transparent;
+}
+.close::before:hover, .close::after:hover {
+    background-color: #e88024;
+}
+.close:active {
+  opacity: 0.8;
+}
+.close::before, .close::after {
+  position: absolute;
+  left: 5px;
+  content: ' ';
+  height: 16px;
+  width: 2px;
+  background-color: #bbb;
+}
+.close::before {
+  transform: rotate(45deg);
+}
+.close::after {
+  transform: rotate(-45deg);
+}

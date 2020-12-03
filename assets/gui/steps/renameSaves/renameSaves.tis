@@ -1,0 +1,34 @@
+function stepRenameSaves() {
+    step.setCanNext(canNextRename());
+}
+
+function showRenameSave(saveList) {
+    $(#renameList).clear();
+    for(var save in saveList) {
+        $(#renameList).$append(<li class="item"><label>{save}</label><input type="text" value="{save}"></li>);
+    }
+}
+
+event change $(#renameList .item) {
+    step.setCanNext(canNextRename());
+}
+
+function canNextRename() {
+    var out = [];
+    var inputs = $$(#renameList input);
+    for(var input in inputs) {
+        if(input.value == ''){
+            return false;
+        }
+
+        for(var i in out) {
+            if(i == input.value){
+                return false;
+            }
+        }
+
+        out.push(input.value);
+    }
+
+    return true;
+}

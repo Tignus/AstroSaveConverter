@@ -1,0 +1,19 @@
+var container_folder;
+
+function showContainerList(path) {
+    $(#containerList).clear();
+    container_folder = path;
+    var list = view.GetContainerList(path);
+
+    if(list.length == 0) {
+        $(#containerList).$append(<span class="noContainerFound>No container found</span>);
+    }
+    for(var container in list) {
+        $(#containerList).$append(<div class="container-item"><button class="btnSelectContainer flat__btns flat__btns--raised">{container}</button></span>);
+    }
+}
+
+event click $(.btnSelectContainer) {
+    showSaveList(container_folder + "/" + this.text);
+    step.next();
+}

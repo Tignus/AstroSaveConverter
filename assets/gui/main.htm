@@ -1,0 +1,69 @@
+<html window-icon="../astroconverterlogo.ico" window-frame="transparent">
+<head>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="step/step.css">
+    <link rel="stylesheet" href="flatBtn.css">
+    <link rel="stylesheet" href="steps/selectContainer/selectContainer.css">
+    <link rel="stylesheet" href="steps/selectSaves/selectSaves.css">
+    <link rel="stylesheet" href="steps/renameSaves/renameSaves.css">
+    <meta charset="utf-8">
+
+    <title>AstroSaveConverter</title>
+    <script type="text/tiscript" src="main.tis"></script>
+    <script type="text/tiscript" src="step/step.tis"></script>
+    <script type="text/tiscript" src="steps/selectFolder/selectFolder.tis"></script>
+    <script type="text/tiscript" src="steps/selectContainer/selectContainer.tis"></script>
+    <script type="text/tiscript" src="steps/selectSaves/selectSaves.tis"></script>
+    <script type="text/tiscript" src="steps/renameSaves/renameSaves.tis"></script>
+    <script type="text/tiscript" src="steps/verify/verify.tis"></script>
+    <script type="text/tiscript" src="steps/convert/convert.tis"></script>
+    <script type="text/tiscript">
+      const DEFAULT_WIDTH = 800dip;
+      const DEFAULT_HEIGHT = 500dip;
+
+      var (sx,sy,sw,sh) = View.screenBox(0,#workarea,#rectw);
+
+      var w = self.toPixels(DEFAULT_WIDTH, #width);
+      var h = self.toPixels(DEFAULT_HEIGHT, #height);
+
+      view.move( sx + (sw - w) / 2, sy + (sh - h) / 2, w,h, true );
+
+    </script>
+</head>
+<body>
+    <div id="page-wrapper">
+        <div id="wrapper">
+            <header role="window-caption">
+                <h1>AstroSaveConverter</h1>
+                <a href="#" class="close" id="closeBtn"></a>
+            </header>
+
+            <nav>
+                <div id="home-nav">
+                    <a href="#" id="nav-about">About</a>
+                    <a href="#" id="nav-logs">Logs</a>
+                </div>
+                <div id="back-nav" class="d-none">
+                     <a href="#" id="nav-back">Back</a>
+                </div>
+            </nav>
+
+            <div id="step-content">
+                <include src="steps/selectFolder/selectFolder.htm"/>
+                <include src="steps/selectContainer/selectContainer.htm"/>
+                <include src="steps/selectSaves/selectSaves.htm"/>
+                <include src="steps/renameSaves/renameSaves.htm"/>
+                <include src="steps/verify/verify.htm"/>
+                <include src="steps/convert/convert.htm"/>
+            </div>
+            <div id="page-content">
+                <include src="about.htm"/>
+            </div>
+        </div>
+
+        <footer>
+            <include src="step/step.htm"/>
+        </footer>
+    </div>
+</body>
+</html>

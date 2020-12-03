@@ -1,0 +1,3 @@
+function stepConvert() {
+    step.setNextVisible(false);
+}

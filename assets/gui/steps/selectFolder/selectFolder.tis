@@ -1,0 +1,24 @@
+var folder_path = null;
+
+function stepSelectFolder() {
+    if(folder_path != null) {
+        $(#selectedFolder).text = folder_path;
+        showContainerList(folder_path);
+
+        step.setCanNext(true);
+    }
+}
+
+event click $(#btnSelectFolder) {
+    var fn = view.selectFolder(#open,
+          "HTML Files (*.htm,*.html)|*.HTM;*.HTML|All Files (*.*)|*.*" , "html" );
+
+    if(fn != null) {
+        folder_path = fn.replace(/^file:\/\//, '');
+
+        $(#selectedFolder).text = folder_path;
+        showContainerList(folder_path);
+
+        step.setCanNext(true);
+    }
+}

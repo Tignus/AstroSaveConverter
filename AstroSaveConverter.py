@@ -298,54 +298,68 @@ def manage_rename(container):
             container.save_list[number - 1].rename()
 
 
-if __name__ == "__main__":
-    try:
-        os.system(
-            "title AstroSaveConverter - Migrate your Astroneer save from Microsoft to Steam")
-    except:
-        pass
-    try:
+def get_args():
         parser = argparse.ArgumentParser()
+
         parser.add_argument(
             "-p", "--savesPath", help="Path from which to read the container and extract the saves", required=False)
 
         args = parser.parse_args()
-        AstroLogging.setup_logging(os.getcwd())
 
-        try:
-            if not args.savesPath:
-                save_folder_path = get_save_folder()
-            else:
-                save_folder_path = args.savesPath
-            container_file_name = check_container_path(save_folder_path)
-        except FileNotFoundError as e:
-            AstroLogging.logPrint(
-                '\nSave folder or container not found, press any key to exit')
-            AstroLogging.logPrint(e, 'exception')
-            input()
-            sys.exit(-1)
+        # Default values
+        args.savesPath = args.savesPath or get_save_folder()
 
-        container = AstroSaveContainer(os.path.join(
-            save_folder_path, container_file_name))
+        return args
+
+
+def exit(code):
+    input()
+    sys.exit(code)
+
+
+def rm_dir_if_exists(path):
+    if not os.path.isdir(path):
+        os.mkdir(path)
+
+
+if __name__ == "__main__":
+
+    AstroLogging.setup_logging(os.getcwd())
+
+    try:
+        os.system("title AstroSaveConverter - Migrate your Astroneer save from Microsoft to Steam")
+    except:
+        pass
+
+    args = get_args()
+
+    try:
+        container_file_name = check_container_path(args.savesPath)
+    except FileNotFoundError as e:
+        AstroLogging.logPrint('\nSave folder or container not found, press any key to exit')
+        AstroLogging.logPrint(e, 'exception')
+        exit(1)
+
+    try:
+        container = AstroSaveContainer(os.path.join(args.savesPath, container_file_name))
 
         AstroLogging.logPrint('Container file loaded successfully !\n')
         container.print_container()
 
         save_numbers_list = choose_save_to_export(container)
-
         manage_rename(container)
 
         AstroLogging.logPrint(f'\nExtracting saves {str(save_numbers_list)}')
 
-        export_saves_path = os.path.join(save_folder_path, 'Steam saves')
-        if not os.path.isdir(export_saves_path):
-            os.mkdir(export_saves_path)
+        export_saves_path = os.path.join(args.savesPath, 'Steam saves')
+        rm_dir_if_exists(export_saves_path)
         container.xbox_to_steam(save_numbers_list, export_saves_path)
 
         AstroLogging.logPrint(f'\nTask completed, press any key to exit')
-        input()
+
+        exit(0)
     except Exception as ex:
         AstroLogging.logPrint(ex)
         AstroLogging.logPrint('', 'exception')
+        exit(1)
 
-        sys.exit()

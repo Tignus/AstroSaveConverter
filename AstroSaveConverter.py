@@ -179,31 +179,31 @@ def create_folder_name() -> str:
     return f'AstroSaveFolder_{now}'
 
 
-def is_folder_writable(path):
+def is_folder_writable(path) -> bool:
     return os.access(os.path.dirname(path), os.W_OK)
 
 
-def is_folder_exists(path):
+def is_folder_exists(path) -> bool:
     return os.path.exists(path)
 
 
-def is_folder_a_dir(path):
+def is_folder_a_dir(path) -> bool:
     return os.path.isdir(path)
 
 
-def is_a_file(path):
+def is_a_file(path) -> bool:
     return os.path.isfile(path)
 
 
-def is_a_container_file(path):
+def is_a_container_file(path) -> bool:
     return is_a_file(path) and path.rfind('container') != -1
 
 
-def get_folder_content(path):
+def get_folder_content(path) -> list(str):
     return os.listdir(path)
 
 
-def get_container_list(path):
+def get_containers_list(path) -> list(str):
     """
     List all containers in a folder
     Arguments:
@@ -214,61 +214,52 @@ def get_container_list(path):
         None
     """
     folder_content = get_folder_content(path)
-    list_containers = [file for file in folder_content if is_a_container_file(file)]
+    containers_list = [file for file in folder_content if is_a_container_file(file)]
 
-    if not list_containers:
+    if not containers_list or len(containers_list) == 0:
         AstroLogging.logPrint('\nNo container found in path: ' + path)
-    else:
-        AstroLogging.logPrint('\nContainers found:')
-        for i, container in list_containers:
-            AstroLogging.logPrint(f'\t {i+1}) {container}')
-
-    return list_containers
-
-
-def check_container_path(path):
-    """
-    Defines the container to use
-
-    Find every *container* file in the
-    given path and make the user chose one
-
-    Arguments:
-        path -- path where to look for the containers
-
-    Returns:
-        Returns the chosen container filename
-
-    Exception:
-        Raise FileNotFoundError if no container is found
-    """
-    list_containers = []
-    list_containers = get_container_list(path)
-
-    if len(list_containers) == 0:
         raise FileNotFoundError
-    if len(list_containers) == 1:
-        container_name = list_containers[0]
-    else:
 
-        min_container_number = 1
-        max_container_number = len(list_containers)
-        container_index = 0
+    return containers_list
 
-        while container_index == 0:
-            AstroLogging.logPrint(
-                '\nWhich container would you like to convert ?')
-            container_index = input()
-            try:
-                container_index = int(container_index)
-                if (container_index < min_container_number or container_index > max_container_number):
-                    raise ValueError
-            except ValueError:
-                container_index = 0
-                AstroLogging.logPrint(
-                    f'Please use only values between {min_container_number} and {max_container_number}')
-        container_name = list_containers[container_index-1]
-    return container_name
+
+def ask_user_to_choose_in_a_list(text, file_list):
+    """ Defines the container to use
+
+    Print every *container* file in the
+    given and make the user choose one
+
+    :param containers_list: A list of identified to be containers
+
+    :returns: The chosen container filename
+    """
+    max_container_number = len(file_list)
+    min_container_number = 1
+    choice_index = 0
+
+    while choice_index == 0:
+        AstroLogging.logPrint('\nWhich container would you like to convert ?')
+        print_list_elements(file_list)
+        choice_index = input()
+        try:
+            choice_index = int(choice_index)
+            verify_choice_input(choice_index, min_container_number, max_container_number)
+        except ValueError:
+            choice_index = 0
+            AstroLogging.logPrint(f'Please use only values between {min_container_number} and {max_container_number}')
+
+    return file_list[choice_index-1]
+
+
+def print_list_elements(list):
+    for i, container in containers_list:
+        AstroLogging.logPrint(f'\t {i+1}) {container}')
+
+
+def verify_choice_input(choice, min, max):
+    if (choice < min or choice > max):
+        raise ValueError
+
 
 """"""
 def process_multiple_choices_input(choices, max_value) -> list(int):
@@ -277,7 +268,7 @@ def process_multiple_choices_input(choices, max_value) -> list(int):
     return choices
 
 
-def verify_choice_input(choices):
+def verify_choices_input(choices):
     if len(choices) == 0:
         raise ValueError
 
@@ -304,7 +295,7 @@ def multiple_choice_input(maximum_value) -> list(int):
         choices = process_multiple_choices_input(choices, maximum_value)
 
         try:
-            verify_choice_input(choices)
+            verify_choices_input(choices)
         except ValueError:
             choices = []
             AstroLogging.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
@@ -366,11 +357,20 @@ if __name__ == "__main__":
     args = get_args()
 
     try:
-        container_file_name = check_container_path(args.savesPath)
+        containers_list = get_containers_list(args.savesPath)
+        AstroLogging.logPrint('\nContainers found:')
     except FileNotFoundError as e:
-        AstroLogging.logPrint('\nSave folder or container not found, press any key to exit')
+        AstroLogging.logPrint('\nContainer not found, press any key to exit')
         AstroLogging.logPrint(e, 'exception')
         wait_and_exit(1)
+
+    if len(containers_list) == 1:
+        container_name = containers_list[0]
+    else:
+        container_name = ask_user_to_choose_in_a_list(
+            '\nWhich container would you like to convert ?',
+            containers_list
+        )
 
     try:
         container = AstroSaveContainer(os.path.join(args.savesPath, container_file_name))

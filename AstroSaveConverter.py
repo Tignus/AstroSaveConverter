@@ -7,66 +7,86 @@ import re
 import glob
 import winpath
 
+from cogs.AstroSaveErrors import MultipleFolderFoundError
 from cogs.AstroLogging import AstroLogging
 from cogs.AstroSaveContainer import AstroSaveContainer
 
-
+"""
+"""
 def get_microsoft_save_folder():
-    """
-    Retrieves the microsoft save folders from %appdata%
+    """ Retrieves the microsoft save folders from %appdata%
 
     We know that the saves are stored along with a container.* file.
     We look for that specific container by checking if it contains a
     save date in order to return the whole path
 
-    Arguments:
-        None
-
-    Returns:
-        Returns the list of the microsoft save folder path found in %appdata%
-
-    Exception:
-        FileNotFoundError if no save folder is found
+    :return: The list of the microsoft save folder content found in %appdata%
+    :exception: FileNotFoundError if no save folder is found
     """
-    # glob is used to get the path using the wildcard *
-    for result in glob.iglob(os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'):
-        AstroLogging.logPrint(f'SES path found in appadata: {result}', 'debug')
-        SES_appdata_path = result
 
-    microsoft_save_folders = []
+    target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
+    microsoft_save_paths = list(glob.iglob(target))
 
-    for root, _, files in os.walk(SES_appdata_path):
-        # Seeking every file in the SES folder
-        for file in files:
-            if re.search(r'^container\.', file):
-                # We matched a container.* file
-                container_full_path = os.path.join(root, file)
-                AstroLogging.logPrint(
-                    f'Container file found:{container_full_path}', 'debug')
+    for path in microsoft_save_paths:
+        AstroLogging.logPrint(f'SES path found in appadata: {path}', 'debug')
 
-                with open(container_full_path, 'rb') as container:
-                    # Decoding the container to check for a date string
-                    container_binary_content = container.read()
-                    container_text = container_binary_content.decode(
-                        'utf-16le', errors='ignore')
+    SES_appdata_path = microsoft_save_paths[-1]
 
-                    # Save date matches $YYYY.MM.dd
-                    if re.search(r'\$\d{4}\.\d{2}\.\d{2}', container_text):
-                        AstroLogging.logPrint(
-                            f'Matching save folder {root}', 'debug')
-                        microsoft_save_folders.append(root)
+    # TODO : manage multiple files and no file error
+    microsoft_save_folder = seek_microsoft_save_folder(SES_appdata_path)
+
+    return microsoft_save_folder
+
+
+def seek_microsoft_save_folder(appdata_path):
+
+    microsoft_save_folders = get_save_folders_from_path(appdata_path)
 
     if not microsoft_save_folders:
         AstroLogging.logPrint(f'No save folder found.', 'debug')
         raise FileNotFoundError
     elif len(microsoft_save_folders) != 1:
         # We are not supposed to have more than one save folder
-        AstroLogging.logPrint(
-            f'More than one save folders was found:\n {microsoft_save_folders}', 'debug')
+        AstroLogging.logPrint(f'More than one save folders was found:\n {microsoft_save_folders}', 'debug')
+        raise MultipleFolderFoundError
 
     return microsoft_save_folders
 
 
+def get_save_folders_from_path(path):
+    microsoft_save_folders = []
+
+    for root, _, files in os.walk(path):
+        for file in files:
+            if re.search(r'^container\.', file):
+                container_full_path = os.path.join(root, file)
+
+                AstroLogging.logPrint(f'Container file found:{container_full_path}', 'debug')
+
+                container_text = read_text_from_container(container_full_path)
+
+                if do_container_text_match_date(container_text):
+                    AstroLogging.logPrint(f'Matching save folder {root}', 'debug')
+                    microsoft_save_folders.append(root)
+
+    return microsoft_save_folders
+
+
+def read_text_from_container(path):
+    with open(path, 'rb') as container:
+        # Decoding the container to check for a date string
+        binary_content = container.read()
+        text = binary_content.decode('utf-16le', errors='ignore')
+
+        return text
+
+
+def do_container_text_match_date(text):
+    # Do save date matches $YYYY.MM.dd
+    return re.search(r'\$\d{4}\.\d{2}\.\d{2}', text)
+
+""""""
+""""""
 def get_save_folder():
     """
     Obtains the save folder
@@ -229,7 +249,7 @@ def check_container_path(path):
         container_name = list_containers[container_index-1]
     return container_name
 
-
+""""""
 def process_multiple_choices_input(choices, max_value):
     choices = choices.split(',').map(lambda x: int(x))
     choices = [number for number in choices if number >= 0 or number < max_value]
@@ -299,7 +319,7 @@ def get_args():
         return args
 
 
-def exit(code):
+def wait_and_exit(code):
     input()
     sys.exit(code)
 
@@ -325,7 +345,7 @@ if __name__ == "__main__":
     except FileNotFoundError as e:
         AstroLogging.logPrint('\nSave folder or container not found, press any key to exit')
         AstroLogging.logPrint(e, 'exception')
-        exit(1)
+        wait_and_exit(1)
 
     try:
         container = AstroSaveContainer(os.path.join(args.savesPath, container_file_name))
@@ -350,13 +370,15 @@ if __name__ == "__main__":
 
         export_saves_path = os.path.join(args.savesPath, 'Steam saves')
         rm_dir_if_exists(export_saves_path)
+
+        # Core function
         container.xbox_to_steam(saves_to_export, export_saves_path)
 
         AstroLogging.logPrint(f'\nTask completed, press any key to exit')
 
-        exit(0)
+        wait_and_exit(0)
     except Exception as ex:
         AstroLogging.logPrint(ex)
         AstroLogging.logPrint('', 'exception')
-        exit(1)
-
+        wait_and_exit(1)
+""""""

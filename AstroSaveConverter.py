@@ -1,4 +1,5 @@
 import argparse
+from argparse import Namespace
 import os
 import sys
 import shutil
@@ -13,7 +14,7 @@ from cogs.AstroSaveContainer import AstroSaveContainer
 
 """
 """
-def get_microsoft_save_folder():
+def get_microsoft_save_folder() -> str:
     """ Retrieves the microsoft save folders from %appdata%
 
     We know that the saves are stored along with a container.* file.
@@ -22,6 +23,7 @@ def get_microsoft_save_folder():
 
     :return: The list of the microsoft save folder content found in %appdata%
     :exception: FileNotFoundError if no save folder is found
+    :exception: MultipleFolderFoundError if multiple save folder are found
     """
 
     target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
@@ -32,13 +34,12 @@ def get_microsoft_save_folder():
 
     SES_appdata_path = microsoft_save_paths[-1]
 
-    # TODO : manage multiple files and no file error
     microsoft_save_folder = seek_microsoft_save_folder(SES_appdata_path)
 
     return microsoft_save_folder
 
 
-def seek_microsoft_save_folder(appdata_path):
+def seek_microsoft_save_folder(appdata_path) -> str:
 
     microsoft_save_folders = get_save_folders_from_path(appdata_path)
 
@@ -50,10 +51,10 @@ def seek_microsoft_save_folder(appdata_path):
         AstroLogging.logPrint(f'More than one save folders was found:\n {microsoft_save_folders}', 'debug')
         raise MultipleFolderFoundError
 
-    return microsoft_save_folders
+    return microsoft_save_folders[0]
 
 
-def get_save_folders_from_path(path):
+def get_save_folders_from_path(path) -> list(str):
     microsoft_save_folders = []
 
     for root, _, files in os.walk(path):
@@ -72,7 +73,7 @@ def get_save_folders_from_path(path):
     return microsoft_save_folders
 
 
-def read_text_from_container(path):
+def read_text_from_container(path) -> str:
     with open(path, 'rb') as container:
         # Decoding the container to check for a date string
         binary_content = container.read()
@@ -81,7 +82,7 @@ def read_text_from_container(path):
         return text
 
 
-def do_container_text_match_date(text):
+def do_container_text_match_date(text) -> bool:
     # Do save date matches $YYYY.MM.dd
     return re.search(r'\$\d{4}\.\d{2}\.\d{2}', text)
 
@@ -104,77 +105,90 @@ def get_save_folder():
         None
     """
     AstroLogging.logPrint("Which  folder would you like to work with ?")
-    AstroLogging.logPrint(
-        "\t1) Automatically detect and copy my save folder (Please close Astroneer first)")
+    AstroLogging.logPrint("\t1) Automatically detect and copy my save folder (Please close Astroneer first)")
     AstroLogging.logPrint("\t2) Chose a custom folder")
 
-    folder_type = input()
-    while folder_type not in ('1', '2'):
+    work_choice = input()
+    while work_choice not in ('1', '2'):
         AstroLogging.logPrint(f'\nPlease choose 1 or 2')
-        folder_type = input()
-        AstroLogging.logPrint(f'folder_type {folder_type}', 'debug')
+        work_choice = input()
+        AstroLogging.logPrint(f'folder_type {work_choice}', 'debug')
 
-    if folder_type == '1':
-        microsoft_save_folders = get_microsoft_save_folder()
+    if work_choice == '1':
+        microsoft_save_folder = get_microsoft_save_folder()
+        AstroLogging.logPrint(f'Microsoft folder path: {microsoft_save_folder}', 'debug')
 
-        if len(microsoft_save_folders) != 1:
-            AstroLogging.logPrint(
-                f'\nToo many save folders found ! Please use custom folder mode.')
-            AstroLogging.logPrint('\nPress any key to exit')
-            input()
-            exit(-1)
+        save_path = ask_copy_target()
+        copy_files(microsoft_save_folder, save_path)
 
-        AstroLogging.logPrint(
-            'Where would you like to copy your save folder ?')
-        AstroLogging.logPrint(
-            '\t1) New folder on my desktop')
-        AstroLogging.logPrint("\t2) New folder in a custom path")
+        AstroLogging.logPrint(f'Save files copied to: {save_path}')
 
-        copy_choice = input()
-        while copy_choice not in ('1', '2'):
-            AstroLogging.logPrint(f'\nPlease choose 1 or 2')
-            copy_choice = input()
-            AstroLogging.logPrint(f'copy_choice {copy_choice}', 'debug')
+    elif work_choice == '2':
+        save_path = ask_custom_folder_path()
 
-        # Using date and time to create a unique folder name
-        now = datetime.now().strftime('%Y.%m.%d-%H.%M')
-        astrosave_folder_name = f'AstroSaveFolder_{now}'
 
-        if copy_choice == '1':
-            # Winpath is needed here because Windows user can have a custom Desktop location
-            astrosave_folder_path = winpath.get_desktop()
-        elif copy_choice == '2':
-            AstroLogging.logPrint(f'\nEnter your custom folder path:')
-            astrosave_folder_path = input()
-            AstroLogging.logPrint(
-                f'astrosave_folder_path {astrosave_folder_path}', 'debug')
+    return save_path
 
-        save_folder_path = os.path.join(
-            astrosave_folder_path, astrosave_folder_name)
 
-        AstroLogging.logPrint(
-            f'Microsoft folder path: {microsoft_save_folders[0]}', 'debug')
-        AstroLogging.logPrint(
-            f'Save files copied to: {save_folder_path}')
+def copy_files(source, target):
+    if os.path.isdir(target):
+        shutil.rmtree(target)
+    shutil.copytree(source, target)
 
-        # Creating the new folder and copying the saves and container into it
-        if os.path.isdir(save_folder_path):
-            shutil.rmtree(save_folder_path)
-        shutil.copytree(microsoft_save_folders[0], save_folder_path)
 
-    elif folder_type == '2':
+def ask_copy_target():
+    AstroLogging.logPrint('Where would you like to copy your save folder ?')
+    AstroLogging.logPrint('\t1) New folder on my desktop')
+    AstroLogging.logPrint("\t2) New folder in a custom path")
+
+    choice = input()
+    while choice not in ('1', '2'):
+        AstroLogging.logPrint(f'\nPlease choose 1 or 2')
+        choice = input()
+        AstroLogging.logPrint(f'copy_choice {choice}', 'debug')
+
+    if choice == '1':
+        # Winpath is needed here because Windows user can have a custom Desktop location
+        save_path = winpath.get_desktop()
+    elif choice == '2':
         AstroLogging.logPrint(f'\nEnter your custom folder path:')
-        save_folder_path = input()
-        AstroLogging.logPrint(f'save_folder_path {save_folder_path}', 'debug')
+        save_path = input()
+        AstroLogging.logPrint(f'save_path {save_path}', 'debug')
 
-        while not os.path.isdir(save_folder_path):
-            AstroLogging.logPrint(
-                f'\nWrong path for save folder, please enter a valid path : ')
-            save_folder_path = input()
-            AstroLogging.logPrint(
-                f'save_folder_path {save_folder_path}', 'debug')
+    return os.path.join(save_path, create_folder_name())
 
-    return save_folder_path
+
+def ask_custom_folder_path() -> str:
+    AstroLogging.logPrint(f'\nEnter your custom folder path:')
+    path = input()
+    AstroLogging.logPrint(f'save_folder_path {path}', 'debug')
+
+    if is_folder_a_dir(path):
+        return path
+    else:
+        AstroLogging.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
+        return ask_custom_folder_path()
+
+
+def get_windows_desktop_path() -> str:
+    return winpath.get_desktop()
+
+
+def create_folder_name() -> str:
+    now = datetime.now().strftime('%Y.%m.%d-%H.%M')
+    return f'AstroSaveFolder_{now}'
+
+
+def is_folder_writable(path):
+    return os.access(os.path.dirname(path), os.W_OK)
+
+
+def is_folder_exists(path):
+    return os.path.exists(path)
+
+
+def is_folder_a_dir(path):
+    return os.path.isdir(path)
 
 
 def get_container_list(path):
@@ -250,7 +264,7 @@ def check_container_path(path):
     return container_name
 
 """"""
-def process_multiple_choices_input(choices, max_value):
+def process_multiple_choices_input(choices, max_value) -> list(int):
     choices = choices.split(',').map(lambda x: int(x))
     choices = [number for number in choices if number >= 0 or number < max_value]
     return choices
@@ -263,10 +277,8 @@ def verify_choice_input(choices):
     if 0 in choices and len(choices) != 1:
         raise ValueError
 
-    return choices
 
-
-def multiple_choice_input(maximum_value):
+def multiple_choice_input(maximum_value) -> list(int):
     """ Let the user choose multiple numbers between 0 and a maximum value
 
     If the user choice is 0 then return an array with all values
@@ -282,7 +294,7 @@ def multiple_choice_input(maximum_value):
     choices = []
     while not choices:
         choices = input()
-        process_multiple_choices_input(choices, maximum_value)
+        choices = process_multiple_choices_input(choices, maximum_value)
 
         try:
             verify_choice_input(choices)
@@ -305,7 +317,7 @@ def rename_saves(container):
         container.save_list[number - 1].rename()
 
 
-def get_args():
+def get_args() -> Namespace:
         parser = argparse.ArgumentParser()
 
         parser.add_argument(
@@ -314,7 +326,13 @@ def get_args():
         args = parser.parse_args()
 
         # Default values
-        args.savesPath = args.savesPath or get_save_folder()
+
+        try:
+            args.savesPath = args.savesPath or get_save_folder()
+        except MultipleFolderFoundError:
+            AstroLogging.logPrint(f'\nToo many save folders found ! Please use custom folder mode.')
+            # Recursive until it works
+            return get_args()
 
         return args
 

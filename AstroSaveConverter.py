@@ -230,49 +230,50 @@ def check_container_path(path):
     return container_name
 
 
-def choose_save_to_export(container):
+def process_multiple_choices_input(choices, max_value):
+    choices = choices.split(',').map(lambda x: int(x))
+    choices = [number for number in choices if number >= 0 or number < max_value]
+    return choices
+
+
+def verify_choice_input(choices):
+    if len(choices) == 0:
+        raise ValueError
+
+    if 0 in choices and len(choices) != 1:
+        raise ValueError
+
+    return choices
+
+
+def multiple_choice_input(maximum_value):
     """
-    Let the user choose the save(s) to export from the container
-
-    The user can choose one or several saves to export.
-    Multi-save is supported (separated by commas)
+    Let the user choose multiple numbers  between 0 and a maximum value
+    If the user choice is 0 then return an array with all values
     Ex: 1,2,4
-
-    Arguments:
-        container -- Container from which to export the saves
+    Ex: 0
 
     Returns:
-        Returns the list of the saves number to extract
+        Returns the list of numbers
 
     Exception:
-        None
+        None (repeat until the choices are valid)
     """
-    save_numbers_list = []
-    max_save_number = len(container.save_list)
-    while not save_numbers_list:
-        AstroLogging.logPrint(
-            '\nWhich saves would you like to convert ? (Choose 0 for all of them)')
-        AstroLogging.logPrint(
-            '(Multi-convert is supported. Ex: "1,2,4")')
-        save_numbers = input()
+    choices = []
+    while not choices:
+        choices = input()
+        process_multiple_choices_input(choices, maximum_value)
+
         try:
-            for number in save_numbers.split(','):
-                number = int(number)
-                if (number < 0 or number > max_save_number):
-                    raise ValueError
-                save_numbers_list.append(number)
-
-            if 0 in save_numbers_list and len(save_numbers_list) != 1:
-                raise ValueError
-            if save_numbers_list == [0]:
-                save_numbers_list = [i+1 for i in range(max_save_number)]
+            verify_choice_input(choices)
         except ValueError:
-            save_numbers_list = []
-            AstroLogging.logPrint(
-                f'Please use only values between 1 and {max_save_number} or 0 alone')
+            choices = []
+            AstroLogging.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
 
-    AstroLogging.logPrint(save_numbers_list)
-    return save_numbers_list
+        if saves_to_export == [0]:
+            return list(range(1, maximum_value))
+        else:
+            return choices
 
 
 def manage_rename(container):
@@ -294,7 +295,7 @@ def manage_rename(container):
         is_rename = input().lower()
 
     if is_rename == 'y':
-        for number in save_numbers_list:
+        for number in saves_to_export:
             container.save_list[number - 1].rename()
 
 
@@ -346,14 +347,20 @@ if __name__ == "__main__":
         AstroLogging.logPrint('Container file loaded successfully !\n')
         container.print_container()
 
-        save_numbers_list = choose_save_to_export(container)
+        AstroLogging.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
+        AstroLogging.logPrint('(Multi-convert is supported. Ex: "1,2,4")')
+
+        maximum_save_number = len(container.save_list)
+        saves_to_export = multiple_choice_input(maximum_save_number)
+        AstroLogging.logPrint(saves_to_export)
+
         manage_rename(container)
 
-        AstroLogging.logPrint(f'\nExtracting saves {str(save_numbers_list)}')
+        AstroLogging.logPrint(f'\nExtracting saves {str(saves_to_export)}')
 
         export_saves_path = os.path.join(args.savesPath, 'Steam saves')
         rm_dir_if_exists(export_saves_path)
-        container.xbox_to_steam(save_numbers_list, export_saves_path)
+        container.xbox_to_steam(saves_to_export, export_saves_path)
 
         AstroLogging.logPrint(f'\nTask completed, press any key to exit')
 

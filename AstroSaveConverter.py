@@ -247,17 +247,17 @@ def verify_choice_input(choices):
 
 
 def multiple_choice_input(maximum_value):
-    """
-    Let the user choose multiple numbers  between 0 and a maximum value
+    """ Let the user choose multiple numbers between 0 and a maximum value
+
     If the user choice is 0 then return an array with all values
-    Ex: 1,2,4
-    Ex: 0
 
-    Returns:
-        Returns the list of numbers
+    :Example:
 
-    Exception:
-        None (repeat until the choices are valid)
+    -  [1,2,4]
+    -  [0]
+
+    :return: The list of numbers
+    :exception: None (repeat until the choices are valid)
     """
     choices = []
     while not choices:
@@ -276,27 +276,13 @@ def multiple_choice_input(maximum_value):
             return choices
 
 
-def manage_rename(container):
+def rename_saves(container):
+    """ Rename all the list of save in the container
+
+    :param container: Container from which to rename the saves
     """
-    Manage wether some saves have to be renamed or not
-
-    Arguments:
-        container -- Container from which to rename the saves
-
-    Returns:
-        Nothing
-
-    Exception:
-        None
-    """
-    is_rename = None
-    while is_rename not in ('y', 'n'):
-        AstroLogging.logPrint('\nWould you like to rename a save ? (y/n)')
-        is_rename = input().lower()
-
-    if is_rename == 'y':
-        for number in saves_to_export:
-            container.save_list[number - 1].rename()
+    for number in saves_to_export:
+        container.save_list[number - 1].rename()
 
 
 def get_args():
@@ -354,7 +340,11 @@ if __name__ == "__main__":
         saves_to_export = multiple_choice_input(maximum_save_number)
         AstroLogging.logPrint(saves_to_export)
 
-        manage_rename(container)
+        do_rename = None
+        while do_rename not in ('y', 'n'):
+            AstroLogging.logPrint('\nWould you like to rename a save ? (y/n)')
+            do_rename = input().lower()
+        if do_rename == 'y': rename_saves(container)
 
         AstroLogging.logPrint(f'\nExtracting saves {str(saves_to_export)}')
 

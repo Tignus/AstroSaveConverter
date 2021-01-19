@@ -191,6 +191,18 @@ def is_folder_a_dir(path):
     return os.path.isdir(path)
 
 
+def is_a_file(path):
+    return os.path.isfile(path)
+
+
+def is_a_container_file(path):
+    return is_a_file(path) and path.rfind('container') != -1
+
+
+def get_folder_content(path):
+    return os.listdir(path)
+
+
 def get_container_list(path):
     """
     List all containers in a folder
@@ -201,19 +213,14 @@ def get_container_list(path):
     Exception:
         None
     """
-    list_containers = []
-
-    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        if file.rfind("container") != -1:
-            list_containers.append(file)
+    folder_content = get_folder_content(path)
+    list_containers = [file for file in folder_content if is_a_container_file(file)]
 
     if not list_containers:
         AstroLogging.logPrint('\nNo container found in path: ' + path)
-    elif len(list_containers) == 1:
-        AstroLogging.logPrint('\nOne container found', 'debug')
     else:
         AstroLogging.logPrint('\nContainers found:')
-        for i, container in enumerate(list_containers):
+        for i, container in list_containers:
             AstroLogging.logPrint(f'\t {i+1}) {container}')
 
     return list_containers

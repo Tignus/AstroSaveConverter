@@ -5,7 +5,7 @@ import re
 from utils import is_a_file, list_folder_content, join_paths
 
 from cogs.AstroSave import AstroSave
-from cogs.AstroLogging import AstroLogging
+from cogs import AstroLogging as Logger 
 
 CHUNK_METADATA_SIZE = 160  # Length of a chunk metadata found in a save container
 
@@ -52,8 +52,8 @@ class AstroSaveContainer():
         """
         self.full_path = container_file_path
         self.save_list = []
-        AstroLogging.logPrint('\nInitializing Astroneer save container...')
-        AstroLogging.logPrint('full_path: {self.full_path}', "debug")
+        Logger.logPrint('\nInitializing Astroneer save container...')
+        Logger.logPrint('full_path: {self.full_path}', "debug")
 
         with open(self.full_path, "rb") as container:
             # The Astroneer file type is contained in at least the first 2 bytes of the file
@@ -69,7 +69,7 @@ class AstroSaveContainer():
             self.chunk_count = int.from_bytes(
                 container.read(4), byteorder='little')
 
-            AstroLogging.logPrint(f'Detected chunks: {self.chunk_count}')
+            Logger.logPrint(f'Detected chunks: {self.chunk_count}')
 
             # Parsing saves chunks
             current_save_name = None
@@ -109,7 +109,7 @@ class AstroSaveContainer():
             None
         """
         for save in save_to_convert:
-            AstroLogging.logPrint(
+            Logger.logPrint(
                 f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
             self.save_list[save -
                            1].export_to_steam(os.path.dirname(self.full_path), export_path)
@@ -263,7 +263,7 @@ class AstroSaveContainer():
             None
         """
         folder_content = list_folder_content(path)
-        AstroLogging.logPrint('folder content ' + str(folder_content)) 
+        Logger.logPrint('folder content ' + str(folder_content)) 
         containers_list = [file for file in folder_content if AstroSaveContainer.is_a_container_file(join_paths(path, file))]
 
         if not containers_list or len(containers_list) == 0:

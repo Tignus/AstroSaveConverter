@@ -1,5 +1,5 @@
-from cogs.AstroSaveContainer import AstroSaveContainer
-from cogs.AstroLogging import AstroLogging
+from cogs.AstroSaveContainer import Container
+from cogs import AstroLogging as Logger
 import utils
 from cogs.AstroSaveErrors import MultipleFolderFoundError
 from cogs import AstroMicrosoftSaveFolder
@@ -9,15 +9,15 @@ def ask_for_container(save_path = None):
     while not save_path:
         try:
             save_path = ask_for_save_folder()
-            containers_list = AstroSaveContainer.get_containers_list(save_path)
+            containers_list = Container.get_containers_list(save_path)
         except FileNotFoundError as e:
-            AstroLogging.logPrint('\nNo container found in path: ' + save_path)
-            AstroLogging.logPrint(e, 'exception')
+            Logger.logPrint('\nNo container found in path: ' + save_path)
+            Logger.logPrint(e, 'exception')
 
-    AstroLogging.logPrint('\nContainers found:' + str(containers_list))
+    Logger.logPrint('\nContainers found:' + str(containers_list))
     container_name = ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
 
-    container = AstroSaveContainer(utils.join_paths(save_path, container_name))
+    container = Container(utils.join_paths(save_path, container_name))
 
     return container
 
@@ -42,7 +42,7 @@ def ask_user_to_choose_in_a_list(text, file_list):
     choice_index = 0
 
     while choice_index == 0:
-        AstroLogging.logPrint('\nWhich container would you like to convert ?')
+        Logger.logPrint('\nWhich container would you like to convert ?')
         print_list_elements(file_list)
         choice_index = input()
         try:
@@ -50,14 +50,14 @@ def ask_user_to_choose_in_a_list(text, file_list):
             verify_choice_input(choice_index, min_container_number, max_container_number)
         except ValueError:
             choice_index = 0
-            AstroLogging.logPrint(f'Please use only values between {min_container_number} and {max_container_number}')
+            Logger.logPrint(f'Please use only values between {min_container_number} and {max_container_number}')
 
     return file_list[choice_index-1]
 
 
 def print_list_elements(elements):
     for i, container in elements:
-        AstroLogging.logPrint(f'\t {i+1}) {container}')
+        Logger.logPrint(f'\t {i+1}) {container}')
 
 
 def verify_choice_input(choice, min, max):
@@ -75,24 +75,24 @@ def ask_for_save_folder():
     """
     while 1:
         try:
-            AstroLogging.logPrint("Which  folder would you like to work with ?")
-            AstroLogging.logPrint("\t1) Automatically detect and copy my save folder (Please close Astroneer first)")
-            AstroLogging.logPrint("\t2) Chose a custom folder")
+            Logger.logPrint("Which  folder would you like to work with ?")
+            Logger.logPrint("\t1) Automatically detect and copy my save folder (Please close Astroneer first)")
+            Logger.logPrint("\t2) Chose a custom folder")
 
             work_choice = input()
             while work_choice not in ('1', '2'):
-                AstroLogging.logPrint(f'\nPlease choose 1 or 2')
+                Logger.logPrint(f'\nPlease choose 1 or 2')
                 work_choice = input()
-                AstroLogging.logPrint(f'folder_type {work_choice}', 'debug')
+                Logger.logPrint(f'folder_type {work_choice}', 'debug')
 
             if work_choice == '1':
                 microsoft_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
-                AstroLogging.logPrint(f'Microsoft folder path: {microsoft_save_folder}', 'debug')
+                Logger.logPrint(f'Microsoft folder path: {microsoft_save_folder}', 'debug')
 
                 save_path = ask_copy_target()
                 utils.copy_files(microsoft_save_folder, save_path)
 
-                AstroLogging.logPrint(f'Save files copied to: {save_path}')
+                Logger.logPrint(f'Save files copied to: {save_path}')
 
             elif work_choice == '2':
                 save_path = ask_custom_folder_path()
@@ -100,46 +100,46 @@ def ask_for_save_folder():
             return save_path
 
         except MultipleFolderFoundError:
-            AstroLogging.logPrint(f'\nToo many save folders found ! Please use custom folder mode.')
+            Logger.logPrint(f'\nToo many save folders found ! Please use custom folder mode.')
 
 
 def ask_copy_target():
-    AstroLogging.logPrint('Where would you like to copy your save folder ?')
-    AstroLogging.logPrint('\t1) New folder on my desktop')
-    AstroLogging.logPrint("\t2) New folder in a custom path")
+    Logger.logPrint('Where would you like to copy your save folder ?')
+    Logger.logPrint('\t1) New folder on my desktop')
+    Logger.logPrint("\t2) New folder in a custom path")
 
     choice = input()
     while choice not in ('1', '2'):
-        AstroLogging.logPrint(f'\nPlease choose 1 or 2')
+        Logger.logPrint(f'\nPlease choose 1 or 2')
         choice = input()
-        AstroLogging.logPrint(f'copy_choice {choice}', 'debug')
+        Logger.logPrint(f'copy_choice {choice}', 'debug')
 
     if choice == '1':
         # Winpath is needed here because Windows user can have a custom Desktop location
         save_path = utils.get_windows_desktop_path()
     elif choice == '2':
-        AstroLogging.logPrint(f'\nEnter your custom folder path:')
+        Logger.logPrint(f'\nEnter your custom folder path:')
         save_path = input()
-        AstroLogging.logPrint(f'save_path {save_path}', 'debug')
+        Logger.logPrint(f'save_path {save_path}', 'debug')
 
     return utils.join_paths(save_path, utils.create_folder_name('AstroSaveFolder'))
 
 
 def ask_custom_folder_path() -> str:
-    AstroLogging.logPrint(f'\nEnter your custom folder path:')
+    Logger.logPrint(f'\nEnter your custom folder path:')
     path = input()
-    AstroLogging.logPrint(f'save_folder_path {path}', 'debug')
+    Logger.logPrint(f'save_folder_path {path}', 'debug')
 
     if utils.is_folder_a_dir(path):
         return path
     else:
-        AstroLogging.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
+        Logger.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
         return ask_custom_folder_path()
 
 
 def ask_saves_to_export(container):
-    AstroLogging.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
-    AstroLogging.logPrint('(Multi-convert is supported. Ex: "1,2,4")')
+    Logger.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
+    Logger.logPrint('(Multi-convert is supported. Ex: "1,2,4")')
 
     maximum_save_number = len(container.save_list)
     saves_to_export = ask_for_multiple_choices(maximum_save_number)
@@ -169,7 +169,7 @@ def ask_for_multiple_choices(maximum_value) -> list:
             verify_choices_input(choices)
         except ValueError:
             choices = []
-            AstroLogging.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
+            Logger.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
 
         if choices == [0]:
             return list(range(0, maximum_value))
@@ -194,7 +194,7 @@ def verify_choices_input(choices):
 def ask_rename_container(saves, container):
     do_rename = None
     while do_rename not in ('y', 'n'):
-        AstroLogging.logPrint('\nWould you like to rename a save ? (y/n)')
+        Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
     if do_rename == 'y': rename_saves(saves, container)
 

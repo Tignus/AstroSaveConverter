@@ -11,6 +11,7 @@ import winpath
 from cogs.AstroSaveErrors import MultipleFolderFoundError
 from cogs.AstroLogging import AstroLogging
 from cogs.AstroSaveContainer import AstroSaveContainer
+from utils import *
 
 def get_microsoft_save_folder() -> str:
     """ Retrieves the microsoft save folders from %appdata%
@@ -38,7 +39,6 @@ def get_microsoft_save_folder() -> str:
 
 
 def seek_microsoft_save_folder(appdata_path) -> str:
-
     microsoft_save_folders = get_save_folders_from_path(appdata_path)
 
     if not microsoft_save_folders:
@@ -52,7 +52,7 @@ def seek_microsoft_save_folder(appdata_path) -> str:
     return microsoft_save_folders[0]
 
 
-def get_save_folders_from_path(path) -> list(str):
+def get_save_folders_from_path(path) -> list:
     microsoft_save_folders = []
 
     for root, _, files in os.walk(path):
@@ -71,7 +71,6 @@ def get_save_folders_from_path(path) -> list(str):
     return microsoft_save_folders
 
 
-
 def read_container_text_from_path(path) -> str:
     with open(path, 'rb') as container:
         # Decoding the container to check for a date string
@@ -81,62 +80,12 @@ def read_container_text_from_path(path) -> str:
         return text
 
 
-def copy_files(source, target):
-    if os.path.isdir(target):
-        shutil.rmtree(target)
-    shutil.copytree(source, target)
-
-
-def get_windows_desktop_path() -> str:
-    return winpath.get_desktop()
-
-
-def create_folder_name() -> str:
-    now = datetime.now().strftime('%Y.%m.%d-%H.%M')
-    return f'AstroSaveFolder_{now}'
-
-
-
 def do_container_text_match_date(text) -> bool:
     # Do save date matches $YYYY.MM.dd
     return re.search(r'\$\d{4}\.\d{2}\.\d{2}', text)
 
 
-def is_folder_writable(path) -> bool:
-    return os.access(os.path.dirname(path), os.W_OK)
-
-
-def is_folder_exists(path) -> bool:
-    return os.path.exists(path)
-
-
-def is_folder_a_dir(path) -> bool:
-    return os.path.isdir(path)
-
-
-def is_a_file(path) -> bool:
-    return os.path.isfile(path)
-
-
-def is_a_container_file(path) -> bool:
-    return is_a_file(path) and path.rfind('container') != -1
-
-
-def get_folder_content(path) -> list(str):
-    return os.listdir(path)
-
-
-def wait_and_exit(code):
-    input()
-    sys.exit(code)
-
-
-def rm_dir_if_exists(path):
-    if not os.path.isdir(path):
-        os.mkdir(path)
-
-
-def get_containers_list(path) -> list(str):
+def get_containers_list(path) -> list:
     """
     List all containers in a folder
     Arguments:
@@ -146,8 +95,9 @@ def get_containers_list(path) -> list(str):
     Exception:
         None
     """
-    folder_content = get_folder_content(path)
-    containers_list = [file for file in folder_content if is_a_container_file(file)]
+    folder_content = list_folder_content(path)
+    AstroLogging.logPrint('folder content ' + str(folder_content)) 
+    containers_list = [file for file in folder_content if is_a_container_file(join_paths(path, file))]
 
     if not containers_list or len(containers_list) == 0:
         AstroLogging.logPrint('\nNo container found in path: ' + path)
@@ -160,6 +110,7 @@ def verify_choice_input(choice, min, max):
     if (choice < min or choice > max):
         raise ValueError
 
+
 def rename_saves(index_to_rename, container):
     """ Rename all the list of save in the container
 
@@ -168,7 +119,7 @@ def rename_saves(index_to_rename, container):
     for i in index_to_rename:
         container.save_list[i].rename()
 
-""""""
+
 def ask_copy_target():
     AstroLogging.logPrint('Where would you like to copy your save folder ?')
     AstroLogging.logPrint('\t1) New folder on my desktop')
@@ -182,13 +133,13 @@ def ask_copy_target():
 
     if choice == '1':
         # Winpath is needed here because Windows user can have a custom Desktop location
-        save_path = winpath.get_desktop()
+        save_path = get_windows_desktop_path()
     elif choice == '2':
         AstroLogging.logPrint(f'\nEnter your custom folder path:')
         save_path = input()
         AstroLogging.logPrint(f'save_path {save_path}', 'debug')
 
-    return os.path.join(save_path, create_folder_name())
+    return os.path.join(save_path, create_folder_name('AstroSaveFolder'))
 
 
 def ask_custom_folder_path() -> str:
@@ -201,6 +152,7 @@ def ask_custom_folder_path() -> str:
     else:
         AstroLogging.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
         return ask_custom_folder_path()
+
 
 def ask_user_to_choose_in_a_list(text, file_list):
     """ Defines the container to use
@@ -230,8 +182,7 @@ def ask_user_to_choose_in_a_list(text, file_list):
     return file_list[choice_index-1]
 
 
-
-def ask_for_multiple_choices(maximum_value) -> list(int):
+def ask_for_multiple_choices(maximum_value) -> list:
     """ Let the user choose multiple numbers between 0 and a maximum value
 
     If the user choice is 0 then return an array with all values
@@ -259,6 +210,7 @@ def ask_for_multiple_choices(maximum_value) -> list(int):
             return list(range(0, maximum_value))
         else:
             return choices
+
 
 def ask_for_save_folder():
     """ Obtains the save folder
@@ -293,7 +245,8 @@ def ask_for_save_folder():
 
     return save_path
 
-def process_multiple_choices_input(choices, max_value) -> list(int):
+
+def process_multiple_choices_input(choices, max_value) -> list:
     choices = choices.split(',').map(lambda x: int(x))
     choices = [number - 1 for number in choices if number >= 0 or number < max_value]
     return choices
@@ -324,7 +277,6 @@ def get_args() -> Namespace:
 
 
 def scenario():
-
     AstroLogging.setup_logging(os.getcwd())
 
     try:
@@ -380,18 +332,18 @@ def scenario():
 
 
 if __name__ == "__main__":
-    try:
-        container, saves_to_export, to_path = scenario()
+    # try:
+    container, saves_to_export, to_path = scenario()
 
-        AstroLogging.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
+    AstroLogging.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
 
-        rm_dir_if_exists(to_path)
+    rm_dir_if_exists(to_path)
 
-        container.xbox_to_steam(saves_to_export, to_path)
+    container.xbox_to_steam(saves_to_export, to_path)
 
-        AstroLogging.logPrint(f'\nTask completed, press any key to exit')
-        wait_and_exit(0)
-    except Exception as e:
-        AstroLogging.logPrint(e)
-        AstroLogging.logPrint('', 'exception')
-        wait_and_exit(1)
+    AstroLogging.logPrint(f'\nTask completed, press any key to exit')
+    wait_and_exit(0)
+    # except Exception as e:
+    #     AstroLogging.logPrint(e)
+    #     AstroLogging.logPrint('', 'exception')
+    #     wait_and_exit(1)

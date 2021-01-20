@@ -2,6 +2,8 @@ import os
 import hexdump
 import re
 
+from utils import is_a_file, list_folder_content, join_paths
+
 from cogs.AstroSave import AstroSave
 from cogs.AstroLogging import AstroLogging
 
@@ -91,23 +93,6 @@ class AstroSaveContainer():
             # Saving the last save of the container file
             self.save_list.append(AstroSave(current_save_name,
                                             current_chunks_names))
-
-    def print_container(self):
-        """
-        Displays the saves of a container
-
-        Arguments:
-            None
-
-        Returns:
-            None 
-
-        Exception:
-            None
-        """
-        AstroLogging.logPrint('Extracted save list :')
-        for i, save in enumerate(self.save_list):
-            AstroLogging.logPrint(f'\t {str(i+1)}) {save.save_name}')
 
     def xbox_to_steam(self, save_to_convert, export_path):
         """
@@ -265,3 +250,30 @@ class AstroSaveContainer():
             None
         """
         return string.encode('latin1').hex().upper()
+
+    @staticmethod
+    def get_containers_list(path) -> list:
+        """
+        List all containers in a folder
+        Arguments:
+            path -- path for search containers
+        Returns:
+            Returns a list of all containers found (only filename of container)
+        Exception:
+            None
+        """
+        folder_content = list_folder_content(path)
+        AstroLogging.logPrint('folder content ' + str(folder_content)) 
+        containers_list = [file for file in folder_content if AstroSaveContainer.is_a_container_file(join_paths(path, file))]
+
+        if not containers_list or len(containers_list) == 0:
+            raise FileNotFoundError
+
+        return containers_list
+
+    @staticmethod
+    def is_a_container_file(path) -> bool:
+        return is_a_file(path) and path.rfind('container') != -1
+
+
+

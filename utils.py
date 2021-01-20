@@ -27,10 +27,6 @@ def is_a_file(path) -> bool:
     return os.path.isfile(path)
 
 
-def is_a_container_file(path) -> bool:
-    return is_a_file(path) and path.rfind('container') != -1
-
-
 def list_folder_content(path) -> list:
     return os.listdir(path)
 

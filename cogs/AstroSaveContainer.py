@@ -103,16 +103,14 @@ class AstroSaveContainer():
             export_path -- Path where to export the steam saves
 
         Returns:
-            None 
+            None
 
         Exception:
             None
         """
         for save in save_to_convert:
-            Logger.logPrint(
-                f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
-            self.save_list[save -
-                           1].export_to_steam(os.path.dirname(self.full_path), export_path)
+            Logger.logPrint(f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
+            self.save_list[save].export_to_steam(os.path.dirname(self.full_path), export_path)
 
     def is_valid_container_header(self, header):
         """
@@ -263,7 +261,6 @@ class AstroSaveContainer():
             None
         """
         folder_content = list_folder_content(path)
-        Logger.logPrint('folder content ' + str(folder_content)) 
         containers_list = [file for file in folder_content if AstroSaveContainer.is_a_container_file(join_paths(path, file))]
 
         if not containers_list or len(containers_list) == 0:

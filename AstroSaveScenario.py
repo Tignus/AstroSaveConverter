@@ -1,25 +1,8 @@
-from cogs.AstroSaveContainer import Container
+from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs import AstroLogging as Logger
 import utils
 from cogs.AstroSaveErrors import MultipleFolderFoundError
 from cogs import AstroMicrosoftSaveFolder
-
-def ask_for_container(save_path = None):
-    save_path = None
-    while not save_path:
-        try:
-            save_path = ask_for_save_folder()
-            containers_list = Container.get_containers_list(save_path)
-        except FileNotFoundError as e:
-            Logger.logPrint('\nNo container found in path: ' + save_path)
-            Logger.logPrint(e, 'exception')
-
-    Logger.logPrint('\nContainers found:' + str(containers_list))
-    container_name = ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
-
-    container = Container(utils.join_paths(save_path, container_name))
-
-    return container
 
 
 def ask_for_containers_to_convert(containers):
@@ -101,7 +84,9 @@ def ask_for_save_folder():
 
         except MultipleFolderFoundError:
             Logger.logPrint(f'\nToo many save folders found ! Please use custom folder mode.')
-
+        except FileNotFoundError as e:
+            Logger.logPrint('\nNo container found in path: ' + save_path)
+            Logger.logPrint(e, 'exception')
 
 def ask_copy_target():
     Logger.logPrint('Where would you like to copy your save folder ?')
@@ -137,11 +122,19 @@ def ask_custom_folder_path() -> str:
         return ask_custom_folder_path()
 
 
-def ask_saves_to_export(container):
+def print_save_from_container(save_list):
+    """ Displays the human readable saves of a container """
+    for i, save in enumerate(save_list):
+        Logger.logPrint(f'\t {str(i+1)}) {save.save_name}')
+
+
+def ask_saves_to_export(save_list):
+    Logger.logPrint('Extracted save list :')
+    print_save_from_container(save_list)
     Logger.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
     Logger.logPrint('(Multi-convert is supported. Ex: "1,2,4")')
 
-    maximum_save_number = len(container.save_list)
+    maximum_save_number = len(save_list)
     saves_to_export = ask_for_multiple_choices(maximum_save_number)
 
     return saves_to_export
@@ -150,12 +143,14 @@ def ask_saves_to_export(container):
 def ask_for_multiple_choices(maximum_value) -> list:
     """ Let the user choose multiple numbers between 0 and a maximum value
 
-    If the user choice is 0 then return an array with all values
+    If the user choice is 0 then return an array with all values,
+    the user choices are reduce by 1 in order to match future array indexes
 
     :Example:
 
-    -  [1,2,4]
-    -  [0]
+    User choices:
+    -  [1,2,4]  - returns 0, 1, 2
+    -  [0]      - returns all choices
 
     :return: The list of numbers
     :exception: None (repeat until the choices are valid)
@@ -164,21 +159,21 @@ def ask_for_multiple_choices(maximum_value) -> list:
     while not choices:
         choices = input()
         choices = process_multiple_choices_input(choices, maximum_value)
-
         try:
             verify_choices_input(choices)
         except ValueError:
             choices = []
             Logger.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
 
-        if choices == [0]:
+        if choices == [-1]:
             return list(range(0, maximum_value))
         else:
             return choices
 
 
 def process_multiple_choices_input(choices, max_value) -> list:
-    choices = choices.split(',').map(lambda x: int(x))
+    choices = choices.split(',') if utils.rcontains(',', choices) else choices
+    choices = map(lambda x: int(x), choices)
     choices = [number - 1 for number in choices if number >= 0 or number < max_value]
     return choices
 

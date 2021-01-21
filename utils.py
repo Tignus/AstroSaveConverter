@@ -1,5 +1,4 @@
 from datetime import datetime
-from cogs.AstroLogging import AstroLogging
 import shutil
 import os
 import sys
@@ -49,6 +48,8 @@ def copy_files(source, target):
 def get_windows_desktop_path() -> str:
     return winpath.get_desktop()
 
+def rcontains(rgexp, string) -> bool:
+    return string.rfind(rgexp) != -1
 
 def wait_and_exit(code):
     input()

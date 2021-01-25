@@ -42,7 +42,7 @@ if __name__ == "__main__":
         saves_to_export = Scenario.ask_saves_to_export(container.save_list)
         Logger.logPrint(saves_to_export)
 
-        Scenario.ask_rename_container(saves_to_export, container)
+        Scenario.ask_rename_save(saves_to_export, container)
 
         to_path = utils.join_paths(save_path, 'Steam saves')
 

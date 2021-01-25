@@ -186,7 +186,7 @@ def verify_choices_input(choices):
         raise ValueError
 
 
-def ask_rename_container(saves, container):
+def ask_rename_save(saves, container):
     do_rename = None
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')

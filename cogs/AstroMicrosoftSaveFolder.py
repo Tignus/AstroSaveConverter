@@ -20,8 +20,8 @@ def get_microsoft_save_folder() -> str:
     try:
         target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
     except KeyError:
-        Logger.logPrint("Local Appdatas are missing, maybe you're on linux ?")
-        Logger.logPrint("Press key to exit")
+        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
+        Logger.logPrint("Press any key to exit")
         utils.wait_and_exit(1)
 
     microsoft_save_paths = list(glob.iglob(target))

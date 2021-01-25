@@ -158,17 +158,17 @@ def ask_for_multiple_choices(maximum_value) -> list:
     choices = []
     while not choices:
         choices = input()
-        choices = process_multiple_choices_input(choices)
         try:
+            choices = process_multiple_choices_input(choices)
             verify_choices_input(choices, maximum_value)
         except ValueError:
             choices = []
             Logger.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
 
-        if choices == [-1]:
-            return list(range(0, maximum_value))
-        else:
-            return choices
+    if choices == [-1]:
+        return list(range(0, maximum_value))
+    else:
+        return choices
 
 
 def process_multiple_choices_input(choices) -> list:

@@ -172,7 +172,7 @@ def ask_for_multiple_choices(maximum_value) -> list:
 
 
 def process_multiple_choices_input(choices) -> list:
-    choices = choices.split(',') if utils.rcontains(',', choices) else choices
+    choices = choices.split(',') if utils.rcontains(',', choices) else [choices]
     choices = map(lambda x: int(x), choices)
 
     choices = [number - 1 for number in choices]

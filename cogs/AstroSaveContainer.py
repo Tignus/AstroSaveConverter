@@ -2,8 +2,10 @@ import os
 import hexdump
 import re
 
+from utils import is_a_file, list_folder_content, join_paths
+
 from cogs.AstroSave import AstroSave
-from cogs.AstroLogging import AstroLogging
+from cogs import AstroLogging as Logger 
 
 CHUNK_METADATA_SIZE = 160  # Length of a chunk metadata found in a save container
 
@@ -50,8 +52,8 @@ class AstroSaveContainer():
         """
         self.full_path = container_file_path
         self.save_list = []
-        AstroLogging.logPrint('\nInitializing Astroneer save container...')
-        AstroLogging.logPrint('full_path: {self.full_path}', "debug")
+        Logger.logPrint('\nInitializing Astroneer save container...')
+        Logger.logPrint('full_path: {self.full_path}', "debug")
 
         with open(self.full_path, "rb") as container:
             # The Astroneer file type is contained in at least the first 2 bytes of the file
@@ -67,7 +69,7 @@ class AstroSaveContainer():
             self.chunk_count = int.from_bytes(
                 container.read(4), byteorder='little')
 
-            AstroLogging.logPrint(f'Detected chunks: {self.chunk_count}')
+            Logger.logPrint(f'Detected chunks: {self.chunk_count}')
 
             # Parsing saves chunks
             current_save_name = None
@@ -92,23 +94,6 @@ class AstroSaveContainer():
             self.save_list.append(AstroSave(current_save_name,
                                             current_chunks_names))
 
-    def print_container(self):
-        """
-        Displays the saves of a container
-
-        Arguments:
-            None
-
-        Returns:
-            None 
-
-        Exception:
-            None
-        """
-        AstroLogging.logPrint('Extracted save list :')
-        for i, save in enumerate(self.save_list):
-            AstroLogging.logPrint(f'\t {str(i+1)}) {save.save_name}')
-
     def xbox_to_steam(self, save_to_convert, export_path):
         """
         Exports saves to steam file
@@ -118,16 +103,14 @@ class AstroSaveContainer():
             export_path -- Path where to export the steam saves
 
         Returns:
-            None 
+            None
 
         Exception:
             None
         """
         for save in save_to_convert:
-            AstroLogging.logPrint(
-                f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
-            self.save_list[save -
-                           1].export_to_steam(os.path.dirname(self.full_path), export_path)
+            Logger.logPrint(f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
+            self.save_list[save].export_to_steam(os.path.dirname(self.full_path), export_path)
 
     def is_valid_container_header(self, header):
         """
@@ -265,3 +248,29 @@ class AstroSaveContainer():
             None
         """
         return string.encode('latin1').hex().upper()
+
+    @staticmethod
+    def get_containers_list(path) -> list:
+        """
+        List all containers in a folder
+        Arguments:
+            path -- path for search containers
+        Returns:
+            Returns a list of all containers found (only filename of container)
+        Exception:
+            None
+        """
+        folder_content = list_folder_content(path)
+        containers_list = [file for file in folder_content if AstroSaveContainer.is_a_container_file(join_paths(path, file))]
+
+        if not containers_list or len(containers_list) == 0:
+            raise FileNotFoundError
+
+        return containers_list
+
+    @staticmethod
+    def is_a_container_file(path) -> bool:
+        return is_a_file(path) and path.rfind('container') != -1
+
+
+

@@ -7,7 +7,7 @@ PyInstaller.__main__.run([
     '--onefile',
     '--add-data=%s' % "assets/*;.",
     '--icon=%s' % "assets/astroconverterlogo.ico",
-    'AstroSaveConverter.py'
+    'main.py'
 ])
 
 shutil.rmtree("build")

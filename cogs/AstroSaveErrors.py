@@ -1,0 +1,3 @@
+class MultipleFolderFoundError(Exception):
+    pass
+

@@ -1,6 +1,6 @@
 import os
 import re
-from cogs.AstroLogging import AstroLogging
+from cogs import AstroLogging as Logger
 
 
 XBOX_CHUNK_SIZE = int.from_bytes(b'\x01\x00\x00\x00', byteorder='big')
@@ -60,7 +60,7 @@ class AstroSave():
         while os.path.exists(os.path.join(path_to, file_name)):
             is_overwrite = None
             while is_overwrite != 'y' and is_overwrite != 'n':
-                AstroLogging.logPrint(
+                Logger.logPrint(
                     f'\nFile {file_name} already exists, overwrite it ? (y/n)')
                 is_overwrite = input().lower()
 
@@ -75,7 +75,7 @@ class AstroSave():
                 with open(os.path.join(path_from, chunk_name), 'rb') as chunk_file:
                     steam_save.write(chunk_file.read())
 
-        AstroLogging.logPrint(
+        Logger.logPrint(
             f"\nSave {self.save_name} has been exported succesfully.")
 
     def rename(self):
@@ -112,5 +112,5 @@ class AstroSave():
                         '$' + old_name.split("$")[1]
             except ValueError:
                 new_name = None
-                AstroLogging.logPrint(
+                Logger.logPrint(
                     f'Please use only alphanum and a length < 30')

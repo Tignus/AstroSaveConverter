@@ -20,40 +20,40 @@ def get_args() -> Namespace:
 
 
 if __name__ == "__main__":
-    # try:
-    Logger.setup_logging(os.getcwd())
-
     try:
-        os.system("title AstroSaveConverter - Migrate your Astroneer save from Microsoft to Steam")
-    except:
-        pass
+        Logger.setup_logging(os.getcwd())
 
-    args = get_args()
-    save_path = Scenario.ask_for_save_folder()
+        try:
+            os.system("title AstroSaveConverter - Migrate your Astroneer save from Microsoft to Steam")
+        except:
+            pass
 
-    containers_list = Container.get_containers_list(save_path)
-    Logger.logPrint('\nContainers found:' + str(containers_list))
-    container_name = Scenario.ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
+        args = get_args()
+        save_path = Scenario.ask_for_save_folder()
 
-    container = Container(utils.join_paths(save_path, container_name))
+        containers_list = Container.get_containers_list(save_path)
+        Logger.logPrint('\nContainers found:' + str(containers_list))
+        container_name = Scenario.ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
 
-    Logger.logPrint('Container file loaded successfully !\n')
+        container = Container(utils.join_paths(save_path, container_name))
 
-    saves_to_export = Scenario.ask_saves_to_export(container.save_list)
-    Logger.logPrint(saves_to_export)
+        Logger.logPrint('Container file loaded successfully !\n')
 
-    Scenario.ask_rename_container(saves_to_export, container)
+        saves_to_export = Scenario.ask_saves_to_export(container.save_list)
+        Logger.logPrint(saves_to_export)
 
-    to_path = utils.join_paths(save_path, 'Steam saves')
+        Scenario.ask_rename_container(saves_to_export, container)
 
-    Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
-    utils.rm_dir_if_exists(to_path)
+        to_path = utils.join_paths(save_path, 'Steam saves')
 
-    container.xbox_to_steam(saves_to_export, to_path)
+        Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
+        utils.rm_dir_if_exists(to_path)
 
-    Logger.logPrint(f'\nTask completed, press any key to exit')
-    utils.wait_and_exit(0)
-    # except Exception as e:
-    #     Logger.logPrint(e)
-    #     Logger.logPrint('', 'exception')
-    #     utils.wait_and_exit(1)
+        container.xbox_to_steam(saves_to_export, to_path)
+
+        Logger.logPrint(f'\nTask completed, press any key to exit')
+        utils.wait_and_exit(0)
+    except Exception as e:
+        Logger.logPrint(e)
+        Logger.logPrint('', 'exception')
+        utils.wait_and_exit(1)

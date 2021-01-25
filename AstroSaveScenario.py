@@ -158,9 +158,9 @@ def ask_for_multiple_choices(maximum_value) -> list:
     choices = []
     while not choices:
         choices = input()
-        choices = process_multiple_choices_input(choices, maximum_value)
+        choices = process_multiple_choices_input(choices)
         try:
-            verify_choices_input(choices)
+            verify_choices_input(choices, maximum_value)
         except ValueError:
             choices = []
             Logger.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
@@ -171,19 +171,25 @@ def ask_for_multiple_choices(maximum_value) -> list:
             return choices
 
 
-def process_multiple_choices_input(choices, max_value) -> list:
+def process_multiple_choices_input(choices) -> list:
     choices = choices.split(',') if utils.rcontains(',', choices) else choices
     choices = map(lambda x: int(x), choices)
-    choices = [number - 1 for number in choices if number >= 0 or number < max_value]
+
+    choices = [number - 1 for number in choices]
+
     return choices
 
 
-def verify_choices_input(choices):
+def verify_choices_input(choices, max_value):
     if len(choices) == 0:
         raise ValueError
 
     if -1 in choices and len(choices) != 1:
         raise ValueError
+
+    for choice in choices:
+        if (choice > max_value - 1 or choice < -1):
+            raise ValueError
 
 
 def ask_rename_save(saves, container):

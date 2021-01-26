@@ -20,41 +20,41 @@ def get_args() -> Namespace:
 
 
 if __name__ == "__main__":
-    # try:
-    Logger.setup_logging(os.getcwd())
-
     try:
-        os.system("title AstroSaveConverter - Migrate your Astroneer save from Microsoft to Steam")
-    except:
-        pass
+        Logger.setup_logging(os.getcwd())
 
-    args = get_args()
-    original_save_path = Scenario.ask_for_save_folder()
+        try:
+            os.system("title AstroSaveConverter - Migrate your Astroneer save from Microsoft to Steam")
+        except:
+            pass
 
-    containers_list = Container.get_containers_list(original_save_path)
+        args = get_args()
+        original_save_path = Scenario.ask_for_save_folder()
 
-    Logger.logPrint('\nContainers found:' + str(containers_list))
-    container_name = Scenario.ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
-    container_url = utils.join_paths(original_save_path, container_name)
+        containers_list = Container.get_containers_list(original_save_path)
 
-    container = Container(container_url)
+        Logger.logPrint('\nContainers found:' + str(containers_list))
+        container_name = Scenario.ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
+        container_url = utils.join_paths(original_save_path, container_name)
 
-    Logger.logPrint('Container file loaded successfully !\n')
+        container = Container(container_url)
 
-    saves_to_export = Scenario.ask_saves_to_export(container.save_list)
+        Logger.logPrint('Container file loaded successfully !\n')
 
-    Scenario.ask_rename_saves(saves_to_export, container)
+        saves_to_export = Scenario.ask_saves_to_export(container.save_list)
 
-    to_path = utils.join_paths(original_save_path, 'Steam saves')
-    utils.make_dir_if_doesnt_exists(to_path)
+        Scenario.ask_rename_saves(saves_to_export, container)
 
-    Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
+        to_path = utils.join_paths(original_save_path, 'Steam saves')
+        utils.make_dir_if_doesnt_exists(to_path)
 
-    Scenario.export_saves(container, saves_to_export, original_save_path, to_path)
+        Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
 
-    Logger.logPrint(f'\nTask completed, press any key to exit')
-    utils.wait_and_exit(0)
-    # except Exception as e:
-    #     Logger.logPrint(e)
-    #     Logger.logPrint('', 'exception')
-    #     utils.wait_and_exit(1)
+        Scenario.export_saves(container, saves_to_export, original_save_path, to_path)
+
+        Logger.logPrint(f'\nTask completed, press any key to exit')
+        utils.wait_and_exit(0)
+    except Exception as e:
+        Logger.logPrint(e)
+        Logger.logPrint('', 'exception')
+        utils.wait_and_exit(1)

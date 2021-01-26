@@ -52,7 +52,6 @@ class AstroSaveContainer():
         """
         self.full_path = container_file_path
         self.save_list = []
-        Logger.logPrint('\nInitializing Astroneer save container...')
         Logger.logPrint('full_path: {self.full_path}', "debug")
 
         with open(self.full_path, "rb") as container:
@@ -68,8 +67,6 @@ class AstroSaveContainer():
             # Next 4 bytes are the number of saves chunk
             self.chunk_count = int.from_bytes(
                 container.read(4), byteorder='little')
-
-            Logger.logPrint(f'Detected chunks: {self.chunk_count}')
 
             # Parsing saves chunks
             current_save_name = None

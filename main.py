@@ -37,7 +37,9 @@ if __name__ == "__main__":
         container_name = Scenario.ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
         container_url = utils.join_paths(original_save_path, container_name)
 
+        Logger.logPrint('\nInitializing Astroneer save container...')
         container = Container(container_url)
+        Logger.logPrint(f'Detected chunks: {container.chunk_count}')
 
         Logger.logPrint('Container file loaded successfully !\n')
 

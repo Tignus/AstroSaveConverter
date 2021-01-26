@@ -51,8 +51,15 @@ if __name__ == "__main__":
         utils.make_dir_if_doesnt_exists(to_path)
 
         Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
+        Logger.logPrint(f'Container: {container.full_path} Export to: {to_path}', "debug")
 
-        Scenario.export_saves(container, saves_to_export, original_save_path, to_path)
+        for save_index in saves_to_export:
+            save = container.save_list[save_index]
+
+            Scenario.ask_overwrite_save_while_file_exists(save, to_path)
+            Scenario.export_save(save, original_save_path, to_path)
+
+            Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
 
         Logger.logPrint(f'\nTask completed, press any key to exit')
         utils.wait_and_exit(0)

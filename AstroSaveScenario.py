@@ -233,19 +233,10 @@ def ask_overwrite_if_file_exists(filename, target):
         return True
 
 
-def export_saves(container, saves_to_export, from_path, to_path):
-    for save_index in saves_to_export:
-        save = container.save_list[save_index]
-
-        ask_overwrite_save_while_file_exists(save, to_path)
-
-        Logger.logPrint(f'Container: {container.full_path} Export to: {to_path}', "debug")
-
-        target_full_path = utils.join_paths(to_path, save.get_file_name())
-        converted_save = save.convert_to_steam(from_path)
-        utils.write_buffer_to_file(target_full_path, converted_save)
-
-        Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
+def export_save(save, from_path, to_path):
+    target_full_path = utils.join_paths(to_path, save.get_file_name())
+    converted_save = save.convert_to_steam(from_path)
+    utils.write_buffer_to_file(target_full_path, converted_save)
 
 
 def ask_overwrite_save_while_file_exists(save, target):

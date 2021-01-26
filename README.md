@@ -14,12 +14,12 @@
 
 
 # Table of contents
-- [Table of contents](https://github.com/Tignus/AstroSaveConverter#tableofcontents)
+- [Table of contents](https://github.com/Tignus/AstroSaveConverter#table-of-contents)
 - [AstroSaveConverter](https://github.com/Tignus/AstroSaveConverter#astrosaveconverter)
-- [Convert your game saves](https://github.com/Tignus/AstroSaveConverter#convertyourgamesaves)
-	- [XBOX to Steam](https://github.com/Tignus/AstroSaveConverter#xboxtosteam)
-	- [Steam to XBOX](https://github.com/Tignus/AstroSaveConverter#steamtxbox)
-	- [How to use](https://github.com/Tignus/AstroSaveConverter#howtouse)
+- [Convert your game saves](https://github.com/Tignus/AstroSaveConverter#convert-your-game-saves)
+	- [XBOX to Steam](https://github.com/Tignus/AstroSaveConverter#xbox-to-steam)
+	- [Steam to XBOX](https://github.com/Tignus/AstroSaveConverter#steam-to-xbox)
+	- [How to use](https://github.com/Tignus/AstroSaveConverter#how-to-use)
 - [FAQ](https://github.com/Tignus/AstroSaveConverter#faq)
 - [Contributing](https://github.com/Tignus/AstroSaveConverter#contributing)
 - [Special thanks](https://github.com/Tignus/AstroSaveConverter#special-thanks) 
@@ -98,5 +98,5 @@ We (Tignus and EmptyProfile) would like to thanks everyone who helped us in the 
 
 - Ricky Davis and his [AstroLauncher](https://github.com/ricky-davis/AstroLauncher) which we used to start building our own AstroSaveConverter
 - Gina and Cyber for their contribution to the "[Importing and Converting files between Microsoft & Microsoft OR Microsoft & Steam](https://forum.systemera.net/topic/53054-importing-and-converting-files-between-microsoft-microsoft-or-microsoft-steam/)" thread
-- The Twitch chat and in particular WinXaito, AbsoluteVirtue, Zic0h, SyndGame, SamirJap for their help and support during the long hours of (improductive) coding ♥
+- The Twitch chat and in particular WinXaito, AbsoluteVirtue, Zic0h, SyndGame, SamirJap, rockeurbrun for their help and support during the long hours of (improductive) coding ♥
 

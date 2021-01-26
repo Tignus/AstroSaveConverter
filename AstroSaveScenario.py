@@ -1,7 +1,7 @@
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs import AstroLogging as Logger
 import utils
-from cogs.AstroSaveErrors import MultipleFolderFoundError
+from errors import MultipleFolderFoundError
 from cogs import AstroMicrosoftSaveFolder
 
 

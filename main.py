@@ -5,7 +5,7 @@ import AstroSaveScenario as Scenario
 import utils
 from cogs import AstroLogging as Logger
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
-from cogs.AstroSaveErrors import MultipleFolderFoundError
+from errors import MultipleFolderFoundError
 
 
 def get_args() -> Namespace:

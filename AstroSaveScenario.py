@@ -195,18 +195,19 @@ def ask_rename_saves(saves_indexes, container):
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
-    if do_rename == 'y': 
+
+    if do_rename == 'y':
         for index in saves_indexes:
-            rename_save(index, container)
+            save = container.save_list[index]
+            rename_save(save)
 
 
-def rename_save(save_indexe, container):
+def rename_save(save):
     """ Guide user in order to rename a save
 
     :param save_indexe: Index of the save in the container.save_list you want to rename
     :param container: Container from which to rename the save
     """
-    save = container.save_list[save_indexe]
     new_name = None
     while not new_name:
         new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
@@ -236,16 +237,20 @@ def export_saves(container, saves_to_export, from_path, to_path):
     for save_index in saves_to_export:
         save = container.save_list[save_index]
 
-        do_overwrite = None
-        while not do_overwrite:
-            do_overwrite = ask_overwrite_if_file_exists(save.get_file_name(), to_path)
-            if not do_overwrite:
-                rename_save(save_index, container)
+        ask_overwrite_save_while_file_exists(save, to_path)
 
-        Logger.logPrint(f'Container :{utils.get_dir_name(container.full_path)} Export to: {to_path}', "debug")
+        Logger.logPrint(f'Container: {container.full_path} Export to: {to_path}', "debug")
 
         target_full_path = utils.join_paths(to_path, save.get_file_name())
         converted_save = save.convert_to_steam(from_path)
         utils.write_buffer_to_file(target_full_path, converted_save)
 
         Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
+
+
+def ask_overwrite_save_while_file_exists(save, target):
+    do_overwrite = None
+    while not do_overwrite:
+        do_overwrite = ask_overwrite_if_file_exists(save.get_file_name(), target)
+        if not do_overwrite:
+            rename_save(save)

@@ -86,7 +86,7 @@ We found out that even though Astroneer allows more than 30 characters, it can c
 We didn't know which special characters were allowed in Astroneer and it would be too long to test every option. To avoid compatibility errors, we chose to restrict which characters can be used. You can however edit the save name directly in Astroneer
 
 - ***How can I know which feature(s) will be added in the tool ?***<br />
-Please feel free to look at [our Trello](https://trello.com/b/jM8tx7GU/astro-save-converter) (in French)
+Please feel free to look at [our TO DO list](https://github.com/Tignus/AstroSaveConverter/projects/1?add_cards_query=is%3Aopen). We can't promise we'll do all of it :)
 
 # Contributing
 Contributions are greatly appreciated. Do not hesitate to fork the project and open pull requests !

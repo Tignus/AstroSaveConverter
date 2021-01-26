@@ -92,6 +92,8 @@ Please feel free to look at [our Trello](https://trello.com/b/jM8tx7GU/astro-sav
 Contributions are greatly appreciated. Do not hesitate to fork the project and open pull requests !
 This software is distributed under the [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/) license
 
+Here's our [TO DO list](https://github.com/Tignus/AstroSaveConverter/projects/1?add_cards_query=is%3Aopen), feel free to participate 
+
 # Special thanks
 
 We (Tignus and EmptyProfile) would like to thanks everyone who helped us in the process of developping our tool:

@@ -55,39 +55,23 @@ class AstroSave():
         return self.name + '.savegame'
 
 
-    def rename(self):
-        """
-        Renames a save
+    def rename(self, new_name):
+        """ Renames a save
 
         We chosed to limit the characters to [a-zA-Z0-9] because we
         have no idea what are the characters supported by Astroneer
         Also the max length is 30 because somewhere above 30 won't fit
-        into the chunk name once the save becomes multi-chunks when it 
+        into the chunk name once the save becomes multi-chunks when it
         grows and that might crash the game (test pending)
 
-        Arguments:
-            None
-
-        Returns:
-            None 
-
         Exception:
-            None
+            ValueError if any character is not alphanumeric or if length > 30 or if new name is empty
         """
-        old_name = self.name
-        new_name = None
-        while new_name == None:
-            try:
-                new_name = input(
-                    f'\nNew name for {old_name.split("$")[0]}: [ENTER = unchanged] > ').upper()
-                # We check less characters than the alphanum set because we're unsure of the
-                # supported set by Astroneer
-                if (new_name != ''):
-                    if re.search(r'[^a-zA-Z0-9]', new_name) != None or len(new_name) > 30:
-                        raise ValueError
-                    self.name = new_name + \
-                        '$' + old_name.split("$")[1]
-            except ValueError:
-                new_name = None
-                Logger.logPrint(
-                    f'Please use only alphanum and a length < 30')
+        if (new_name == ''): raise ValueError
+        # We check less characters than the alphanum set because we're unsure of the
+        # supported set by Astroneer
+        if (new_name == '') or re.search(r'[^a-zA-Z0-9]', new_name) != None or len(new_name) > 30:
+            raise ValueError
+
+        date_string = self.name.split("$")[1]
+        self.name = new_name + '$' + date_string

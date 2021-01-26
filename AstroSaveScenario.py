@@ -195,17 +195,27 @@ def ask_rename_saves(saves_indexes, container):
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
-    if do_rename == 'y': rename_saves(saves_indexes, container)
+    if do_rename == 'y': 
+        for index in saves_indexes:
+            rename_save(index, container)
 
 
-def rename_saves(saves_indexes, container):
-    """ Rename all the list of save in the container
+def rename_save(save_indexe, container):
+    """ Guide user in order to rename a save
 
-    :param container: Container from which to rename the saves
+    :param save_indexe: Index of the save in the container.save_list you want to rename
+    :param container: Container from which to rename the save
     """
-    for i in saves_indexes:
-        save = container.save_list[i]
-        save.rename()
+    save = container.save_list[save_indexe]
+    new_name = None
+    while not new_name:
+        new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
+        if (new_name == ''): new_name = save.name
+        try:
+            save.rename(new_name)
+        except ValueError:
+            new_name = None
+            Logger.logPrint(f'Please use only alphanum and a length < 30')
 
 
 def ask_overwrite_if_file_exists(filename, target):

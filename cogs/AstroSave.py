@@ -1,6 +1,8 @@
 import os
 import re
 from cogs import AstroLogging as Logger
+from utils import join_paths, is_folder_exists
+from io import BytesIO
 
 
 XBOX_CHUNK_SIZE = int.from_bytes(b'\x01\x00\x00\x00', byteorder='big')
@@ -35,48 +37,23 @@ class AstroSave():
         Exception:
             None
         """
-        self.save_name = save_name  # User-defined save name + YYYY.MM.dd-HH.mm.ss
+        self.name = save_name  # User-defined save name + YYYY.MM.dd-HH.mm.ss
         self.chunks_names = chunks_names  # Names of the all the chunks composing the save
 
-    def export_to_steam(self, path_from, path_to):
-        """
-        Exports a save to the disk in its Steam file format
 
-        The save is written to the disk in a unique file
-        obtained by concatenating all its chunks
+    def convert_to_steam(self, source) -> BytesIO:
+        buffer = BytesIO()
+        for chunk_name in self.chunks_names:
+            chunk_file_path = join_paths(source, chunk_name)
 
-        Arguments:
-            path_from -- Where to read the chunks of the save
-            path_to -- Where to save the steam save
+            with open(chunk_file_path, 'rb') as chunk_file:
+                buffer.write(chunk_file.read())
+        return buffer
 
-        Returns:
-            None 
 
-        Exception:
-            None
-        """
-        file_name = self.save_name+'.savegame'
+    def get_file_name(self):
+        return self.name + '.savegame'
 
-        while os.path.exists(os.path.join(path_to, file_name)):
-            is_overwrite = None
-            while is_overwrite != 'y' and is_overwrite != 'n':
-                Logger.logPrint(
-                    f'\nFile {file_name} already exists, overwrite it ? (y/n)')
-                is_overwrite = input().lower()
-
-            if is_overwrite == 'n':
-                self.rename()
-                file_name = self.save_name+'.savegame'
-            elif is_overwrite == 'y':
-                break
-
-        with open(os.path.join(path_to, file_name), "wb") as steam_save:
-            for chunk_name in self.chunks_names:
-                with open(os.path.join(path_from, chunk_name), 'rb') as chunk_file:
-                    steam_save.write(chunk_file.read())
-
-        Logger.logPrint(
-            f"\nSave {self.save_name} has been exported succesfully.")
 
     def rename(self):
         """
@@ -97,7 +74,7 @@ class AstroSave():
         Exception:
             None
         """
-        old_name = self.save_name
+        old_name = self.name
         new_name = None
         while new_name == None:
             try:
@@ -108,7 +85,7 @@ class AstroSave():
                 if (new_name != ''):
                     if re.search(r'[^a-zA-Z0-9]', new_name) != None or len(new_name) > 30:
                         raise ValueError
-                    self.save_name = new_name + \
+                    self.name = new_name + \
                         '$' + old_name.split("$")[1]
             except ValueError:
                 new_name = None

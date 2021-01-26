@@ -94,24 +94,6 @@ class AstroSaveContainer():
             self.save_list.append(AstroSave(current_save_name,
                                             current_chunks_names))
 
-    def xbox_to_steam(self, save_to_convert, export_path):
-        """
-        Exports saves to steam file
-
-        Arguments:
-            save_to_convert -- List of saves number to export
-            export_path -- Path where to export the steam saves
-
-        Returns:
-            None
-
-        Exception:
-            None
-        """
-        for save in save_to_convert:
-            Logger.logPrint(f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
-            self.save_list[save].export_to_steam(os.path.dirname(self.full_path), export_path)
-
     def is_valid_container_header(self, header):
         """
         Validates the container header against the expected save container header

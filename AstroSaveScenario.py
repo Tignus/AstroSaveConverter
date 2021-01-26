@@ -125,7 +125,7 @@ def ask_custom_folder_path() -> str:
 def print_save_from_container(save_list):
     """ Displays the human readable saves of a container """
     for i, save in enumerate(save_list):
-        Logger.logPrint(f'\t {str(i+1)}) {save.save_name}')
+        Logger.logPrint(f'\t {str(i+1)}) {save.name}')
 
 
 def ask_saves_to_export(save_list):
@@ -190,19 +190,33 @@ def verify_choices_input(choices, max_value):
             raise ValueError
 
 
-def ask_rename_save(saves, container):
+def ask_rename_saves(saves_indexes, container):
     do_rename = None
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
-    if do_rename == 'y': rename_saves(saves, container)
+    if do_rename == 'y': rename_saves(saves_indexes, container)
 
 
-def rename_saves(index_to_rename, container):
+def rename_saves(saves_indexes, container):
     """ Rename all the list of save in the container
 
     :param container: Container from which to rename the saves
     """
-    for i in index_to_rename:
-        container.save_list[i].rename()
+    for i in saves_indexes:
+        save = container.save_list[i]
+        save.rename()
 
+
+def ask_overwrite_if_file_exists(filename, target):
+    file_url = utils.join_paths(target, filename)
+
+    if utils.is_folder_exists(file_url):
+        do_overwrite = None
+        while do_overwrite not in ('y', 'n'):
+            Logger.logPrint(f'\nFile {filename} already exists, overwrite it ? (y/n)')
+            do_overwrite = input().lower()
+
+        return do_overwrite == 'y'
+    else:
+        return True

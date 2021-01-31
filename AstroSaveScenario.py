@@ -88,6 +88,7 @@ def ask_for_save_folder():
             Logger.logPrint('\nNo container found in path: ' + save_path)
             Logger.logPrint(e, 'exception')
 
+
 def ask_copy_target():
     Logger.logPrint('Where would you like to copy your save folder ?')
     Logger.logPrint('\t1) New folder on my desktop')
@@ -191,6 +192,12 @@ def verify_choices_input(choices, max_value):
 
 
 def ask_rename_saves(saves_indexes, container):
+    """ Guide the user in order to rename a save
+
+    :param save_indexes: List of the saves in the container.save_list you want to rename
+    :param container: Container from which to rename the save
+    """
+
     do_rename = None
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
@@ -203,15 +210,16 @@ def ask_rename_saves(saves_indexes, container):
 
 
 def rename_save(save):
-    """ Guide user in order to rename a save
+    """ Rename a save
+    Rename can be skipped by pressing Enter directly
 
-    :param save_indexe: Index of the save in the container.save_list you want to rename
-    :param container: Container from which to rename the save
+    :param save: Save object to be renamed
     """
     new_name = None
     while not new_name:
         new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
-        if (new_name == ''): new_name = save.name
+        if (new_name == ''):
+            new_name = save.name
         try:
             save.rename(new_name)
         except ValueError:

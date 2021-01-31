@@ -9,8 +9,7 @@ XBOX_CHUNK_SIZE = int.from_bytes(b'\x01\x00\x00\x00', byteorder='big')
 
 
 class AstroSave():
-    """
-        The Astroneer Save Class.
+    """The Astroneer Save Class.
 
         This object represents an Astroneer save
 
@@ -24,15 +23,14 @@ class AstroSave():
     """
 
     def __init__(self, save_name, chunks_names):
-        """
-        Initiates a save object
+        """Initiates a save object
 
         Arguments:
             save_name -- Name of the save
             chunks_names -- Names of the chunks constituting the save
 
         Returns:
-            The AstroSAve object 
+            The AstroSAve object
 
         Exception:
             None
@@ -40,8 +38,18 @@ class AstroSave():
         self.name = save_name  # User-defined save name + YYYY.MM.dd-HH.mm.ss
         self.chunks_names = chunks_names  # Names of the all the chunks composing the save
 
-
     def convert_to_steam(self, source) -> BytesIO:
+        """Exports a save to the disk in its Steam file format
+
+        The save is returned in a buffer representing a unique file
+        obtained by concatenating all its chunks
+
+        Arguments:
+            source: Where to read the chunks of the save
+
+        Returns:
+            A buffer containing the Steam save
+        """
         buffer = BytesIO()
         for chunk_name in self.chunks_names:
             chunk_file_path = join_paths(source, chunk_name)
@@ -50,13 +58,11 @@ class AstroSave():
                 buffer.write(chunk_file.read())
         return buffer
 
-
     def get_file_name(self):
         return self.name + '.savegame'
 
-
     def rename(self, new_name):
-        """ Renames a save
+        """Renames a save
 
         We chosed to limit the characters to [a-zA-Z0-9] because we
         have no idea what are the characters supported by Astroneer
@@ -67,7 +73,8 @@ class AstroSave():
         Exception:
             ValueError if any character is not alphanumeric or if length > 30 or if new name is empty
         """
-        if (new_name == ''): raise ValueError
+        if (new_name == ''):
+            raise ValueError
         # We check less characters than the alphanum set because we're unsure of the
         # supported set by Astroneer
         if (new_name == '') or re.search(r'[^a-zA-Z0-9]', new_name) != None or len(new_name) > 30:

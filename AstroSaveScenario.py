@@ -1,8 +1,9 @@
+import utils
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs import AstroLogging as Logger
-import utils
-from errors import MultipleFolderFoundError
 from cogs import AstroMicrosoftSaveFolder
+from cogs.AstroConvType import AstroConvType
+from errors import MultipleFolderFoundError
 
 
 def ask_for_containers_to_convert(containers):
@@ -48,13 +49,17 @@ def verify_choice_input(choice, min, max):
         raise ValueError
 
 
-def ask_for_save_folder():
+def ask_for_save_folder(conversion_type: AstroConvType) -> str:
     """ Obtains the save folder
 
     Lets the user pick between automatic save retrieving/copying or
     a custom save folder
 
-    :return: The save folder path
+    Arguments:
+        conversion_type : Type of save conversion (for automatic folder retrieval purpose)
+
+    Returns:
+        The save folder path
     """
     while 1:
         try:
@@ -69,8 +74,11 @@ def ask_for_save_folder():
                 Logger.logPrint(f'folder_type {work_choice}', 'debug')
 
             if work_choice == '1':
-                microsoft_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
-                Logger.logPrint(f'Microsoft folder path: {microsoft_save_folder}', 'debug')
+                if conversion_type == AstroConvType.WIN2STEAM:
+                    microsoft_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
+                    Logger.logPrint(f'Microsoft folder path: {microsoft_save_folder}', 'debug')
+                else:
+                    return None  # TODO retrieve %LocalAppData%\Astro\Saved\SaveGames
 
                 save_path = ask_copy_target()
                 utils.copy_files(microsoft_save_folder, save_path)
@@ -219,7 +227,6 @@ def rename_save(save):
     while new_name is None:
         new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
         if (new_name != ''):
-            new_name = save.name
             try:
                 save.rename(new_name)
             except ValueError:
@@ -253,3 +260,20 @@ def ask_overwrite_save_while_file_exists(save, target):
         do_overwrite = ask_overwrite_if_file_exists(save.get_file_name(), target)
         if not do_overwrite:
             rename_save(save)
+
+
+def ask_conversion_type() -> AstroConvType:
+    Logger.logPrint(f'\nWhich conversion do you want to do ?')
+    Logger.logPrint("\t1) Convert a Microsoft save into a Steam save")
+    Logger.logPrint('\t2) Convert a Steam save into a Microsoft save')
+
+    choice = input()
+    while choice not in ('1', '2'):
+        Logger.logPrint(f'\nPlease choose 1 or 2')
+        choice = input()
+        Logger.logPrint(f'convert_choice {choice}', 'debug')
+
+    if choice == '1':
+        return AstroConvType.WIN2STEAM
+    else:
+        return AstroConvType.STEAM2WIN

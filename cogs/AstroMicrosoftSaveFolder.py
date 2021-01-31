@@ -1,7 +1,7 @@
 import os
-from cogs import AstroLogging as Logger 
+from cogs import AstroLogging as Logger
 import utils
-from cogs.AstroSaveErrors import MultipleFolderFoundError
+from errors import MultipleFolderFoundError
 import re
 import glob
 

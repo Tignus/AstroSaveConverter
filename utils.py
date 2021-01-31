@@ -3,6 +3,7 @@ import shutil
 import os
 import sys
 import winpath
+from io import StringIO
 
 
 def create_folder_name(prefix) -> str:
@@ -30,9 +31,13 @@ def list_folder_content(path) -> list:
     return os.listdir(path)
 
 
-def rm_dir_if_exists(path):
+def make_dir_if_doesnt_exists(path):
     if not os.path.isdir(path):
         os.mkdir(path)
+
+
+def get_dir_name(path):
+    return os.path.dirname(path)
 
 
 def join_paths(path1, path2):
@@ -50,6 +55,11 @@ def get_windows_desktop_path() -> str:
 
 def rcontains(rgexp, string) -> bool:
     return string.rfind(rgexp) != -1
+
+def write_buffer_to_file(target: str, buffer: StringIO):
+    with open(target, "wb") as target_save:
+        target_save.write(buffer.getvalue())
+
 
 def wait_and_exit(code):
     input()

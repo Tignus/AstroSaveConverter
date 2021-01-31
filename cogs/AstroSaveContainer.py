@@ -52,7 +52,6 @@ class AstroSaveContainer():
         """
         self.full_path = container_file_path
         self.save_list = []
-        Logger.logPrint('\nInitializing Astroneer save container...')
         Logger.logPrint('full_path: {self.full_path}', "debug")
 
         with open(self.full_path, "rb") as container:
@@ -68,8 +67,6 @@ class AstroSaveContainer():
             # Next 4 bytes are the number of saves chunk
             self.chunk_count = int.from_bytes(
                 container.read(4), byteorder='little')
-
-            Logger.logPrint(f'Detected chunks: {self.chunk_count}')
 
             # Parsing saves chunks
             current_save_name = None
@@ -93,24 +90,6 @@ class AstroSaveContainer():
             # Saving the last save of the container file
             self.save_list.append(AstroSave(current_save_name,
                                             current_chunks_names))
-
-    def xbox_to_steam(self, save_to_convert, export_path):
-        """
-        Exports saves to steam file
-
-        Arguments:
-            save_to_convert -- List of saves number to export
-            export_path -- Path where to export the steam saves
-
-        Returns:
-            None
-
-        Exception:
-            None
-        """
-        for save in save_to_convert:
-            Logger.logPrint(f'Container :{os.path.dirname(self.full_path)} Export to: {export_path}', "debug")
-            self.save_list[save].export_to_steam(os.path.dirname(self.full_path), export_path)
 
     def is_valid_container_header(self, header):
         """

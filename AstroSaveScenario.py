@@ -1,7 +1,7 @@
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs import AstroLogging as Logger
 import utils
-from cogs.AstroSaveErrors import MultipleFolderFoundError
+from errors import MultipleFolderFoundError
 from cogs import AstroMicrosoftSaveFolder
 
 
@@ -125,7 +125,7 @@ def ask_custom_folder_path() -> str:
 def print_save_from_container(save_list):
     """ Displays the human readable saves of a container """
     for i, save in enumerate(save_list):
-        Logger.logPrint(f'\t {str(i+1)}) {save.save_name}')
+        Logger.logPrint(f'\t {str(i+1)}) {save.name}')
 
 
 def ask_saves_to_export(save_list):
@@ -190,19 +190,58 @@ def verify_choices_input(choices, max_value):
             raise ValueError
 
 
-def ask_rename_save(saves, container):
+def ask_rename_saves(saves_indexes, container):
     do_rename = None
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
-    if do_rename == 'y': rename_saves(saves, container)
+
+    if do_rename == 'y':
+        for index in saves_indexes:
+            save = container.save_list[index]
+            rename_save(save)
 
 
-def rename_saves(index_to_rename, container):
-    """ Rename all the list of save in the container
+def rename_save(save):
+    """ Guide user in order to rename a save
 
-    :param container: Container from which to rename the saves
+    :param save_indexe: Index of the save in the container.save_list you want to rename
+    :param container: Container from which to rename the save
     """
-    for i in index_to_rename:
-        container.save_list[i].rename()
+    new_name = None
+    while not new_name:
+        new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
+        if (new_name == ''): new_name = save.name
+        try:
+            save.rename(new_name)
+        except ValueError:
+            new_name = None
+            Logger.logPrint(f'Please use only alphanum and a length < 30')
 
+
+def ask_overwrite_if_file_exists(filename, target):
+    file_url = utils.join_paths(target, filename)
+
+    if utils.is_folder_exists(file_url):
+        do_overwrite = None
+        while do_overwrite not in ('y', 'n'):
+            Logger.logPrint(f'\nFile {filename} already exists, overwrite it ? (y/n)')
+            do_overwrite = input().lower()
+
+        return do_overwrite == 'y'
+    else:
+        return True
+
+
+def export_save(save, from_path, to_path):
+    target_full_path = utils.join_paths(to_path, save.get_file_name())
+    converted_save = save.convert_to_steam(from_path)
+    utils.write_buffer_to_file(target_full_path, converted_save)
+
+
+def ask_overwrite_save_while_file_exists(save, target):
+    do_overwrite = None
+    while not do_overwrite:
+        do_overwrite = ask_overwrite_if_file_exists(save.get_file_name(), target)
+        if not do_overwrite:
+            rename_save(save)

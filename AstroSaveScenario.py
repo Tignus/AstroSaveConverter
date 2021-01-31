@@ -216,15 +216,15 @@ def rename_save(save):
     :param save: Save object to be renamed
     """
     new_name = None
-    while not new_name:
+    while new_name is None:
         new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
-        if (new_name == ''):
+        if (new_name != ''):
             new_name = save.name
-        try:
-            save.rename(new_name)
-        except ValueError:
-            new_name = None
-            Logger.logPrint(f'Please use only alphanum and a length < 30')
+            try:
+                save.rename(new_name)
+            except ValueError:
+                new_name = None
+                Logger.logPrint(f'Please use only alphanum and a length < 30')
 
 
 def ask_overwrite_if_file_exists(filename, target):

@@ -9,14 +9,14 @@ from errors import MultipleFolderFoundError
 
 
 def get_args() -> Namespace:
-        parser = ArgumentParser()
+    parser = ArgumentParser()
 
-        parser.add_argument(
-            "-p", "--savesPath", help="Path from which to read the container and extract the saves", required=False)
+    parser.add_argument(
+        "-p", "--savesPath", help="Path from which to read the container and extract the saves", required=False)
 
-        args = parser.parse_args()
+    args = parser.parse_args()
 
-        return args
+    return args
 
 
 if __name__ == "__main__":
@@ -29,12 +29,24 @@ if __name__ == "__main__":
             pass
 
         args = get_args()
-        original_save_path = Scenario.ask_for_save_folder()
+
+        try:
+            if not args.savesPath:
+                original_save_path = Scenario.ask_for_save_folder()
+            else:
+                original_save_path = args.savesPath
+                if not utils.is_folder_exists(original_save_path):
+                    raise FileNotFoundError
+        except FileNotFoundError as e:
+            Logger.logPrint('\nSave folder or container not found, press any key to exit')
+            Logger.logPrint(e, 'exception')
+            utils.wait_and_exit(1)
 
         containers_list = Container.get_containers_list(original_save_path)
 
         Logger.logPrint('\nContainers found:' + str(containers_list))
-        container_name = Scenario.ask_for_containers_to_convert(containers_list) if len(containers_list) > 1 else containers_list[0]
+        container_name = Scenario.ask_for_containers_to_convert(
+            containers_list) if len(containers_list) > 1 else containers_list[0]
         container_url = utils.join_paths(original_save_path, container_name)
 
         Logger.logPrint('\nInitializing Astroneer save container...')

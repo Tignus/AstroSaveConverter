@@ -1,7 +1,7 @@
 import os
 import re
 from cogs import AstroLogging as Logger
-from utils import join_paths, is_folder_exists
+from utils import join_paths
 from io import BytesIO
 
 

@@ -1,7 +1,10 @@
 import utils
-from cogs.AstroSaveContainer import AstroSaveContainer as Container
+from typing import List
 from cogs import AstroLogging as Logger
 from cogs import AstroMicrosoftSaveFolder
+from cogs import AstroSteamSaveFolder
+from cogs.AstroSaveContainer import AstroSaveContainer as Container
+from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
 from errors import MultipleFolderFoundError
 
@@ -75,13 +78,14 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
 
             if work_choice == '1':
                 if conversion_type == AstroConvType.WIN2STEAM:
-                    microsoft_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
-                    Logger.logPrint(f'Microsoft folder path: {microsoft_save_folder}', 'debug')
+                    astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
+                    Logger.logPrint(f'Microsoft folder path: {astroneer_save_folder}', 'debug')
                 else:
-                    return None  # TODO retrieve %LocalAppData%\Astro\Saved\SaveGames
+                    astroneer_save_folder = AstroSteamSaveFolder.get_steam_save_folder()
+                    Logger.logPrint(f'Steam folder path: {astroneer_save_folder}', 'debug')
 
-                save_path = ask_copy_target()
-                utils.copy_files(microsoft_save_folder, save_path)
+                save_path = ask_copy_target('AstroSaveFolder')
+                utils.copy_files(astroneer_save_folder, save_path)
 
                 Logger.logPrint(f'Save files copied to: {save_path}')
 
@@ -97,7 +101,15 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
             Logger.logPrint(e, 'exception')
 
 
-def ask_copy_target():
+def ask_copy_target(folder_main_name: str):
+    ''' Requests a target folder to the user
+    TODO doc to explain the folder name format
+    Arguments:
+        folder_main_name:
+
+    Returns
+        ...
+    '''
     Logger.logPrint('Where would you like to copy your save folder ?')
     Logger.logPrint('\t1) New folder on my desktop')
     Logger.logPrint("\t2) New folder in a custom path")
@@ -116,7 +128,7 @@ def ask_copy_target():
         save_path = input()
         Logger.logPrint(f'save_path {save_path}', 'debug')
 
-    return utils.join_paths(save_path, utils.create_folder_name('AstroSaveFolder'))
+    return utils.join_paths(save_path, utils.create_folder_name(folder_main_name))
 
 
 def ask_custom_folder_path() -> str:
@@ -137,7 +149,9 @@ def print_save_from_container(save_list):
         Logger.logPrint(f'\t {str(i+1)}) {save.name}')
 
 
-def ask_saves_to_export(save_list):
+def ask_saves_to_export(save_list: List[AstroSave]) -> List[int]:
+    """TODO explained that this function returns the indexes in the save list and not a sublist of the save_list
+    """
     Logger.logPrint('Extracted save list :')
     print_save_from_container(save_list)
     Logger.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
@@ -199,11 +213,11 @@ def verify_choices_input(choices, max_value):
             raise ValueError
 
 
-def ask_rename_saves(saves_indexes, container):
+def ask_rename_saves(saves_indexes, save_list):
     """ Guide the user in order to rename a save
 
-    :param save_indexes: List of the saves in the container.save_list you want to rename
-    :param container: Container from which to rename the save
+    :param save_indexes: List of the saves in the save_list you want to rename
+    :param save_list: List of the save objects you may rename
     """
 
     do_rename = None
@@ -213,7 +227,7 @@ def ask_rename_saves(saves_indexes, container):
 
     if do_rename == 'y':
         for index in saves_indexes:
-            save = container.save_list[index]
+            save = save_list[index]
             rename_save(save)
 
 
@@ -234,10 +248,10 @@ def rename_save(save):
                 Logger.logPrint(f'Please use only alphanum and a length < 30')
 
 
-def ask_overwrite_if_file_exists(filename, target):
+def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
     file_url = utils.join_paths(target, filename)
 
-    if utils.is_folder_exists(file_url):
+    if utils.is_path_exists(file_url):
         do_overwrite = None
         while do_overwrite not in ('y', 'n'):
             Logger.logPrint(f'\nFile {filename} already exists, overwrite it ? (y/n)')
@@ -248,13 +262,28 @@ def ask_overwrite_if_file_exists(filename, target):
         return True
 
 
-def export_save(save, from_path, to_path):
+def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> None:
     target_full_path = utils.join_paths(to_path, save.get_file_name())
     converted_save = save.convert_to_steam(from_path)
     utils.write_buffer_to_file(target_full_path, converted_save)
 
 
-def ask_overwrite_save_while_file_exists(save, target):
+def export_save_to_xbox(save: AstroSave, from_path: str, to_path: str) -> None:
+    chunk_names, converted_chunks = save.convert_to_xbox(from_path)
+
+    for i in len(chunk_names):
+        target_full_path = utils.join_paths(to_path, chunk_names[i])
+
+        # Regenerating chunk name if it already exists. Very, very unlikely
+        while utils.is_path_exists(target_full_path):
+            chunk_names[i] = save.regenerate_uuid(i)  # TODO write regenerate_uuid
+            target_full_path = utils.join_paths(to_path, chunk_names[i])
+
+        # TODO raise exception if can't write, catch it then delete all the chunks already written
+        utils.write_buffer_to_file(target_full_path, converted_chunks[i])
+
+
+def ask_overwrite_save_while_file_exists(save: AstroSave, target: str) -> None:
     do_overwrite = None
     while not do_overwrite:
         do_overwrite = ask_overwrite_if_file_exists(save.get_file_name(), target)
@@ -277,3 +306,12 @@ def ask_conversion_type() -> AstroConvType:
         return AstroConvType.WIN2STEAM
     else:
         return AstroConvType.STEAM2WIN
+
+
+def backup_win_before_steam_export() -> str:
+    Logger.logPrint('\nFor safety reasons, we will now copy your current Microsoft Astroneer saves')
+    backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup')
+
+    astroneer_save_folder = AstroMicrosoftSaveFolder.backup_microsoft_save_folder(backup_path)
+
+    return astroneer_save_folder

@@ -15,7 +15,7 @@ def is_folder_writable(path) -> bool:
     return os.access(os.path.dirname(path), os.W_OK)
 
 
-def is_folder_exists(path) -> bool:
+def is_path_exists(path) -> bool:
     return os.path.exists(path)
 
 
@@ -53,8 +53,10 @@ def copy_files(source, target):
 def get_windows_desktop_path() -> str:
     return winpath.get_desktop()
 
+
 def rcontains(rgexp, string) -> bool:
     return string.rfind(rgexp) != -1
+
 
 def write_buffer_to_file(target: str, buffer: StringIO):
     with open(target, "wb") as target_save:
@@ -64,4 +66,3 @@ def write_buffer_to_file(target: str, buffer: StringIO):
 def wait_and_exit(code):
     input()
     sys.exit(code)
-

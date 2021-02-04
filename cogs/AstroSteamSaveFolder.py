@@ -6,35 +6,27 @@ import re
 import glob
 
 
-def get_microsoft_save_folder() -> str:
-    """ Retrieves the microsoft save folders from %LocalAppdata%
+def get_steam_save_folder() -> str:
+    """ Retrieves the Steam save folders from %LocalAppdata%
 
-    We know that the saves are stored along with a container.* file.
-    We look for that specific container by checking if it contains a
-    save date in order to return the whole path
-
-    :return: The list of the microsoft save folder content found in %appdata%
+    :return: The Steam save folder content found in %appdata%
     :exception: FileNotFoundError if no save folder is found
     :exception: MultipleFolderFoundError if multiple save folder are found
     """
 
     try:
-        target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
+        target = os.environ['LOCALAPPDATA'] + '\\Astro\\Saved\\SaveGames'
     except KeyError:
         Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
         Logger.logPrint("Press any key to exit")
         utils.wait_and_exit(1)
 
-    microsoft_save_paths = list(glob.iglob(target))
+    steam_save_paths = list(glob.iglob(target))
 
-    for path in microsoft_save_paths:
+    for path in steam_save_paths:
         Logger.logPrint(f'SES path found in appadata: {path}', 'debug')
 
-    SES_appdata_path = microsoft_save_paths[-1]
-
-    microsoft_save_folder = seek_microsoft_save_folder(SES_appdata_path)
-
-    return microsoft_save_folder
+    return steam_save_paths[0]
 
 
 def seek_microsoft_save_folder(appdata_path) -> str:
@@ -82,10 +74,3 @@ def read_container_text_from_path(path) -> str:
 def do_container_text_match_date(text) -> bool:
     # Do save date matches $YYYY.MM.dd
     return re.search(r'\$\d{4}\.\d{2}\.\d{2}', text)
-
-
-def backup_microsoft_save_folder(to_path: str) -> str:
-    astroneer_save_folder = get_microsoft_save_folder()
-    utils.copy_files(astroneer_save_folder, to_path)
-
-    return astroneer_save_folder

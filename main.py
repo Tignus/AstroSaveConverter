@@ -4,6 +4,7 @@ from argparse import ArgumentParser, Namespace
 import AstroSaveScenario as Scenario
 from cogs import AstroLogging as Logger
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
+from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
 from errors import MultipleFolderFoundError
 
@@ -35,7 +36,7 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
 
     saves_to_export = Scenario.ask_saves_to_export(container.save_list)
 
-    Scenario.ask_rename_saves(saves_to_export, container)
+    Scenario.ask_rename_saves(saves_to_export, container.save_list)
 
     to_path = utils.join_paths(original_save_path, 'Steam saves')
     utils.make_dir_if_doesnt_exists(to_path)
@@ -47,14 +48,41 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
         save = container.save_list[save_index]
 
         Scenario.ask_overwrite_save_while_file_exists(save, to_path)
-        Scenario.export_save(save, original_save_path, to_path)
+        Scenario.export_save_to_steam(save, original_save_path, to_path)
 
         Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
 
 
 def steam_to_windows_conversion(original_save_path: str) -> None:
-    Logger.logPrint('\nThis conversion is not supported yet. Exiting...')
-    utils.wait_and_exit(0)
+    Logger.logPrint('\n\n/!\\ WARNING /!\\')
+    Logger.logPrint('/!\\ Astroneer needs to be closed longer than 20 seconds before we can start exporting your saves /!\\')
+    Logger.logPrint('/!\\ More info and save restoring procedure are available on Github (cf. README) /!\\')
+    # TODO Elfou loading bar => "safety bar" (15 sec)
+
+    xbox_astroneer_save_folder = Scenario.backup_win_before_steam_export()
+
+    steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
+
+    saves_list = AstroSave.init_saves_list_from(steamsave_files_list)
+
+    # convert  steamsave_files_list to an object save_list
+
+    saves_indexes_to_export = Scenario.ask_saves_to_export(saves_list)
+
+    Scenario.ask_rename_saves(saves_indexes_to_export, saves_list)
+
+    Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_indexes_to_export])}')
+    Logger.logPrint(f'Working folder: {original_save_path} Export to: {xbox_astroneer_save_folder}', "debug")
+
+    for save_index in saves_indexes_to_export:
+        save = saves_list[save_index]
+        Scenario.export_save_to_xbox(save, original_save_path, xbox_astroneer_save_folder)
+
+    # Retrieve the real Microsoft gamepass astro container full path
+    # Export save objects to container (prepare chunks in hexa and concat them to the container)
+    # If export failed, delete all the chunk files written to disk
+
+        Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
 
 
 if __name__ == "__main__":
@@ -75,7 +103,7 @@ if __name__ == "__main__":
                 original_save_path = Scenario.ask_for_save_folder(conversion_type)
             else:
                 original_save_path = args.savesPath
-                if not utils.is_folder_exists(original_save_path):
+                if not utils.is_path_exists(original_save_path):
                     raise FileNotFoundError
         except FileNotFoundError as e:
             Logger.logPrint('\nSave folder or container not found, press any key to exit')

@@ -9,6 +9,8 @@ from pprint import pformat
     the "info" type to the console and add exception printing to the
     log file.
 """
+
+
 def logPrint(message, msgType="info"):
     if msgType == "debug":
         logging.debug(pformat(message))
@@ -24,11 +26,12 @@ def logPrint(message, msgType="info"):
     if msgType == "critical":
         logging.critical(pformat(message))
 
+
 def setup_logging(astroPath, console_print=True):
     formatter = logging.Formatter(
         '%(asctime)s - %(levelname)-6s %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
     rootLogger = logging.getLogger()
-    rootLogger.setLevel(logging.INFO)
+    rootLogger.setLevel(logging.DEBUG)
 
     # The console print is managed with the "info" message type
     # console = logging.StreamHandler()

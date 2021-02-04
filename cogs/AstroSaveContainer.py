@@ -5,7 +5,7 @@ import re
 from utils import is_a_file, list_folder_content, join_paths
 
 from cogs.AstroSave import AstroSave
-from cogs import AstroLogging as Logger 
+from cogs import AstroLogging as Logger
 
 CHUNK_METADATA_SIZE = 160  # Length of a chunk metadata found in a save container
 
@@ -230,17 +230,20 @@ class AstroSaveContainer():
 
     @staticmethod
     def get_containers_list(path) -> list:
-        """
-        List all containers in a folder
+        """List all containers in a folder
+
         Arguments:
-            path -- path for search containers
+            path -- path where to search containers
+
         Returns:
             Returns a list of all containers found (only filename of container)
+
         Exception:
             None
         """
         folder_content = list_folder_content(path)
-        containers_list = [file for file in folder_content if AstroSaveContainer.is_a_container_file(join_paths(path, file))]
+        containers_list = [
+            file for file in folder_content if AstroSaveContainer.is_a_container_file(join_paths(path, file))]
 
         if not containers_list or len(containers_list) == 0:
             raise FileNotFoundError
@@ -250,6 +253,3 @@ class AstroSaveContainer():
     @staticmethod
     def is_a_container_file(path) -> bool:
         return is_a_file(path) and path.rfind('container') != -1
-
-
-

@@ -6,6 +6,7 @@ from cogs import AstroLogging as Logger
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
+from cogs.LoadingBar import LoadingBar
 from errors import MultipleFolderFoundError
 
 
@@ -57,7 +58,8 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     Logger.logPrint('\n\n/!\\ WARNING /!\\')
     Logger.logPrint('/!\\ Astroneer needs to be closed longer than 20 seconds before we can start exporting your saves /!\\')
     Logger.logPrint('/!\\ More info and save restoring procedure are available on Github (cf. README) /!\\')
-    # TODO Elfou loading bar => "safety bar" (15 sec)
+    loading_bar = LoadingBar(15)
+    loading_bar.start_loading()
 
     xbox_astroneer_save_folder = Scenario.backup_win_before_steam_export()
 

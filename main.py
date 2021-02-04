@@ -65,8 +65,6 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
 
     saves_list = AstroSave.init_saves_list_from(steamsave_files_list)
 
-    # convert  steamsave_files_list to an object save_list
-
     saves_indexes_to_export = Scenario.ask_saves_to_export(saves_list)
 
     Scenario.ask_rename_saves(saves_indexes_to_export, saves_list)
@@ -78,6 +76,7 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
         save = saves_list[save_index]
         Scenario.export_save_to_xbox(save, original_save_path, xbox_astroneer_save_folder)
 
+    # TODO
     # Retrieve the real Microsoft gamepass astro container full path
     # Export save objects to container (prepare chunks in hexa and concat them to the container)
     # If export failed, delete all the chunk files written to disk

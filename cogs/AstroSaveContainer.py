@@ -145,7 +145,7 @@ class AstroSaveContainer():
         """
         chunk_file_name = ''
         partial_name = ''
-        i = CHUNK_METADATA_SIZE - 32
+        i = CHUNK_METADATA_SIZE - 16
 
         (partial_name, i) = self.chunk_grab_bytes_to_string(chunk, i, 4)
         chunk_file_name = self.convert_chunk_name_to_file_name(partial_name)

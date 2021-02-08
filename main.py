@@ -91,7 +91,7 @@ if __name__ == "__main__":
         Logger.setup_logging(os.getcwd())
 
         try:
-            os.system("title AstroSaveConverter - Migrate your Astroneer save from Microsoft to Steam")
+            os.system("title AstroSaveConverter 2.0 - Convert your Astroneer saves between Microsoft and Steam")
         except:
             pass
 

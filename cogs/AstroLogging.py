@@ -13,7 +13,7 @@ from pprint import pformat
 
 def logPrint(message, msgType="info"):
     if msgType == "debug":
-        logging.debug(pformat(message))
+        logging.debug(message)
     if msgType == "info":
         logging.info(pformat(message))
         print(message)

@@ -1,9 +1,9 @@
-from datetime import datetime
-import shutil
 import os
+import shutil
 import sys
 import winpath
 from io import StringIO
+from datetime import datetime
 
 
 def create_folder_name(prefix) -> str:
@@ -60,6 +60,11 @@ def rcontains(rgexp, string) -> bool:
 
 def write_buffer_to_file(target: str, buffer: StringIO):
     with open(target, "wb") as target_save:
+        target_save.write(buffer.getvalue())
+
+
+def append_buffer_to_file(target: str, buffer: StringIO):
+    with open(target, "ab") as target_save:
         target_save.write(buffer.getvalue())
 
 

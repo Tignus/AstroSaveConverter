@@ -51,7 +51,7 @@ def get_save_folders_from_path(path) -> list:
             if re.search(r'^container\.', file):
                 container_full_path = utils.join_paths(root, file)
 
-                Logger.logPrint(f'Container file found:{container_full_path}', 'debug')
+                Logger.logPrint(f'Container file found: {container_full_path}', 'debug')
 
                 container_text = read_container_text_from_path(container_full_path)
 

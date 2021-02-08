@@ -1,4 +1,5 @@
 import utils
+from io import BytesIO
 from typing import List
 from cogs import AstroLogging as Logger
 from cogs import AstroMicrosoftSaveFolder
@@ -103,7 +104,7 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
 
 def ask_copy_target(folder_main_name: str):
     ''' Requests a target folder to the user
-    TODO doc to explain the folder name format
+    TODO [doc] to explain the folder name format
     Arguments:
         folder_main_name:
 
@@ -150,7 +151,7 @@ def print_save_from_container(save_list):
 
 
 def ask_saves_to_export(save_list: List[AstroSave]) -> List[int]:
-    """TODO explained that this function returns the indexes in the save list and not a sublist of the save_list
+    """TODO [doc] explain that this function returns the indexes in the save list and not a sublist of the save_list
     """
     Logger.logPrint('Extracted save list :')
     print_save_from_container(save_list)
@@ -269,18 +270,73 @@ def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> None:
 
 
 def export_save_to_xbox(save: AstroSave, from_path: str, to_path: str) -> None:
-    chunk_names, converted_chunks = save.convert_to_xbox(from_path)
+    chunk_uuids, converted_chunks = save.convert_to_xbox(from_path)
 
-    for i in len(chunk_names):
-        target_full_path = utils.join_paths(to_path, chunk_names[i])
+    chunk_count = len(chunk_uuids)
+
+    if chunk_count >= 10:
+        Logger.logPrint(
+            f'The selected save contains {chunk_count} which is over the 9 chunks limit AstroSaveconverter can handle yet')
+        Logger.logPrint(f'Congrats for having such a huge save, please open an issue on the GitHub :D')
+
+    for i in range(chunk_count):
+
+        # The file name is the HEX upper form of the uuid
+        chunk_name = save.chunks_names[i]
+        Logger.logPrint(f'UUID as file name: {chunk_name}', "debug")
+
+        target_full_path = utils.join_paths(to_path, chunk_name)
+        Logger.logPrint(f'Chunk file written to: {target_full_path}', "debug")
 
         # Regenerating chunk name if it already exists. Very, very unlikely
         while utils.is_path_exists(target_full_path):
-            chunk_names[i] = save.regenerate_uuid(i)  # TODO write regenerate_uuid
-            target_full_path = utils.join_paths(to_path, chunk_names[i])
+            Logger.logPrint(f'UUID: {chunk_name} already exists ! (omg)', "debug")
 
-        # TODO raise exception if can't write, catch it then delete all the chunks already written
+            chunk_uuids[i] = save.regenerate_uuid(i)
+            chunk_name = save.chunks_names[i]
+
+            Logger.logPrint(f'Regenerated UUID: {chunk_name}', "debug")
+            target_full_path = utils.join_paths(to_path, chunk_name)
+
+        # TODO [enhance] raise exception if can't write, catch it then delete all the chunks already written and exit
         utils.write_buffer_to_file(target_full_path, converted_chunks[i])
+
+    # Container is updated only after all the chunks of the save have been written successfully
+    container_file_name = Container.get_containers_list(to_path)[0]
+
+    container_full_path = utils.join_paths(to_path, container_file_name)
+
+    with open(container_full_path, "r+b") as container:
+        container.read(4)
+
+        current_container_chunk_count = int.from_bytes(container.read(4), byteorder='little')
+
+        new_container_chunk_count = current_container_chunk_count + chunk_count
+
+        container.seek(-4, 1)
+        container.write(new_container_chunk_count.to_bytes(4, byteorder='little'))
+
+    chunks_buffer = BytesIO()
+    for i in range(chunk_count):
+
+        total_written_len = 0
+
+        encoded_save_name = save.name.encode('utf-16le', errors='ignore')
+        total_written_len += chunks_buffer.write(encoded_save_name)
+
+        if chunk_count > 1:
+            # Multi-chunks save. Adding metadata, format: '$${i}${chunk_count}$1'
+            chunk_metadata = f'$${i}${chunk_count}$1'
+
+            encoded_metadata = chunk_metadata.encode('utf-16le', errors='ignore')
+            total_written_len += chunks_buffer.write(encoded_metadata)
+
+        chunks_buffer.write(b"\00" * (144 - total_written_len))
+
+        chunks_buffer.write(chunk_uuids[i].bytes_le)
+
+    Logger.logPrint(f'Editing container: {container_full_path}', "debug")
+    utils.append_buffer_to_file(container_full_path, chunks_buffer)
 
 
 def ask_overwrite_save_while_file_exists(save: AstroSave, target: str) -> None:

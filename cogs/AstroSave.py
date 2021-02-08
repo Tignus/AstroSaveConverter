@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 import re
+import uuid
 from typing import List, Tuple
 from io import BytesIO
 
@@ -25,7 +26,7 @@ class AstroSave():
             rename() -- Renames the save
     """
 
-    def __init__(self, save_name, chunks_names):
+    def __init__(self, save_name: str, chunks_names: List[str]) -> AstroSave:
         """Initiates a save object
 
         Arguments:
@@ -42,10 +43,9 @@ class AstroSave():
         self.chunks_names = chunks_names  # Names of the all the chunks composing the save
 
     @staticmethod
-    # TODO how to mypy the return -> List[AstroSave]
     def init_saves_list_from(steamsave_files_list: List[str]) -> List[AstroSave]:
         """
-        TODO Explains that the chunks are empty and that they will have to be initialized later
+        # TODO [doc] Explains that the chunks are empty and that they will have to be initialized later
         """
         saves_list = []
 
@@ -53,7 +53,7 @@ class AstroSave():
 
             current_save_name = re.search(r'(.*)\.savegame', save_file).group(1)
             saves_list.append(AstroSave(current_save_name,
-                                        None))
+                                        []))
         return saves_list
 
     def convert_to_steam(self, source: str) -> BytesIO:
@@ -76,7 +76,7 @@ class AstroSave():
                 buffer.write(chunk_file.read())
         return buffer
 
-    def convert_to_xbox(self, source: str) -> Tuple[List[str], List[BytesIO]]:
+    def convert_to_xbox(self, source: str) -> Tuple[List[uuid.UUID], List[BytesIO]]:
         """Exports a save as a tuple in its Xbox file format
 
         The save is returned as a tuple (chunks names, chunk buffers) representing all of its chunks
@@ -87,21 +87,41 @@ class AstroSave():
             source: In which folder to read the Steam save
 
         Returns:
-            A tuple containing the names and the buffers of the Xbox chunks
+            A tuple containing the names and the buffers uuid of the Xbox chunks
         """
-        # open the file file_path (AstroSave)
-        #   every XBOX_CHUNK_SIZE
-        #       split into a chunk -> List[buffer(chunk)]
-        #       generate 1 UIID, append it to the save object chunk names (check that it doesnt exist in the appdata wgs folder)
+        # TODO [enhance] this functionned could be renamed by something like load_save_from_steam_file
+        #       and the whole AstroSave class modified to store the uuids list instead of chunk names list + to store the whole buffer of each chunk
+        #       That would make more sense and the tuple wouldn't need to be returned
+        #       The reading of the saves from a container would also be simplified by a lot (by building a uuid from the bytes read in the container)
 
-        return ([], [])  # TODO
-        # buffer = BytesIO()
-        # for chunk_name in self.chunks_names:
-        #     chunk_file_path = join_paths(source, chunk_name)
+        buffer_uuids = []
+        buffers = []
+        self.chunks_names = []
 
-        #     with open(chunk_file_path, 'rb') as chunk_file:
-        #         buffer.write(chunk_file.read())
-        # return buffer
+        len_read = XBOX_CHUNK_SIZE
+        save_file_path = join_paths(source, self.get_file_name())
+
+        with open(save_file_path, 'rb') as save_file:
+
+            while len_read == XBOX_CHUNK_SIZE:
+                buffer = BytesIO()
+                file_uuid = uuid.uuid4()
+                Logger.logPrint(f'UUID generated: {file_uuid}', "debug")
+
+                buffer.write(save_file.read(XBOX_CHUNK_SIZE))
+
+                len_read = len(buffer.getvalue())
+
+                self.chunks_names.append(file_uuid.hex.upper())
+                buffer_uuids.append(file_uuid)
+                buffers.append(buffer)
+
+        return (buffer_uuids, buffers)
+
+    def regenerate_uuid(self, chunk_index: int) -> uuid.UUID:
+        new_uuid = uuid.uuid4()
+        self.chunks_names[chunk_index](new_uuid.hex.upper())
+        return new_uuid
 
     def get_file_name(self):
         return self.name + '.savegame'

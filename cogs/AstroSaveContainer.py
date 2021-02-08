@@ -52,7 +52,7 @@ class AstroSaveContainer():
         """
         self.full_path = container_file_path
         self.save_list = []
-        Logger.logPrint('full_path: {self.full_path}', "debug")
+        Logger.logPrint(f'full_path: {self.full_path}', "debug")
 
         with open(self.full_path, "rb") as container:
             # The Astroneer file type is contained in at least the first 2 bytes of the file
@@ -74,6 +74,7 @@ class AstroSaveContainer():
                 current_chunk = container.read(CHUNK_METADATA_SIZE)
                 current_chunk_name = self.extract_name_from_chunk(
                     current_chunk)
+                Logger.logPrint(f'Save: {current_chunk_name}', "debug")
 
                 if current_chunk_name != current_save_name:
                     if current_save_name != None:
@@ -84,8 +85,10 @@ class AstroSaveContainer():
                     current_chunks_names = []
                     current_save_name = current_chunk_name
 
-                current_chunks_names.append(
-                    self.extract_chunk_file_name_from_chunk(current_chunk))
+                chunk_file_name = self.extract_chunk_file_name_from_chunk(current_chunk)
+                Logger.logPrint(f'Processed chunk: {chunk_file_name}', "debug")
+
+                current_chunks_names.append(chunk_file_name)
 
             # Saving the last save of the container file
             self.save_list.append(AstroSave(current_save_name,

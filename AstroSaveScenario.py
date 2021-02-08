@@ -269,8 +269,8 @@ def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> None:
     utils.write_buffer_to_file(target_full_path, converted_save)
 
 
-def export_save_to_xbox(save: AstroSave, from_path: str, to_path: str) -> None:
-    chunk_uuids, converted_chunks = save.convert_to_xbox(from_path)
+def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
+    chunk_uuids, converted_chunks = save.convert_to_xbox(from_file)
 
     chunk_count = len(chunk_uuids)
 

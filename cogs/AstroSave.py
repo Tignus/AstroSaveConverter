@@ -99,7 +99,7 @@ class AstroSave():
         self.chunks_names = []
 
         len_read = XBOX_CHUNK_SIZE
-        save_file_path = join_paths(source, self.get_file_name())
+        save_file_path = source
 
         with open(save_file_path, 'rb') as save_file:
 

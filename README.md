@@ -7,7 +7,7 @@
   <h3 align="center">AstroSaveConverter - Switch from XBOX to Steam</h3>
 
   <p align="center">
-    <a href="https://github.com/Tignus/AstroSaveConverter/releases">Latest release</a>
+    <a href="https://github.com/Tignus/AstroSaveConverter/releases/latest">Latest release</a>
     ·
     <a href="https://github.com/Tignus/AstroSaveConverter/issues">Post an issue</a>
   </p>

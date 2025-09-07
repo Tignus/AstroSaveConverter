@@ -1,7 +1,6 @@
 import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
-from pprint import pformat
 
 
 """
@@ -12,19 +11,20 @@ from pprint import pformat
 
 
 def logPrint(message, msgType="info"):
+    message = str(message)
     if msgType == "debug":
         logging.debug(message)
     if msgType == "info":
-        logging.info(pformat(message))
+        logging.info(message)
         print(message)
     if msgType == "warning":
-        logging.warning(pformat(message))
+        logging.warning(message)
     if msgType == "exception":
-        logging.exception('Encountered the following exception :')
+        logging.exception(message)
     if msgType == "error":
-        logging.error(pformat(message))
+        logging.error(message)
     if msgType == "critical":
-        logging.critical(pformat(message))
+        logging.critical(message)
 
 
 def setup_logging(astroPath, console_print=True):

@@ -191,8 +191,8 @@ def ask_custom_folder_path() -> str:
         if not os.path.isdir(path):
             try:
                 os.makedirs(path)
-            except OSError as e:
-                Logger.logPrint(e, 'exception')
+            except OSError:
+                Logger.logPrint('Path cannot be created or drive not found.', 'error')
                 Logger.logPrint('\nWrong path for save folder, please enter a valid path : ', 'error')
                 continue
 

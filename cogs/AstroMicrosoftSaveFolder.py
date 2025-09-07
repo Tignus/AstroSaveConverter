@@ -58,22 +58,27 @@ def seek_microsoft_save_folder(appdata_path: str) -> str:
     if len(folders) == 1:
         return folders[0]
 
-    Logger.logPrint("Select the save folder to use:")
+    Logger.logPrint(
+        f"{len(folders)} Microsoft save folders have been found. Select the one to use:"
+    )
     for i, folder in enumerate(folders, 1):
-        details = get_save_details(folder)
-        formatted = ', '.join([f"{name} ({date})" for name, date in details]) if details else folder
-        Logger.logPrint(f"\t{i}) {formatted}")
+        Logger.logPrint(f"\t{i}) {folder}")
+        Logger.logPrint("\tFolder content:")
+        for name, date in get_save_details(folder):
+            Logger.logPrint(f"\t\t{name} - {date}")
 
     while True:
         choice = input()
-        Logger.logPrint(f"User choice: {choice}", "debug")
         try:
             index = int(choice)
             if 1 <= index <= len(folders):
-                return folders[index - 1]
+                break
         except ValueError:
             pass
         Logger.logPrint('Invalid selection. Please enter a valid number.')
+
+    Logger.logPrint(f"User choice: {choice}", "debug")
+    return folders[index - 1]
 
 
 def get_save_folders_from_path(path: str) -> list:

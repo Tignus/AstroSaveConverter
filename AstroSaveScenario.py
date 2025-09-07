@@ -41,6 +41,7 @@ def ask_user_to_choose_in_a_list(text, file_list):
             choice_index = 0
             Logger.logPrint(f'Please use only values between {min_container_number} and {max_container_number}')
 
+    Logger.logPrint(f"User choice: {choice_index}", "debug")
     return file_list[choice_index-1]
 
 
@@ -76,8 +77,8 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
             while work_choice not in ('1', '2'):
                 Logger.logPrint(f'\nPlease choose 1 or 2')
                 work_choice = input()
-                Logger.logPrint(f'folder_type {work_choice}', 'debug')
 
+            Logger.logPrint(f"User choice: {work_choice}", "debug")
             if work_choice == '1':
                 if conversion_type == AstroConvType.WIN2STEAM:
                     astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
@@ -118,7 +119,8 @@ def ask_copy_target(folder_main_name: str):
     while choice not in ('1', '2'):
         Logger.logPrint(f'\nPlease choose 1 or 2')
         choice = input()
-        Logger.logPrint(f'copy_choice {choice}', 'debug')
+
+    Logger.logPrint(f"User choice: {choice}", "debug")
 
     if choice == '1':
         # Winpath is needed here because Windows user can have a custom Desktop location
@@ -126,7 +128,7 @@ def ask_copy_target(folder_main_name: str):
     elif choice == '2':
         Logger.logPrint(f'\nEnter your custom folder path:')
         save_path = input()
-        Logger.logPrint(f'save_path {save_path}', 'debug')
+        Logger.logPrint(f"User choice: {save_path}", "debug")
 
     return utils.join_paths(save_path, utils.create_folder_name(folder_main_name))
 
@@ -134,9 +136,9 @@ def ask_copy_target(folder_main_name: str):
 def ask_custom_folder_path() -> str:
     Logger.logPrint(f'\nEnter your custom folder path:')
     path = input()
-    Logger.logPrint(f'save_folder_path {path}', 'debug')
 
     if utils.is_folder_a_dir(path):
+        Logger.logPrint(f"User choice: {path}", "debug")
         return path
     else:
         Logger.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
@@ -188,6 +190,8 @@ def ask_for_multiple_choices(maximum_value) -> list:
             choices = []
             Logger.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
 
+    Logger.logPrint(f"User choice: {choices}", "debug")
+
     if choices == [-1]:
         return list(range(0, maximum_value))
     else:
@@ -225,6 +229,8 @@ def ask_rename_saves(saves_indexes, save_list):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
 
+    Logger.logPrint(f"User choice: {do_rename}", "debug")
+
     if do_rename == 'y':
         for index in saves_indexes:
             save = save_list[index]
@@ -247,6 +253,8 @@ def rename_save(save):
                 new_name = None
                 Logger.logPrint(f'Please use only alphanum and a length < 30')
 
+    Logger.logPrint(f"User choice: {new_name}", "debug")
+
 
 def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
     file_url = utils.join_paths(target, filename)
@@ -257,6 +265,7 @@ def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
             Logger.logPrint(f'\nFile {filename} already exists, overwrite it ? (y/n)')
             do_overwrite = input().lower()
 
+        Logger.logPrint(f"User choice: {do_overwrite}", "debug")
         return do_overwrite == 'y'
     else:
         return True
@@ -355,8 +364,8 @@ def ask_conversion_type() -> AstroConvType:
     while choice not in ('1', '2'):
         Logger.logPrint(f'\nPlease choose 1 or 2')
         choice = input()
-        Logger.logPrint(f'convert_choice {choice}', 'debug')
 
+    Logger.logPrint(f"User choice: {choice}", "debug")
     if choice == '1':
         return AstroConvType.WIN2STEAM
     else:
@@ -406,8 +415,8 @@ def ask_microsoft_target_folder() -> str:
         choice = input()
         try:
             choice_int = int(choice)
-            Logger.logPrint(f'chosen_folder {choice_int}', 'debug')
             if 1 <= choice_int <= len(save_folders):
+                Logger.logPrint(f"User choice: {choice_int}", "debug")
                 return save_folders[choice_int - 1]
         except ValueError:
             pass

@@ -505,10 +505,10 @@ def backup_win_before_steam_export() -> str:
     try:
         folders = AstroMicrosoftSaveFolder.find_microsoft_save_folders()
     except FileNotFoundError:
-        Logger.logPrint('No Microsoft save folders were found. Choose where to place the converted saves.')
-        Logger.logPrint('\t1) Backup converted save to a new folder on the Desktop')
-        Logger.logPrint('\t2) Backup to a custom path')
-        Logger.logPrint('\t3) Cancel and launch the Microsoft version of Astroneer before retrying')
+        Logger.logPrint('No Microsoft save folders were found. Choose where to place the converted save files so you can manually move them later.')
+        Logger.logPrint('\t1) Place the converted save in a new folder on the Desktop')
+        Logger.logPrint('\t2) Place the converted save in a custom path folder')
+        Logger.logPrint('\t3) Cancel')
         choice = input()
         Logger.logPrint(f"User choice: {choice}", "debug")
         while choice not in ('1', '2', '3'):
@@ -519,6 +519,7 @@ def backup_win_before_steam_export() -> str:
             Logger.logPrint('Launch the Microsoft version of Astroneer once, then relaunch AstroSaveConverter.')
             return ''
         backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
+        utils.make_dir_if_doesnt_exists(backup_path)
         return backup_path
     Logger.logPrint(f"{len(folders)} different Microsoft save folders have been detected. They will all be backed up.")
     backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')

@@ -128,3 +128,31 @@ def backup_microsoft_save_folder(to_path: str) -> str:
     utils.copy_files(astroneer_save_folder, to_path)
 
     return astroneer_save_folder
+
+
+def backup_microsoft_save_folders(to_path: str) -> list:
+    save_folders = []
+
+    try:
+        target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
+    except KeyError:
+        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
+        Logger.logPrint("Press any key to exit")
+        utils.wait_and_exit(1)
+
+    for path in glob.iglob(target):
+        save_folders.extend(get_save_folders_from_path(path))
+
+    Logger.logPrint(f'{len(save_folders)} save folders found', 'debug')
+    for folder in save_folders:
+        Logger.logPrint(f'Save folder found: {folder}', 'debug')
+
+    if not save_folders:
+        raise FileNotFoundError
+
+    utils.make_dir_if_doesnt_exists(to_path)
+    for i, folder in enumerate(save_folders, 1):
+        destination = utils.join_paths(to_path, f'Backup_{i}')
+        utils.copy_files(folder, destination)
+
+    return save_folders

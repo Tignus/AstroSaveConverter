@@ -34,7 +34,7 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
 
     Logger.logPrint('Container file loaded successfully !\n')
 
-    saves_to_export = Scenario.ask_saves_to_export(container.save_list)
+    saves_to_export = Scenario.ask_saves_to_export(container.save_list, "Microsoft")
 
     Scenario.ask_rename_saves(saves_to_export, container.save_list)
 
@@ -71,7 +71,7 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     for save in saves_list:
         original_saves_name.append(save.name)
 
-    saves_indexes_to_export = Scenario.ask_saves_to_export(saves_list)
+    saves_indexes_to_export = Scenario.ask_saves_to_export(saves_list, "Steam")
 
     Scenario.ask_rename_saves(saves_indexes_to_export, saves_list)
 

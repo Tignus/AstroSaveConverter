@@ -153,10 +153,10 @@ def print_save_from_container(save_list):
         Logger.logPrint(f'\t {str(i+1)}) {save.name}')
 
 
-def ask_saves_to_export(save_list: List[AstroSave]) -> List[int]:
+def ask_saves_to_export(save_list: List[AstroSave], platform_label: str) -> List[int]:
     """TODO [doc] explain that this function returns the indexes in the save list and not a sublist of the save_list
     """
-    Logger.logPrint('Extracted save list :')
+    Logger.logPrint(f"{platform_label} saves list :")
     print_save_from_container(save_list)
     Logger.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
     Logger.logPrint('(Multi-convert is supported. Ex: "1,2,4")')

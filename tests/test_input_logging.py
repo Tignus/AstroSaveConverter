@@ -23,10 +23,24 @@ def test_ask_conversion_type_logs_choice():
 
 
 def test_ask_copy_target_logs_choices():
-    with patch.object(builtins, 'input', side_effect=['2', '/tmp']), \
+    """ask_copy_target should log each user response and rely on
+    ask_custom_folder_path's internal loop for invalid folders."""
+
+    # First provide an invalid path ('a') followed by a valid one.  The
+    # function should keep asking until the valid directory is given and log
+    # both attempts.
+    invalid_path = os.path.abspath('a')
+    # Simulate an invalid directory (e.g., wrong drive) by making ``os.makedirs``
+    # raise ``OSError`` for the first user-provided path.  ask_custom_folder_path
+    # should then prompt again until a valid directory (``/tmp``) is provided.
+    real_isdir = os.path.isdir
+    with patch.object(builtins, 'input', side_effect=['2', 'a', '/tmp']), \
+         patch('AstroSaveScenario.os.makedirs', side_effect=OSError), \
+         patch('AstroSaveScenario.os.path.isdir', side_effect=lambda p: False if p == invalid_path else real_isdir(p)), \
          patch('cogs.AstroLogging.logPrint') as log_mock:
         scenario.ask_copy_target('folder', 'Steam')
         assert _call_args_contains(log_mock, call('User choice: 2', 'debug'))
+        assert _call_args_contains(log_mock, call(f'User choice: {invalid_path}', 'debug'))
         assert _call_args_contains(log_mock, call('User choice: /tmp', 'debug'))
 
 

@@ -406,14 +406,14 @@ def ask_microsoft_target_folder() -> str:
     Logger.logPrint('\nWhich Microsoft save folder would you like to copy your Steam save to?')
 
     for i, folder in enumerate(save_folders, 1):
-        Logger.logPrint(f"{i}) {folder}")
-        Logger.logPrint('Contenu du dossier :')
+        Logger.logPrint(f"\t{i}) {folder}")
+        Logger.logPrint('\tFolder content:')
         details = AstroMicrosoftSaveFolder.get_save_details(folder)
         if details:
             for name, date in details:
-                Logger.logPrint(f"\t{name} - {date}")
+                Logger.logPrint(f"\t\t{name} - {date}")
         else:
-            Logger.logPrint("\t<vide>")
+            Logger.logPrint("\t\t<vide>")
 
     while True:
         choice = input()

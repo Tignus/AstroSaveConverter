@@ -30,6 +30,9 @@ def get_microsoft_save_folder() -> str:
     for path in microsoft_save_paths:
         Logger.logPrint(f'SES path found in appadata: {path}', 'debug')
 
+    if not microsoft_save_paths:
+        raise FileNotFoundError("No Microsoft save folder detected")
+
     SES_appdata_path = microsoft_save_paths[-1]
 
     microsoft_save_folder = seek_microsoft_save_folder(SES_appdata_path)

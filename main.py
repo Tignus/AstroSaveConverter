@@ -9,6 +9,8 @@ from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
 from cogs.LoadingBar import LoadingBar
 
+APP_VERSION = "2.0"
+
 
 def get_args() -> Namespace:
     parser = ArgumentParser()
@@ -90,9 +92,10 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
 if __name__ == "__main__":
     try:
         Logger.setup_logging(os.getcwd())
+        Logger.logPrint(f"Starting AstroSaveConverter version {APP_VERSION}")
 
         try:
-            os.system("title AstroSaveConverter 2.0 - Convert your Astroneer saves between Microsoft and Steam")
+            os.system(f"title AstroSaveConverter {APP_VERSION} - Convert your Astroneer saves between Microsoft and Steam")
         except:
             pass
 

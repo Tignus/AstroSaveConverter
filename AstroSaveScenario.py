@@ -69,7 +69,7 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
     """
     while 1:
         try:
-            Logger.logPrint("Which  folder would you like to work with ?")
+            Logger.logPrint("Which folder would you like to work with ?")
             Logger.logPrint("\t1) Automatically detect and copy my save folder (Please close Astroneer first)")
             Logger.logPrint("\t2) Chose a custom folder")
 

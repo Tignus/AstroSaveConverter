@@ -568,6 +568,7 @@ def ask_microsoft_target_folder() -> str:
 
     while True:
         choice = input()
+        Logger.logPrint(f"User choice: {choice}", "debug")
         try:
             choice_int = int(choice)
             if 1 <= choice_int <= len(save_folders):
@@ -576,5 +577,4 @@ def ask_microsoft_target_folder() -> str:
             pass
         Logger.logPrint(f'Please choose a number between 1 and {len(save_folders)}')
 
-    Logger.logPrint(f"User choice: {choice}", "debug")
     return save_folders[choice_int - 1]

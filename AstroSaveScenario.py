@@ -187,14 +187,16 @@ def ask_custom_folder_path() -> str:
     Returns:
         str: A valid directory path provided by the user.
     """
-    Logger.logPrint(f'\nEnter your custom folder path:')
-    path = input()
-    Logger.logPrint(f"User choice: {path}", "debug")
+    while True:
+        Logger.logPrint(f'\nEnter your custom folder path:')
+        input_path = input()
+        path = os.path.normpath(input_path)
+        path = os.path.expanduser(path)
+        Logger.logPrint(f"User choice: {path}", "debug")
 
-    if utils.is_folder_a_dir(path):
-        return path
-    Logger.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
-    return ask_custom_folder_path()
+        if utils.is_folder_a_dir(path):
+            return path
+        Logger.logPrint('\nWrong path for save folder, please enter a valid path : ', 'error')
 
 
 def print_save_from_container(save_list: List[AstroSave]) -> None:

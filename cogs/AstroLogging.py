@@ -1,16 +1,17 @@
+"""Thin wrapper around :mod:`logging` used throughout the project."""
+
 import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
 
 
-"""
-    This class has been modified from the original code to print only
-    the "info" type to the console and add exception printing to the
-    log file.
-"""
-
-
 def logPrint(message, msgType="info"):
+    """Log a message with the provided severity and optionally print it.
+
+    Args:
+        message: Message to log.
+        msgType: Logging level such as ``"info"`` or ``"debug"``.
+    """
     message = str(message)
     if msgType == "debug":
         logging.debug(message)
@@ -27,23 +28,24 @@ def logPrint(message, msgType="info"):
         logging.critical(message)
 
 
-def setup_logging(astroPath, console_print=True):
+def setup_logging(astroPath: str, console_print: bool = True) -> None:
+    """Configure the logging subsystem.
+
+    Args:
+        astroPath: Base directory where log files should be stored.
+        console_print: Unused legacy flag to enable console output.
+    """
     formatter = logging.Formatter(
         '%(asctime)s - %(levelname)-6s %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
     rootLogger = logging.getLogger()
     rootLogger.setLevel(logging.DEBUG)
 
-    # The console print is managed with the "info" message type
-    # console = logging.StreamHandler()
-    # console.setFormatter(formatter)
-
     logsPath = os.path.join(astroPath, 'logs')
     if not os.path.exists(logsPath):
         os.makedirs(logsPath)
 
-    fileLogHandler = TimedRotatingFileHandler(os.path.join(
-        astroPath, 'logs', "astro_converter.log"), 'midnight', 1)
+    fileLogHandler = TimedRotatingFileHandler(
+        os.path.join(astroPath, 'logs', "astro_converter.log"), 'midnight', 1)
     fileLogHandler.setFormatter(formatter)
 
-    # rootLogger.addHandler(console)
     rootLogger.addHandler(fileLogHandler)

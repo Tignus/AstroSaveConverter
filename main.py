@@ -1,3 +1,10 @@
+"""Command-line interface for AstroSaveConverter.
+
+This module exposes the entry points used to convert Astroneer save files
+between Microsoft/Xbox and Steam formats. Functions defined here orchestrate
+user interaction, file discovery and conversion workflows.
+"""
+
 import os
 import utils
 from argparse import ArgumentParser, Namespace
@@ -13,17 +20,31 @@ APP_VERSION = "2.0"
 
 
 def get_args() -> Namespace:
+    """Parse command-line arguments.
+
+    Returns:
+        Namespace: Parsed command-line arguments.
+    """
     parser = ArgumentParser()
-
     parser.add_argument(
-        "-p", "--savesPath", help="Path from which to read the container and extract the saves", required=False)
-
-    args = parser.parse_args()
-
-    return args
+        "-p",
+        "--savesPath",
+        help="Path from which to read the container and extract the saves",
+        required=False,
+    )
+    return parser.parse_args()
 
 
 def windows_to_steam_conversion(original_save_path: str) -> None:
+    """Convert Microsoft/Xbox saves to the Steam format.
+
+    Args:
+        original_save_path: Folder containing the Microsoft save container and
+            chunks.
+
+    Raises:
+        FileNotFoundError: If no container file is found in ``original_save_path``.
+    """
     containers_list = Container.get_containers_list(original_save_path)
 
     Logger.logPrint('\nContainers found:' + str(containers_list))
@@ -58,6 +79,14 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
 
 
 def steam_to_windows_conversion(original_save_path: str) -> None:
+    """Convert Steam saves to the Microsoft/Xbox format.
+
+    Args:
+        original_save_path: Directory containing Steam ``.savegame`` files.
+
+    Raises:
+        FileNotFoundError: If a save file to convert cannot be located.
+    """
     Logger.logPrint('\n\n/!\\ WARNING /!\\')
     Logger.logPrint('/!\\ Astroneer needs to be closed longer than 20 seconds before we can start exporting your saves /!\\')
     Logger.logPrint('/!\\ More info and save restoring procedure are available on Github (cf. README) /!\\')

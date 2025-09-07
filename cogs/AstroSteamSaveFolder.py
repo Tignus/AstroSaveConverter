@@ -1,17 +1,24 @@
 import os
 from cogs import AstroLogging as Logger
+"""Helpers for locating Steam save folders."""
+
+import os
 import utils
 from errors import MultipleFolderFoundError
 import re
 import glob
+from cogs import AstroLogging as Logger
 
 
 def get_steam_save_folder() -> str:
-    """ Retrieves the Steam save folders from %LocalAppdata%
+    """Return the path to the Steam save folder.
 
-    :return: The Steam save folder content found in %appdata%
-    :exception: FileNotFoundError if no save folder is found
-    :exception: MultipleFolderFoundError if multiple save folder are found
+    Returns:
+        str: Path to the Steam save folder.
+
+    Raises:
+        FileNotFoundError: If no save folder is found.
+        MultipleFolderFoundError: If multiple folders are detected.
     """
 
     try:
@@ -29,21 +36,33 @@ def get_steam_save_folder() -> str:
     return steam_save_paths[0]
 
 
-def seek_microsoft_save_folder(appdata_path) -> str:
+def seek_microsoft_save_folder(appdata_path: str) -> str:
+    """Identify the unique Microsoft save folder inside ``appdata_path``.
+
+    Args:
+        appdata_path: Base directory to search.
+
+    Returns:
+        str: Path to the save folder.
+
+    Raises:
+        FileNotFoundError: If no folder is found.
+        MultipleFolderFoundError: If more than one folder is found.
+    """
     folders = get_save_folders_from_path(appdata_path)
 
     if not folders:
         Logger.logPrint(f'No save folder found.', 'debug')
         raise FileNotFoundError
-    elif len(folders) != 1:
-        # We are not supposed to have more than one save folder
+    if len(folders) != 1:
         Logger.logPrint(f'More than one save folders was found:\n {folders}', 'debug')
         raise MultipleFolderFoundError
 
     return folders[0]
 
 
-def get_save_folders_from_path(path) -> list:
+def get_save_folders_from_path(path: str) -> list:
+    """Return all subdirectories containing a container file."""
     microsoft_save_folders = []
 
     for root, _, files in os.walk(path):
@@ -62,15 +81,13 @@ def get_save_folders_from_path(path) -> list:
     return microsoft_save_folders
 
 
-def read_container_text_from_path(path) -> str:
+def read_container_text_from_path(path: str) -> str:
+    """Return decoded text from a container file."""
     with open(path, 'rb') as container_file:
-        # Decoding the container to check for a date string
         binary_content = container_file.read()
-        text = binary_content.decode('utf-16le', errors='ignore')
-
-        return text
+        return binary_content.decode('utf-16le', errors='ignore')
 
 
-def do_container_text_match_date(text) -> bool:
-    # Do save date matches $YYYY.MM.dd
+def do_container_text_match_date(text: str) -> bool:
+    """Return ``True`` if ``text`` contains a date pattern."""
     return re.search(r'\$\d{4}\.\d{2}\.\d{2}', text)

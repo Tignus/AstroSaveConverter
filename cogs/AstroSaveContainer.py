@@ -1,3 +1,5 @@
+"""Parsing and handling of Astroneer save container files."""
+
 import os
 import hexdump
 import re
@@ -10,45 +12,14 @@ from cogs import AstroLogging as Logger
 CHUNK_METADATA_SIZE = 160  # Length of a chunk metadata found in a save container
 
 
-class AstroSaveContainer():
-    """
-        The Astroneer Save Container Class.
+class AstroSaveContainer:
+    """Represent an Astroneer save container and its contents."""
 
-        This object represents an Astroneer save container
+    def __init__(self, container_file_path: str) -> None:
+        """Load saves from a container file.
 
-        Attributes:
-            path -- Path of the container file
-            header -- Header of the container file
-            chunk_count -- Number of save chunks in the container file
-            save_list -- List of all the saves contained in the file
-
-        Methods:
-            print_container() -- Prints the saves
-            xbox_to_steam(save_to_convert) -- Convert one or several saves
-            is_valid_container_header(header) -- Validate the header
-            extract_name_from_chunk(chunk) -- Extract a save name from a chunk
-            extract_chunk_file_name_from_chunk(chunk) -- Extract the file name of a chunk
-            chunk_grab_bytes_to_string(chunk, index, n) -- Read some bytes of a chunk
-            reverse_string(string) -- Convert a string to its reversed form
-            convert_chunk_name_to_file_name(string) -- Convert the name of a chunk to its corresponding file name
-            string_to_hex(string) -- Convert a string to its hexadecimal form
-    """
-
-    def __init__(self, container_file_path):
-        """
-        Extracts the saves from an Astroneer save container
-
-        Reads the container file, divides it into chunks and
-        regroups the chunks into save objects
-
-        Arguments:
-            container_file_path -- Path to the container file
-
-        Returns:
-            The AstroSaveContainer object 
-
-        Exception:
-            None
+        Args:
+            container_file_path: Path to the container file.
         """
         self.full_path = container_file_path
         self.save_list = []
@@ -94,36 +65,19 @@ class AstroSaveContainer():
             self.save_list.append(AstroSave(current_save_name,
                                             current_chunks_names))
 
-    def is_valid_container_header(self, header):
-        """
-        Validates the container header against the expected save container header
-
-        Arguments:
-            header -- The header to validate
-
-        Returns:
-            True if the header is correct
-            False otherwise 
-
-        Exception:
-            None
-        """
-        # A save container starts with those 2 bytes
+    def is_valid_container_header(self, header: bytes) -> bool:
+        """Validate a container file header."""
         expected_header = b'\x04\x00'
         return header == expected_header
 
-    def extract_name_from_chunk(self, chunk):
-        """
-        Extracts the save name inside a chunk
+    def extract_name_from_chunk(self, chunk: bytes) -> str:
+        """Extract the save name stored in a chunk.
 
-        Arguments:
-            chunk -- Chunk from which to extract the save name
+        Args:
+            chunk: Raw chunk bytes.
 
         Returns:
-            The name of the save 
-
-        Exception:
-            None
+            str: Name of the save.
         """
         # Reading the whole UTF-16 string in the chunk
         utf_16_encoded_text = chunk[0:CHUNK_METADATA_SIZE -
@@ -133,18 +87,14 @@ class AstroSaveContainer():
         # or '\x00' if only one chunk
         return re.split('[$]{2}|[\\x00]', utf_16_encoded_text)[0]
 
-    def extract_chunk_file_name_from_chunk(self, chunk):
-        """
-        Extracts the file name of a chunk 
+    def extract_chunk_file_name_from_chunk(self, chunk: bytes) -> str:
+        """Extract the filename associated with a chunk.
 
-        Arguments:
-            chunk -- Chunk from which to extract the file name
+        Args:
+            chunk: Chunk to inspect.
 
         Returns:
-            The name of the file 
-
-        Exception:
-            None
+            str: Filename derived from the chunk metadata.
         """
         chunk_file_name = ''
         partial_name = ''
@@ -164,20 +114,16 @@ class AstroSaveContainer():
 
         return chunk_file_name
 
-    def chunk_grab_bytes_to_string(self, chunk, index, n):
-        """
-        Reads bytes from a chunk and put them in a string
+    def chunk_grab_bytes_to_string(self, chunk: bytes, index: int, n: int):
+        """Read ``n`` bytes from ``chunk`` starting at ``index``.
 
-        Arguments:
-            chunk -- Chunk from which to read bytes
-            index -- Index from where to start reading
-            n -- Number of bytes to read
+        Args:
+            chunk: Source bytes.
+            index: Starting index.
+            n: Number of bytes to read.
 
         Returns:
-            The extracted string 
-
-        Exception:
-            None
+            tuple[str, int]: Extracted string and new index position.
         """
         extracted_string = ''
         for _ in range(n):
@@ -186,63 +132,30 @@ class AstroSaveContainer():
 
         return (extracted_string, index)
 
-    def reverse_string(self, string):
-        """
-        Reverses a string
+    def reverse_string(self, string: str) -> str:
+        """Return ``string`` reversed."""
+        return string[::-1]
 
-        Arguments:
-            string -- string to reverse
-
-        Returns:
-            The reversed string 
-
-        Exception:
-            None
-        """
-        return string[:: -1]
-
-    def convert_chunk_name_to_file_name(self, string):
-        """
-        Converts the chunk name to its file name
-
-        Arguments:
-            string -- string to convert
-
-        Returns:
-            The converted string 
-
-        Exception:
-            None
-        """
+    def convert_chunk_name_to_file_name(self, string: str) -> str:
+        """Convert a chunk's display name to its filename."""
         return self.string_to_hex(self.reverse_string(string))
 
-    def string_to_hex(self, string):
-        """
-        Converts a string to its hexadecimal characters in upper case latin1 encoding
-
-        Arguments:
-            string -- string to convert
-
-        Returns:
-            The converted string 
-
-        Exception:
-            None
-        """
+    def string_to_hex(self, string: str) -> str:
+        """Convert ``string`` to uppercase hexadecimal using Latin-1 encoding."""
         return string.encode('latin1').hex().upper()
 
     @staticmethod
     def get_containers_list(path) -> list:
-        """List all containers in a folder
+        """List all container files in ``path``.
 
-        Arguments:
-            path -- path where to search containers
+        Args:
+            path: Directory to search.
 
         Returns:
-            Returns a list of all containers found (only filename of container)
+            list: Container filenames found in ``path``.
 
-        Exception:
-            None
+        Raises:
+            FileNotFoundError: If no container is found.
         """
         folder_content = list_folder_content(path)
         containers_list = [
@@ -255,4 +168,12 @@ class AstroSaveContainer():
 
     @staticmethod
     def is_a_container_file(path) -> bool:
+        """Return ``True`` if ``path`` looks like a save container.
+
+        Args:
+            path: File path to inspect.
+
+        Returns:
+            bool: ``True`` if the file name contains ``'container'``.
+        """
         return is_a_file(path) and path.rfind('container') != -1

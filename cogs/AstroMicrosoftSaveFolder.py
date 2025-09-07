@@ -1,3 +1,5 @@
+"""Utilities for locating and backing up Microsoft/Xbox save folders."""
+
 import os
 from cogs import AstroLogging as Logger
 import utils
@@ -7,16 +9,13 @@ from datetime import datetime
 
 
 def get_microsoft_save_folder() -> str:
-    """ Retrieves the microsoft save folders from %LocalAppdata%
+    """Return the path to the Microsoft save folder.
 
-    We know that the saves are stored along with a container.* file.
-    We look for that specific container by checking if it contains a
-    save date in order to return the whole path
+    Returns:
+        str: Path to the save folder.
 
-    If multiple folders are detected, the user will be prompted to select one.
-
-    :return: The list of the microsoft save folder content found in %appdata%
-    :exception: FileNotFoundError if no save folder is found
+    Raises:
+        FileNotFoundError: If no folder can be located.
     """
 
     try:
@@ -38,7 +37,18 @@ def get_microsoft_save_folder() -> str:
     return microsoft_save_folder
 
 
-def seek_microsoft_save_folder(appdata_path) -> str:
+def seek_microsoft_save_folder(appdata_path: str) -> str:
+    """Search for a valid Microsoft save folder inside ``appdata_path``.
+
+    Args:
+        appdata_path: Base directory to search.
+
+    Returns:
+        str: Chosen save folder path.
+
+    Raises:
+        FileNotFoundError: If no folders are found.
+    """
     folders = get_save_folders_from_path(appdata_path)
 
     if not folders:
@@ -51,10 +61,7 @@ def seek_microsoft_save_folder(appdata_path) -> str:
     Logger.logPrint("Select the save folder to use:")
     for i, folder in enumerate(folders, 1):
         details = get_save_details(folder)
-        if details:
-            formatted = ', '.join([f"{name} ({date})" for name, date in details])
-        else:
-            formatted = folder
+        formatted = ', '.join([f"{name} ({date})" for name, date in details]) if details else folder
         Logger.logPrint(f"\t{i}) {formatted}")
 
     while True:
@@ -69,7 +76,15 @@ def seek_microsoft_save_folder(appdata_path) -> str:
         Logger.logPrint('Invalid selection. Please enter a valid number.')
 
 
-def get_save_folders_from_path(path) -> list:
+def get_save_folders_from_path(path: str) -> list:
+    """Return all subdirectories containing a valid container file.
+
+    Args:
+        path: Directory to scan recursively.
+
+    Returns:
+        list: Paths of detected save folders.
+    """
     microsoft_save_folders = []
 
     for root, _, files in os.walk(path):
@@ -89,7 +104,7 @@ def get_save_folders_from_path(path) -> list:
 
 
 def get_save_details(folder_path: str):
-    """Return list of (save_name, date_str) found in the folder's container file."""
+    """Return list of ``(save_name, date_str)`` for saves in ``folder_path``."""
     container_files = glob.glob(utils.join_paths(folder_path, 'container.*'))
     if not container_files:
         return []
@@ -110,21 +125,27 @@ def get_save_details(folder_path: str):
     return details
 
 
-def read_container_text_from_path(path) -> str:
+def read_container_text_from_path(path: str) -> str:
+    """Read a container file and return its decoded text."""
     with open(path, 'rb') as container_file:
-        # Decoding the container to check for a date string
         binary_content = container_file.read()
-        text = binary_content.decode('utf-16le', errors='ignore')
-
-        return text
+        return binary_content.decode('utf-16le', errors='ignore')
 
 
-def do_container_text_match_date(text) -> bool:
-    # Do save date matches $YYYY.MM.dd
+def do_container_text_match_date(text: str) -> bool:
+    """Check whether container text contains a date pattern."""
     return re.search(r'\$\d{4}\.\d{2}\.\d{2}', text)
 
 
 def backup_microsoft_save_folder(to_path: str) -> str:
+    """Copy the Microsoft save folder to ``to_path``.
+
+    Args:
+        to_path: Destination directory for the backup.
+
+    Returns:
+        str: Path to the original save folder that was backed up.
+    """
     astroneer_save_folder = get_microsoft_save_folder()
     utils.copy_files(astroneer_save_folder, to_path)
 
@@ -132,6 +153,7 @@ def backup_microsoft_save_folder(to_path: str) -> str:
 
 
 def find_microsoft_save_folders() -> list:
+    """Find all Microsoft save folders on the system."""
     save_folders = []
 
     try:
@@ -155,6 +177,7 @@ def find_microsoft_save_folders() -> list:
 
 
 def backup_microsoft_save_folders(folders: list, to_path: str) -> list:
+    """Backup multiple Microsoft save folders into numbered directories."""
     utils.make_dir_if_doesnt_exists(to_path)
     for i, folder in enumerate(folders, 1):
         destination = utils.join_paths(to_path, f'Backup_{i}')

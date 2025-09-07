@@ -7,7 +7,6 @@ from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
 from cogs.LoadingBar import LoadingBar
-from errors import MultipleFolderFoundError
 
 
 def get_args() -> Namespace:

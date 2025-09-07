@@ -1,9 +1,9 @@
 import os
 from cogs import AstroLogging as Logger
 import utils
-from errors import MultipleFolderFoundError
 import re
 import glob
+from datetime import datetime
 
 
 def get_microsoft_save_folder() -> str:
@@ -13,9 +13,10 @@ def get_microsoft_save_folder() -> str:
     We look for that specific container by checking if it contains a
     save date in order to return the whole path
 
+    If multiple folders are detected, the user will be prompted to select one.
+
     :return: The list of the microsoft save folder content found in %appdata%
     :exception: FileNotFoundError if no save folder is found
-    :exception: MultipleFolderFoundError if multiple save folder are found
     """
 
     try:
@@ -43,12 +44,28 @@ def seek_microsoft_save_folder(appdata_path) -> str:
     if not folders:
         Logger.logPrint(f'No save folder found.', 'debug')
         raise FileNotFoundError
-    elif len(folders) != 1:
-        # We are not supposed to have more than one save folder
-        Logger.logPrint(f'More than one save folders was found:\n {folders}', 'debug')
-        raise MultipleFolderFoundError
 
-    return folders[0]
+    if len(folders) == 1:
+        return folders[0]
+
+    for i, folder in enumerate(folders, 1):
+        details = get_save_details(folder)
+        if details:
+            formatted = ', '.join([f"{name} ({date})" for name, date in details])
+        else:
+            formatted = folder
+        Logger.logPrint(f"{i}) {formatted}")
+
+    while True:
+        Logger.logPrint('Select the save folder to use:')
+        choice = input()
+        try:
+            index = int(choice)
+            if 1 <= index <= len(folders):
+                return folders[index - 1]
+        except ValueError:
+            pass
+        Logger.logPrint('Invalid selection. Please enter a valid number.')
 
 
 def get_save_folders_from_path(path) -> list:
@@ -68,6 +85,28 @@ def get_save_folders_from_path(path) -> list:
                     microsoft_save_folders.append(root)
 
     return microsoft_save_folders
+
+
+def get_save_details(folder_path: str):
+    """Return list of (save_name, date_str) found in the folder's container file."""
+    container_files = glob.glob(utils.join_paths(folder_path, 'container.*'))
+    if not container_files:
+        return []
+
+    container_path = container_files[0]
+    with open(container_path, 'rb') as container_file:
+        text = container_file.read().decode('utf-16le', errors='ignore')
+
+    pattern = re.compile(r'([A-Za-z0-9_]+)\$c?(\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2})')
+    details = []
+    for name, date_str in pattern.findall(text):
+        try:
+            dt = datetime.strptime(date_str, '%Y.%m.%d-%H.%M.%S')
+            formatted_date = dt.strftime('%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            formatted_date = date_str
+        details.append((name, formatted_date))
+    return details
 
 
 def read_container_text_from_path(path) -> str:

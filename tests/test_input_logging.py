@@ -80,7 +80,6 @@ def test_ask_microsoft_target_folder_logs_choice():
 def test_backup_win_before_steam_export_logs_choice():
     with patch.object(builtins, 'input', side_effect=['4', '3']), \
          patch('cogs.AstroMicrosoftSaveFolder.find_microsoft_save_folders', side_effect=FileNotFoundError()), \
-         patch('AstroSaveScenario.ask_copy_target', return_value='/tmp'), \
          patch('cogs.AstroLogging.logPrint') as log_mock:
         result = scenario.backup_win_before_steam_export()
         assert result == ''

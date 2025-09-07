@@ -168,6 +168,17 @@ class AstroSaveContainer:
         return containers_list
 
     @staticmethod
+    def create_empty_container(path: str) -> None:
+        """Create an empty container file in ``path``.
+
+        Args:
+            path: Directory where the blank container should be created.
+        """
+        container_full_path = join_paths(path, 'container.1')
+        with open(container_full_path, 'wb') as container:
+            container.write(b'\x04\x00\x00\x00\x00\x00\x00\x00')
+
+    @staticmethod
     def is_a_container_file(path) -> bool:
         """Return ``True`` if ``path`` looks like a save container.
 

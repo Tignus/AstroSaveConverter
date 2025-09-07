@@ -83,7 +83,7 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
         export_path = Scenario.export_save_to_steam(save, original_save_path, to_path)
         Logger.logPrint(f"Container: {container_url} has been exported to {export_path}", "debug")
 
-        Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
+        Logger.logPrint(f"\nSave {save.name} has been exported successfully to {export_path}")
 
 
 def steam_to_windows_conversion(original_save_path: str) -> None:
@@ -123,9 +123,9 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     for save_index in saves_indexes_to_export:
         save = saves_list[save_index]
         original_save_full_path = utils.join_paths(original_save_path, original_saves_name[save_index]+'.savegame')
-        Scenario.export_save_to_xbox(save, original_save_full_path, microsoft_target_folder)
+        export_path = Scenario.export_save_to_xbox(save, original_save_full_path, microsoft_target_folder)
 
-        Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
+        Logger.logPrint(f"\nSave {save.name} has been exported successfully to {export_path}")
 
 
 if __name__ == "__main__":

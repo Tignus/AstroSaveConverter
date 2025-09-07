@@ -48,16 +48,16 @@ def seek_microsoft_save_folder(appdata_path) -> str:
     if len(folders) == 1:
         return folders[0]
 
+    Logger.logPrint("Select the save folder to use:")
     for i, folder in enumerate(folders, 1):
         details = get_save_details(folder)
         if details:
             formatted = ', '.join([f"{name} ({date})" for name, date in details])
         else:
             formatted = folder
-        Logger.logPrint(f"{i}) {formatted}")
+        Logger.logPrint(f"\t{i}) {formatted}")
 
     while True:
-        Logger.logPrint('Select the save folder to use:')
         choice = input()
         try:
             index = int(choice)

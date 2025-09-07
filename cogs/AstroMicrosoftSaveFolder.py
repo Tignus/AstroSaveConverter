@@ -131,7 +131,7 @@ def backup_microsoft_save_folder(to_path: str) -> str:
     return astroneer_save_folder
 
 
-def backup_microsoft_save_folders(to_path: str) -> list:
+def find_microsoft_save_folders() -> list:
     save_folders = []
 
     try:
@@ -151,9 +151,13 @@ def backup_microsoft_save_folders(to_path: str) -> list:
     if not save_folders:
         raise FileNotFoundError
 
+    return save_folders
+
+
+def backup_microsoft_save_folders(folders: list, to_path: str) -> list:
     utils.make_dir_if_doesnt_exists(to_path)
-    for i, folder in enumerate(save_folders, 1):
+    for i, folder in enumerate(folders, 1):
         destination = utils.join_paths(to_path, f'Backup_{i}')
         utils.copy_files(folder, destination)
 
-    return save_folders
+    return folders

@@ -7,7 +7,6 @@ from cogs import AstroSteamSaveFolder
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
-from errors import MultipleFolderFoundError
 
 
 def ask_for_containers_to_convert(containers):
@@ -95,8 +94,6 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
 
             return save_path
 
-        except MultipleFolderFoundError:
-            Logger.logPrint(f'\nToo many save folders found ! Please use custom folder mode.')
         except FileNotFoundError as e:
             Logger.logPrint('\nNo container found in path: ' + save_path)
             Logger.logPrint(e, 'exception')

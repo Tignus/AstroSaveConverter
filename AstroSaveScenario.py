@@ -364,7 +364,7 @@ def ask_conversion_type() -> AstroConvType:
 def backup_win_before_steam_export() -> str:
     Logger.logPrint('\nFor safety reasons, we will now copy your current Microsoft Astroneer saves')
     backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup')
+    save_folders = AstroMicrosoftSaveFolder.backup_microsoft_save_folders(backup_path)
+    Logger.logPrint(f"{len(save_folders)} dossiers différents ont été détectés, ils seront tous sauvegardés")
 
-    astroneer_save_folder = AstroMicrosoftSaveFolder.backup_microsoft_save_folder(backup_path)
-
-    return astroneer_save_folder
+    return save_folders[0]

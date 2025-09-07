@@ -232,17 +232,17 @@ class AstroSaveContainer():
         return string.encode('latin1').hex().upper()
 
     @staticmethod
-    def get_containers_list(path) -> list:
-        """List all containers in a folder
+    def get_containers_list(path: str) -> list:
+        """Return container filenames found in a directory.
 
-        Arguments:
-            path -- path where to search containers
+        Args:
+            path: Directory to search for ``container.*`` files.
 
         Returns:
-            Returns a list of all containers found (only filename of container)
+            List of container filenames located in ``path``.
 
-        Exception:
-            None
+        Raises:
+            FileNotFoundError: If no ``container.*`` files are found.
         """
         folder_content = list_folder_content(path)
         containers_list = [

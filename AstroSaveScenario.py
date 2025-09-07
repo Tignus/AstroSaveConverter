@@ -115,9 +115,14 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
                     try:
                         astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
                         Logger.logPrint(f'Microsoft folder path: {astroneer_save_folder}', 'debug')
-                        save_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
-                        utils.copy_files(astroneer_save_folder, save_path)
-                        Logger.logPrint(f'Save files copied to: {save_path}')
+                        while True:
+                            save_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
+                            try:
+                                utils.copy_files(astroneer_save_folder, save_path)
+                                Logger.logPrint(f'Save files copied to: {save_path}')
+                                break
+                            except (OSError, FileNotFoundError):
+                                Logger.logPrint('Invalid path; please choose another backup location')
                     except FileNotFoundError:
                         Logger.logPrint('No Microsoft folder detected. If you think this is a bug, please visit github.com/Tignus/AstroSaveConverter/')
                         Logger.logPrint('Press any key to exit')
@@ -125,9 +130,14 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
                 else:
                     astroneer_save_folder = AstroSteamSaveFolder.get_steam_save_folder()
                     Logger.logPrint(f'Steam folder path: {astroneer_save_folder}', 'debug')
-                    save_path = ask_copy_target('SteamAstroSaveBackup', 'Steam')
-                    utils.copy_files(astroneer_save_folder, save_path)
-                    Logger.logPrint(f'Save files copied to: {save_path}')
+                    while True:
+                        save_path = ask_copy_target('SteamAstroSaveBackup', 'Steam')
+                        try:
+                            utils.copy_files(astroneer_save_folder, save_path)
+                            Logger.logPrint(f'Save files copied to: {save_path}')
+                            break
+                        except (OSError, FileNotFoundError):
+                            Logger.logPrint('Invalid path; please choose another backup location')
 
             elif work_choice == '2':
                 save_path = ask_custom_folder_path()
@@ -164,9 +174,7 @@ def ask_copy_target(folder_main_name: str, save_type: str) -> str:
         # Winpath is needed here because Windows user can have a custom Desktop location
         save_path = utils.get_windows_desktop_path()
     elif choice == '2':
-        Logger.logPrint(f'\nEnter your custom folder path:')
-        save_path = input()
-        Logger.logPrint(f"User choice: {save_path}", "debug")
+        save_path = ask_custom_folder_path()
 
     return utils.join_paths(save_path, utils.create_folder_name(folder_main_name))
 

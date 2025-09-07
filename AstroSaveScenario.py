@@ -83,11 +83,11 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
                 if conversion_type == AstroConvType.WIN2STEAM:
                     astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
                     Logger.logPrint(f'Microsoft folder path: {astroneer_save_folder}', 'debug')
-                    save_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'microsoft')
+                    save_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
                 else:
                     astroneer_save_folder = AstroSteamSaveFolder.get_steam_save_folder()
                     Logger.logPrint(f'Steam folder path: {astroneer_save_folder}', 'debug')
-                    save_path = ask_copy_target('SteamAstroSaveBackup', 'steam')
+                    save_path = ask_copy_target('SteamAstroSaveBackup', 'Steam')
 
                 utils.copy_files(astroneer_save_folder, save_path)
 
@@ -113,7 +113,7 @@ def ask_copy_target(folder_main_name: str, save_type: str):
     Returns
         ...
     '''
-    Logger.logPrint(f'Where would you like to backup your {save_type} save folder ?')
+    Logger.logPrint(f'Where would you like to backup your {save_type.capitalize()} save folder ?')
     Logger.logPrint('\t1) New folder on my desktop')
     Logger.logPrint("\t2) New folder in a custom path")
 
@@ -156,7 +156,7 @@ def print_save_from_container(save_list):
 def ask_saves_to_export(save_list: List[AstroSave], platform_label: str) -> List[int]:
     """TODO [doc] explain that this function returns the indexes in the save list and not a sublist of the save_list
     """
-    Logger.logPrint(f"{platform_label} saves list :")
+    Logger.logPrint(f"{platform_label.capitalize()} saves list :")
     print_save_from_container(save_list)
     Logger.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
     Logger.logPrint('(Multi-convert is supported. Ex: "1,2,4")')
@@ -378,7 +378,7 @@ def backup_win_before_steam_export() -> str:
     Logger.logPrint('\nFor safety reasons, we will now copy your current Microsoft Astroneer saves')
     folders = AstroMicrosoftSaveFolder.find_microsoft_save_folders()
     Logger.logPrint(f"{len(folders)} different Microsoft save folders have been detected. They will all be backed up.")
-    backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'microsoft')
+    backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
     AstroMicrosoftSaveFolder.backup_microsoft_save_folders(folders, backup_path)
     Logger.logPrint(f'Save files copied to: {backup_path}')
 

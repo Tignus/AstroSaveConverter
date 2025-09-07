@@ -173,7 +173,9 @@ def ask_copy_target(folder_main_name: str, save_type: str) -> str:
     if choice == '1':
         # Winpath is needed here because Windows user can have a custom Desktop location
         save_path = utils.get_windows_desktop_path()
-    elif choice == '2':
+    else:
+        # ``ask_custom_folder_path`` handles its own validation loop, so a
+        # simple call here is sufficient even for short inputs like "a".
         save_path = ask_custom_folder_path()
 
     return utils.join_paths(save_path, utils.create_folder_name(folder_main_name))

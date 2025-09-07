@@ -544,11 +544,11 @@ def backup_win_before_steam_export() -> str:
             base_path = utils.get_windows_desktop_path()
         else:
             base_path = ask_custom_folder_path()
-        output_path = utils.join_paths(base_path, utils.create_folder_name('MicrosoftAstroneerSavesBackup'))
+        output_path = utils.join_paths(base_path, utils.create_folder_name('MicrosoftAstroneerSave'))
         utils.make_dir_if_doesnt_exists(output_path)
         return output_path
     Logger.logPrint(f"{len(folders)} different Microsoft save folders have been detected. They will all be backed up.")
-    backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
+    backup_path = ask_copy_target('MicrosoftAstroneerSave', 'Microsoft')
     AstroMicrosoftSaveFolder.backup_microsoft_save_folders(folders, backup_path)
     Logger.logPrint(f'Save files copied to: {backup_path}')
 

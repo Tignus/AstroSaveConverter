@@ -3,6 +3,7 @@ import utils
 from argparse import ArgumentParser, Namespace
 import AstroSaveScenario as Scenario
 from cogs import AstroLogging as Logger
+from cogs import AstroSteamSaveFolder
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
@@ -38,11 +39,11 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
 
     Scenario.ask_rename_saves(saves_to_export, container.save_list)
 
-    to_path = utils.join_paths(original_save_path, 'Steam saves')
+    to_path = AstroSteamSaveFolder.get_steam_save_folder()
     utils.make_dir_if_doesnt_exists(to_path)
 
     Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_to_export])}')
-    Logger.logPrint(f'Container: {container.full_path} Export to: {to_path}', "debug")
+    Logger.logPrint(f'Exporting to Steam folder: {to_path}', "debug")
 
     for save_index in saves_to_export:
         save = container.save_list[save_index]

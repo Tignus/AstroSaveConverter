@@ -72,6 +72,7 @@ def seek_microsoft_save_folder(appdata_path: str) -> str:
 
     while True:
         choice = input()
+        Logger.logPrint(f"User choice: {choice}", "debug")
         try:
             index = int(choice)
             if 1 <= index <= len(folders):
@@ -80,7 +81,6 @@ def seek_microsoft_save_folder(appdata_path: str) -> str:
             pass
         Logger.logPrint('Invalid selection. Please enter a valid number.')
 
-    Logger.logPrint(f"User choice: {choice}", "debug")
     return folders[index - 1]
 
 

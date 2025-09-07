@@ -1,3 +1,5 @@
+"""Helper script to build the standalone executable using PyInstaller."""
+
 import PyInstaller.__main__
 import os
 import shutil

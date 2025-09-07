@@ -1,4 +1,6 @@
 from __future__ import annotations
+"""Representation of an Astroneer save and related helpers."""
+
 import os
 import re
 import uuid
@@ -12,48 +14,26 @@ from utils import is_a_file, list_folder_content, join_paths
 XBOX_CHUNK_SIZE = int.from_bytes(b'\x01\x00\x00\x00', byteorder='big')
 
 
-class AstroSave():
-    """The Astroneer Save Class.
+class AstroSave:
+    """In-memory representation of an Astroneer save."""
 
-        This object represents an Astroneer save
+    def __init__(self, save_name: str, chunks_names: List[str]) -> None:
+        """Create a new ``AstroSave`` instance.
 
-        Attributes:
-            save_name -- Name of the save
-            chunks_names -- Names of the chunks constituting the save
-
-        Methods:
-            export_to_steam() -- Writes the save to disk
-            rename() -- Renames the save
-    """
-
-    def __init__(self, save_name: str, chunks_names: List[str]) -> AstroSave:
-        """Initiates a save object
-
-        Arguments:
-            save_name -- Name of the save
-            chunks_names -- Names of the chunks constituting the save
-
-        Returns:
-            The AstroSave object
-
-        Exception:
-            None
+        Args:
+            save_name: Name of the save.
+            chunks_names: Names of the chunks constituting the save.
         """
         self.name = save_name  # User-defined save name + '$' + YYYY.MM.dd-HH.mm.ss
         self.chunks_names = chunks_names  # Names of the all the chunks composing the save
 
     @staticmethod
-    def init_saves_list_from(steamsave_files_list: List[str]) -> List[AstroSave]:
-        """
-        # TODO [doc] Explains that the chunks are empty and that they will have to be initialized later
-        """
-        saves_list = []
-
+    def init_saves_list_from(steamsave_files_list: List[str]) -> List['AstroSave']:
+        """Create ``AstroSave`` objects for a list of Steam save files."""
+        saves_list: List[AstroSave] = []
         for save_file in steamsave_files_list:
-
             current_save_name = re.search(r'(.*)\.savegame', save_file).group(1)
-            saves_list.append(AstroSave(current_save_name,
-                                        []))
+            saves_list.append(AstroSave(current_save_name, []))
         return saves_list
 
     def convert_to_steam(self, source: str) -> BytesIO:
@@ -77,32 +57,22 @@ class AstroSave():
         return buffer
 
     def convert_to_xbox(self, source: str) -> Tuple[List[uuid.UUID], List[BytesIO]]:
-        """Exports a save as a tuple in its Xbox file format
+        """Split a Steam save file into Xbox-formatted chunks.
 
-        The save is returned as a tuple (chunks names, chunk buffers) representing all of its chunks
-        Each element of the list is a chunk of the save.
-        The order of the elements matters.
-
-        Arguments:
-            source: In which folder to read the Steam save
+        Args:
+            source: Path to the Steam ``.savegame`` file.
 
         Returns:
-            A tuple containing the names and the buffers uuid of the Xbox chunks
+            Tuple[List[uuid.UUID], List[BytesIO]]: Generated UUIDs and chunk buffers.
         """
-        # TODO [enhance] this functionned could be renamed by something like load_save_from_steam_file
-        #       and the whole AstroSave class modified to store the uuids list instead of chunk names list + to store the whole buffer of each chunk
-        #       That would make more sense and the tuple wouldn't need to be returned
-        #       The reading of the saves from a container would also be simplified by a lot (by building a uuid from the bytes read in the container)
-
-        buffer_uuids = []
-        buffers = []
+        buffer_uuids: List[uuid.UUID] = []
+        buffers: List[BytesIO] = []
         self.chunks_names = []
 
         len_read = XBOX_CHUNK_SIZE
         save_file_path = source
 
         with open(save_file_path, 'rb') as save_file:
-
             while len_read == XBOX_CHUNK_SIZE:
                 buffer = BytesIO()
                 file_uuid = uuid.uuid4()
@@ -119,56 +89,45 @@ class AstroSave():
         return (buffer_uuids, buffers)
 
     def regenerate_uuid(self, chunk_index: int) -> uuid.UUID:
+        """Generate a new UUID for the chunk at ``chunk_index``."""
         new_uuid = uuid.uuid4()
         self.chunks_names[chunk_index](new_uuid.hex.upper())
         return new_uuid
 
-    def get_file_name(self):
+    def get_file_name(self) -> str:
+        """Return the filename corresponding to this save."""
         return self.name + '.savegame'
 
-    def rename(self, new_name):
-        """Renames a save
+    def rename(self, new_name: str) -> None:
+        """Rename the save, enforcing character and length limits.
 
-        We chosed to limit the characters to [a-zA-Z0-9] because we
-        have no idea what are the characters supported by Astroneer
-        Also the max length is 30 because somewhere above 30 won't fit
-        into the chunk name once the save becomes multi-chunks when it
-        grows and that might crash the game (test pending)
+        Args:
+            new_name: New base name for the save.
 
-        Exception:
-            ValueError if any character is not alphanumeric or if length > 30 or if new name is empty
+        Raises:
+            ValueError: If ``new_name`` is empty, non-alphanumeric or too long.
         """
-        if (new_name == ''):
-            raise ValueError
-        # We check less characters than the alphanum set because we're unsure of the
-        # supported set by Astroneer
-        if (new_name == '') or re.search(r'[^a-zA-Z0-9]', new_name) != None or len(new_name) > 30:
+        if new_name == '' or re.search(r'[^a-zA-Z0-9]', new_name) or len(new_name) > 30:
             raise ValueError
 
         date_string = self.name.split("$")[1]
         self.name = new_name + '$' + date_string
 
     @staticmethod
-    def get_steamsaves_list(path) -> list:
-        """List all Steam saves in a folder
-
-        Arguments:
-            path -- path where to search for Steam saves
-
-        Returns:
-            Returns a list of all Steam saves found (only filenames)
-
-        Exception:
-            None
-        """
+    def get_steamsaves_list(path: str) -> List[str]:
+        """List all Steam saves in a folder."""
         folder_content = list_folder_content(path)
-        steamsaves_list = [file for file in folder_content if AstroSave.is_a_steamsave_file(join_paths(path, file))]
+        steamsaves_list = [
+            file for file in folder_content
+            if AstroSave.is_a_steamsave_file(join_paths(path, file))
+        ]
 
-        if not steamsaves_list or len(steamsaves_list) == 0:
+        if not steamsaves_list:
             raise FileNotFoundError
 
         return steamsaves_list
 
     @staticmethod
-    def is_a_steamsave_file(path) -> bool:
+    def is_a_steamsave_file(path: str) -> bool:
+        """Return ``True`` if ``path`` refers to a Steam save file."""
         return is_a_file(path) and path.rfind('.savegame') != -1

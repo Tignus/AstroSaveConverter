@@ -93,8 +93,9 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     loading_bar = LoadingBar(15)
     loading_bar.start_loading()
 
-    Scenario.backup_win_before_steam_export()
-    microsoft_target_folder = Scenario.ask_microsoft_target_folder()
+    microsoft_target_folder = Scenario.backup_win_before_steam_export()
+    if not microsoft_target_folder:
+        utils.wait_and_exit(1)
 
     steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
 

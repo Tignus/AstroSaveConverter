@@ -119,7 +119,7 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
                         utils.copy_files(astroneer_save_folder, save_path)
                         Logger.logPrint(f'Save files copied to: {save_path}')
                     except FileNotFoundError:
-                        Logger.logPrint('\\nNo Microsoft folder detected. If you think this is a bug, please visit github.com/Tignus/AstroSaveConverter/')
+                        Logger.logPrint('No Microsoft folder detected. If you think this is a bug, please visit github.com/Tignus/AstroSaveConverter/')
                         Logger.logPrint('Press any key to exit')
                         utils.wait_and_exit(1)
                 else:

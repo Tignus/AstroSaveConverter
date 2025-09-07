@@ -119,19 +119,9 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
                         utils.copy_files(astroneer_save_folder, save_path)
                         Logger.logPrint(f'Save files copied to: {save_path}')
                     except FileNotFoundError:
-                        Logger.logPrint('\nNo Microsoft save folder detected')
-                        Logger.logPrint('\t1) Backup converted save to a new folder on the Desktop')
-                        Logger.logPrint('\t2) Backup to a custom path')
-                        Logger.logPrint('\t3) Cancel and launch the Microsoft version of Astroneer before retrying')
-                        choice = input()
-                        Logger.logPrint(f"User choice: {choice}", "debug")
-                        while choice not in ('1', '2', '3'):
-                            Logger.logPrint(f'\nPlease choose 1, 2 or 3')
-                            choice = input()
-                            Logger.logPrint(f"User choice: {choice}", "debug")
-                        if choice == '3':
-                            continue
-                        save_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
+                        Logger.logPrint('\\nNo Microsoft folder detected. If you think this is a bug, please visit github.com/Tignus/AstroSaveConverter/')
+                        Logger.logPrint('Press any key to exit')
+                        utils.wait_and_exit(1)
                 else:
                     astroneer_save_folder = AstroSteamSaveFolder.get_steam_save_folder()
                     Logger.logPrint(f'Steam folder path: {astroneer_save_folder}', 'debug')

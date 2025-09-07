@@ -273,10 +273,11 @@ def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
         return True
 
 
-def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> None:
+def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> str:
     target_full_path = utils.join_paths(to_path, save.get_file_name())
     converted_save = save.convert_to_steam(from_path)
     utils.write_buffer_to_file(target_full_path, converted_save)
+    return target_full_path
 
 
 def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:

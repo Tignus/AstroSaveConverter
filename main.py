@@ -51,7 +51,8 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
         save = container.save_list[save_index]
 
         Scenario.ask_overwrite_save_while_file_exists(save, to_path)
-        Scenario.export_save_to_steam(save, original_save_path, to_path)
+        export_path = Scenario.export_save_to_steam(save, original_save_path, to_path)
+        Logger.logPrint(f"Container: {container_url} has been exported to {export_path}", "debug")
 
         Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
 

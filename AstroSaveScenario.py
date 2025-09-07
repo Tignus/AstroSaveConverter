@@ -403,6 +403,8 @@ def ask_microsoft_target_folder() -> str:
     if len(save_folders) == 1:
         return save_folders[0]
 
+    Logger.logPrint('\nWhich Microsoft save folder would you like to copy your Steam save to?')
+
     for i, folder in enumerate(save_folders, 1):
         Logger.logPrint(f"{i}) {folder}")
         Logger.logPrint('Contenu du dossier :')
@@ -412,8 +414,6 @@ def ask_microsoft_target_folder() -> str:
                 Logger.logPrint(f"\t{name} - {date}")
         else:
             Logger.logPrint("\t<vide>")
-
-    Logger.logPrint('\nVers quel dossier Microsoft voulez-vous copier votre sauvegarde Steam ?')
 
     while True:
         choice = input()

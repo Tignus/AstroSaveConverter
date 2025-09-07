@@ -392,6 +392,8 @@ def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
 
     chunk_count = len(chunk_uuids)
 
+    utils.make_dir_if_doesnt_exists(to_path)
+
     if chunk_count >= 10:
         Logger.logPrint(
             f'The selected save contains {chunk_count} which is over the 9 chunks limit AstroSaveconverter can handle yet')
@@ -420,7 +422,11 @@ def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
         utils.write_buffer_to_file(target_full_path, converted_chunks[i])
 
     # Container is updated only after all the chunks of the save have been written successfully
-    container_file_name = Container.get_containers_list(to_path)[0]
+    try:
+        container_file_name = Container.get_containers_list(to_path)[0]
+    except FileNotFoundError:
+        Container.create_empty_container(to_path)
+        container_file_name = 'container.1'
 
     container_full_path = utils.join_paths(to_path, container_file_name)
 

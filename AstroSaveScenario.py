@@ -83,11 +83,12 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
                 if conversion_type == AstroConvType.WIN2STEAM:
                     astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
                     Logger.logPrint(f'Microsoft folder path: {astroneer_save_folder}', 'debug')
+                    save_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'microsoft')
                 else:
                     astroneer_save_folder = AstroSteamSaveFolder.get_steam_save_folder()
                     Logger.logPrint(f'Steam folder path: {astroneer_save_folder}', 'debug')
+                    save_path = ask_copy_target('SteamAstroSaveBackup', 'steam')
 
-                save_path = ask_copy_target('AstroSaveFolder')
                 utils.copy_files(astroneer_save_folder, save_path)
 
                 Logger.logPrint(f'Save files copied to: {save_path}')
@@ -102,16 +103,17 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
             Logger.logPrint(e, 'exception')
 
 
-def ask_copy_target(folder_main_name: str):
+def ask_copy_target(folder_main_name: str, save_type: str):
     ''' Requests a target folder to the user
     TODO [doc] to explain the folder name format
     Arguments:
         folder_main_name:
+        save_type:
 
     Returns
         ...
     '''
-    Logger.logPrint('Where would you like to copy your save folder ?')
+    Logger.logPrint(f'Where would you like to backup your {save_type} save folder ?')
     Logger.logPrint('\t1) New folder on my desktop')
     Logger.logPrint("\t2) New folder in a custom path")
 
@@ -374,7 +376,7 @@ def ask_conversion_type() -> AstroConvType:
 
 def backup_win_before_steam_export() -> str:
     Logger.logPrint('\nFor safety reasons, we will now copy your current Microsoft Astroneer saves')
-    backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup')
+    backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'microsoft')
     save_folders = AstroMicrosoftSaveFolder.backup_microsoft_save_folders(backup_path)
     Logger.logPrint(f"{len(save_folders)} dossiers différents ont été détectés, ils seront tous sauvegardés")
 

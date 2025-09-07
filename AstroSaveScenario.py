@@ -180,12 +180,25 @@ def ask_custom_folder_path() -> str:
     while True:
         Logger.logPrint(f'\nEnter your custom folder path:')
         input_path = input()
-        path = os.path.normpath(input_path)
-        path = os.path.expanduser(path)
+
+        # Normalize and resolve the provided path
+        path = os.path.expanduser(input_path)
+        path = os.path.abspath(path)
+        path = os.path.normpath(path)
         Logger.logPrint(f"User choice: {path}", "debug")
 
-        if utils.is_folder_a_dir(path):
+        # Ensure the directory exists or try to create it
+        if not os.path.isdir(path):
+            try:
+                os.makedirs(path)
+            except OSError as e:
+                Logger.logPrint(e, 'exception')
+                Logger.logPrint('\nWrong path for save folder, please enter a valid path : ', 'error')
+                continue
+
+        if os.path.isdir(path):
             return path
+
         Logger.logPrint('\nWrong path for save folder, please enter a valid path : ', 'error')
 
 

@@ -60,7 +60,8 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     loading_bar = LoadingBar(15)
     loading_bar.start_loading()
 
-    xbox_astroneer_save_folder = Scenario.backup_win_before_steam_export()
+    Scenario.backup_win_before_steam_export()
+    microsoft_target_folder = Scenario.ask_microsoft_target_folder()
 
     steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
 
@@ -75,12 +76,12 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     Scenario.ask_rename_saves(saves_indexes_to_export, saves_list)
 
     Logger.logPrint(f'\nExtracting saves {str([i+1 for i in saves_indexes_to_export])}')
-    Logger.logPrint(f'Working folder: {original_save_path} Export to: {xbox_astroneer_save_folder}', "debug")
+    Logger.logPrint(f'Working folder: {original_save_path} Export to: {microsoft_target_folder}', "debug")
 
     for save_index in saves_indexes_to_export:
         save = saves_list[save_index]
         original_save_full_path = utils.join_paths(original_save_path, original_saves_name[save_index]+'.savegame')
-        Scenario.export_save_to_xbox(save, original_save_full_path, xbox_astroneer_save_folder)
+        Scenario.export_save_to_xbox(save, original_save_full_path, microsoft_target_folder)
 
         Logger.logPrint(f"\nSave {save.name} has been exported succesfully.")
 

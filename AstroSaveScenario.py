@@ -1,3 +1,5 @@
+import os
+import glob
 import utils
 from io import BytesIO
 from typing import List
@@ -368,3 +370,45 @@ def backup_win_before_steam_export() -> str:
     Logger.logPrint(f"{len(save_folders)} dossiers différents ont été détectés, ils seront tous sauvegardés")
 
     return save_folders[0]
+
+
+def ask_microsoft_target_folder() -> str:
+    save_folders = []
+    try:
+        target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
+    except KeyError:
+        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
+        Logger.logPrint("Press any key to exit")
+        utils.wait_and_exit(1)
+
+    for path in glob.iglob(target):
+        save_folders.extend(AstroMicrosoftSaveFolder.get_save_folders_from_path(path))
+
+    if not save_folders:
+        raise FileNotFoundError
+
+    if len(save_folders) == 1:
+        return save_folders[0]
+
+    for i, folder in enumerate(save_folders, 1):
+        Logger.logPrint(f"{i}) {folder}")
+        Logger.logPrint('Contenu du dossier :')
+        details = AstroMicrosoftSaveFolder.get_save_details(folder)
+        if details:
+            for name, date in details:
+                Logger.logPrint(f"\t{name} - {date}")
+        else:
+            Logger.logPrint("\t<vide>")
+
+    Logger.logPrint('\nVers quel dossier Microsoft voulez-vous copier votre sauvegarde Steam ?')
+
+    while True:
+        choice = input()
+        try:
+            choice_int = int(choice)
+            Logger.logPrint(f'chosen_folder {choice_int}', 'debug')
+            if 1 <= choice_int <= len(save_folders):
+                return save_folders[choice_int - 1]
+        except ValueError:
+            pass
+        Logger.logPrint(f'Please choose a number between 1 and {len(save_folders)}')

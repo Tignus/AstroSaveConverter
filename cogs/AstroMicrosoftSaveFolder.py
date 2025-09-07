@@ -59,10 +59,10 @@ def seek_microsoft_save_folder(appdata_path) -> str:
 
     while True:
         choice = input()
+        Logger.logPrint(f"User choice: {choice}", "debug")
         try:
             index = int(choice)
             if 1 <= index <= len(folders):
-                Logger.logPrint(f"User choice: {choice}", "debug")
                 return folders[index - 1]
         except ValueError:
             pass

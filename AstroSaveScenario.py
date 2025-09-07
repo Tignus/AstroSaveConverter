@@ -389,13 +389,16 @@ def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> str:
     return target_full_path
 
 
-def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
+def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> str:
     """Export a Steam save into multiple Xbox chunk files.
 
     Args:
         save: ``AstroSave`` instance to convert.
         from_file: Path to the Steam ``.savegame`` file.
         to_path: Destination directory for the Xbox chunks.
+
+    Returns:
+        str: Directory where the chunks and container are written.
 
     Raises:
         FileExistsError: If generated chunk names already exist and cannot be
@@ -474,6 +477,8 @@ def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
 
     Logger.logPrint(f'Editing container: {container_full_path}', "debug")
     utils.append_buffer_to_file(container_full_path, chunks_buffer)
+
+    return to_path
 
 
 def ask_overwrite_save_while_file_exists(save: AstroSave, target: str) -> None:

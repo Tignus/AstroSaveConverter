@@ -45,7 +45,15 @@ def windows_to_steam_conversion(original_save_path: str) -> None:
     Raises:
         FileNotFoundError: If no container file is found in ``original_save_path``.
     """
-    containers_list = Container.get_containers_list(original_save_path)
+    try:
+        containers_list = Container.get_containers_list(original_save_path)
+    except FileNotFoundError:
+        Logger.logPrint(
+            "No container found in the selected folder. Please choose another path."
+        )
+        original_save_path = Scenario.ask_for_save_folder(AstroConvType.WIN2STEAM)
+        Logger.logPrint(f"User selected new path: {original_save_path}", "debug")
+        containers_list = Container.get_containers_list(original_save_path)
 
     Logger.logPrint('\nContainers found:' + str(containers_list))
     container_name = Scenario.ask_for_containers_to_convert(

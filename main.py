@@ -151,6 +151,7 @@ if __name__ == "__main__":
             steam_to_windows_conversion(original_save_path)
 
         Logger.logPrint(f'\nTask completed, press any key to exit')
+        Logger.logPrint("\n" + "-" * 60 + "\n")
         utils.wait_and_exit(0)
     except Exception as e:
         Logger.logPrint(e)

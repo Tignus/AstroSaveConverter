@@ -34,6 +34,7 @@ def ask_user_to_choose_in_a_list(text, file_list):
         Logger.logPrint('\nWhich container would you like to convert ?')
         print_list_elements(file_list)
         choice_index = input()
+        Logger.logPrint(f"User choice: {choice_index}", "debug")
         try:
             choice_index = int(choice_index)
             verify_choice_input(choice_index, min_container_number, max_container_number)
@@ -41,7 +42,6 @@ def ask_user_to_choose_in_a_list(text, file_list):
             choice_index = 0
             Logger.logPrint(f'Please use only values between {min_container_number} and {max_container_number}')
 
-    Logger.logPrint(f"User choice: {choice_index}", "debug")
     return file_list[choice_index-1]
 
 
@@ -74,11 +74,11 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
             Logger.logPrint("\t2) Chose a custom folder")
 
             work_choice = input()
+            Logger.logPrint(f"User choice: {work_choice}", "debug")
             while work_choice not in ('1', '2'):
                 Logger.logPrint(f'\nPlease choose 1 or 2')
                 work_choice = input()
-
-            Logger.logPrint(f"User choice: {work_choice}", "debug")
+                Logger.logPrint(f"User choice: {work_choice}", "debug")
             if work_choice == '1':
                 if conversion_type == AstroConvType.WIN2STEAM:
                     astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
@@ -118,11 +118,11 @@ def ask_copy_target(folder_main_name: str, save_type: str):
     Logger.logPrint("\t2) New folder in a custom path")
 
     choice = input()
+    Logger.logPrint(f"User choice: {choice}", "debug")
     while choice not in ('1', '2'):
         Logger.logPrint(f'\nPlease choose 1 or 2')
         choice = input()
-
-    Logger.logPrint(f"User choice: {choice}", "debug")
+        Logger.logPrint(f"User choice: {choice}", "debug")
 
     if choice == '1':
         # Winpath is needed here because Windows user can have a custom Desktop location
@@ -138,9 +138,9 @@ def ask_copy_target(folder_main_name: str, save_type: str):
 def ask_custom_folder_path() -> str:
     Logger.logPrint(f'\nEnter your custom folder path:')
     path = input()
+    Logger.logPrint(f"User choice: {path}", "debug")
 
     if utils.is_folder_a_dir(path):
-        Logger.logPrint(f"User choice: {path}", "debug")
         return path
     else:
         Logger.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
@@ -185,14 +185,13 @@ def ask_for_multiple_choices(maximum_value) -> list:
     choices = []
     while not choices:
         choices = input()
+        Logger.logPrint(f"User choice: {choices}", "debug")
         try:
             choices = process_multiple_choices_input(choices)
             verify_choices_input(choices, maximum_value)
         except ValueError:
             choices = []
             Logger.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
-
-    Logger.logPrint(f"User choice: {choices}", "debug")
 
     if choices == [-1]:
         return list(range(0, maximum_value))
@@ -230,8 +229,7 @@ def ask_rename_saves(saves_indexes, save_list):
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
-
-    Logger.logPrint(f"User choice: {do_rename}", "debug")
+        Logger.logPrint(f"User choice: {do_rename}", "debug")
 
     if do_rename == 'y':
         for index in saves_indexes:
@@ -248,14 +246,13 @@ def rename_save(save):
     new_name = None
     while new_name is None:
         new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
+        Logger.logPrint(f"User choice: {new_name}", "debug")
         if (new_name != ''):
             try:
                 save.rename(new_name)
             except ValueError:
                 new_name = None
                 Logger.logPrint(f'Please use only alphanum and a length < 30')
-
-    Logger.logPrint(f"User choice: {new_name}", "debug")
 
 
 def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
@@ -266,8 +263,8 @@ def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
         while do_overwrite not in ('y', 'n'):
             Logger.logPrint(f'\nFile {filename} already exists, overwrite it ? (y/n)')
             do_overwrite = input().lower()
+            Logger.logPrint(f"User choice: {do_overwrite}", "debug")
 
-        Logger.logPrint(f"User choice: {do_overwrite}", "debug")
         return do_overwrite == 'y'
     else:
         return True
@@ -364,11 +361,11 @@ def ask_conversion_type() -> AstroConvType:
     Logger.logPrint('\t2) Convert a Steam save into a Microsoft save')
 
     choice = input()
+    Logger.logPrint(f"User choice: {choice}", "debug")
     while choice not in ('1', '2'):
         Logger.logPrint(f'\nPlease choose 1 or 2')
         choice = input()
-
-    Logger.logPrint(f"User choice: {choice}", "debug")
+        Logger.logPrint(f"User choice: {choice}", "debug")
     if choice == '1':
         return AstroConvType.WIN2STEAM
     else:
@@ -418,10 +415,10 @@ def ask_microsoft_target_folder() -> str:
 
     while True:
         choice = input()
+        Logger.logPrint(f"User choice: {choice}", "debug")
         try:
             choice_int = int(choice)
             if 1 <= choice_int <= len(save_folders):
-                Logger.logPrint(f"User choice: {choice_int}", "debug")
                 return save_folders[choice_int - 1]
         except ValueError:
             pass

@@ -16,7 +16,7 @@ from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
 from cogs.LoadingBar import LoadingBar
 
-APP_VERSION = "2.0"
+APP_VERSION = "3.0"
 
 
 def get_args() -> Namespace:

@@ -1,5 +1,5 @@
 hexdump==3.3
-PyInstaller==3.6
+PyInstaller==6.0.0
 winpath==202002.2
 setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
 

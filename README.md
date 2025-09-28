@@ -125,6 +125,18 @@ Please feel free to look at [our TODO list !](https://github.com/Tignus/AstroSav
 Contributions are greatly appreciated. Do not hesitate to fork the project and open pull requests !
 This software is distributed under the [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/) license
 
+## Generating the .exe (Windows + Git Bash)
+
+- From the project root (where main.py is located), run:
+``` bash
+pip install --upgrade pyinstaller
+```
+``` bash
+.venv/Scripts/python.exe BuildEXE.py
+```
+- The generated executable will be located at `dist/AstroSaveConverter.exe`
+
+
 ## Documentation
 
 To build the project documentation locally:

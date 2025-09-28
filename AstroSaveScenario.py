@@ -1,3 +1,7 @@
+"""Interactive workflow for selecting and converting Astroneer saves."""
+
+import os
+import glob
 import utils
 from io import BytesIO
 from typing import List
@@ -7,23 +11,33 @@ from cogs import AstroSteamSaveFolder
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs.AstroSave import AstroSave
 from cogs.AstroConvType import AstroConvType
-from errors import MultipleFolderFoundError
 
 
-def ask_for_containers_to_convert(containers):
+def ask_for_containers_to_convert(containers: List[str]) -> str:
+    """Ask the user which container to convert.
+
+    Args:
+        containers: List of detected container filenames.
+
+    Returns:
+        str: Chosen container filename.
+    """
     question = '\nWhich container would you like to convert ?'
     return ask_user_to_choose_in_a_list(question, containers)
 
 
-def ask_user_to_choose_in_a_list(text, file_list):
-    """ Defines the container to use
+def ask_user_to_choose_in_a_list(text: str, file_list: List[str]) -> str:
+    """Display a list and return the user's choice.
 
-    Print every *container* file in the
-    given and make the user choose one
+    Args:
+        text: Prompt presented to the user.
+        file_list: Options the user can choose from.
 
-    :param containers_list: A list of identified to be containers
+    Returns:
+        str: The element selected by the user.
 
-    :returns: The chosen container filename
+    Raises:
+        ValueError: If the user selects a value outside the allowed range.
     """
     max_container_number = len(file_list)
     min_container_number = 1
@@ -33,6 +47,7 @@ def ask_user_to_choose_in_a_list(text, file_list):
         Logger.logPrint('\nWhich container would you like to convert ?')
         print_list_elements(file_list)
         choice_index = input()
+        Logger.logPrint(f"User choice: {choice_index}", "debug")
         try:
             choice_index = int(choice_index)
             verify_choice_input(choice_index, min_container_number, max_container_number)
@@ -43,166 +58,245 @@ def ask_user_to_choose_in_a_list(text, file_list):
     return file_list[choice_index-1]
 
 
-def print_list_elements(elements):
-    for i, container in elements:
+def print_list_elements(elements: List[str]) -> None:
+    """Log each element of a list with its index.
+
+    Args:
+        elements: Sequence of strings to display.
+    """
+    for i, container in enumerate(elements):
         Logger.logPrint(f'\t {i+1}) {container}')
 
 
-def verify_choice_input(choice, min, max):
-    if (choice < min or choice > max):
+def verify_choice_input(choice: int, min_value: int, max_value: int) -> None:
+    """Ensure a numeric choice is within bounds.
+
+    Args:
+        choice: Value provided by the user.
+        min_value: Minimum allowed value.
+        max_value: Maximum allowed value.
+
+    Raises:
+        ValueError: If ``choice`` is outside the allowed range.
+    """
+    if choice < min_value or choice > max_value:
         raise ValueError
 
 
 def ask_for_save_folder(conversion_type: AstroConvType) -> str:
-    """ Obtains the save folder
+    """Determine which folder should be used for conversion.
 
-    Lets the user pick between automatic save retrieving/copying or
-    a custom save folder
+    Depending on ``conversion_type`` the user can automatically copy the
+    detected save folder or provide a custom path.
 
-    Arguments:
-        conversion_type : Type of save conversion (for automatic folder retrieval purpose)
+    Args:
+        conversion_type: Desired conversion direction.
 
     Returns:
-        The save folder path
+        str: Path to work with.
+
+    Raises:
+        FileNotFoundError: If no save folder can be located automatically.
     """
     while 1:
         try:
-            Logger.logPrint("Which  folder would you like to work with ?")
+            Logger.logPrint("Which folder would you like to work with ?")
             Logger.logPrint("\t1) Automatically detect and copy my save folder (Please close Astroneer first)")
             Logger.logPrint("\t2) Chose a custom folder")
 
             work_choice = input()
+            Logger.logPrint(f"User choice: {work_choice}", "debug")
             while work_choice not in ('1', '2'):
                 Logger.logPrint(f'\nPlease choose 1 or 2')
                 work_choice = input()
-                Logger.logPrint(f'folder_type {work_choice}', 'debug')
-
+                Logger.logPrint(f"User choice: {work_choice}", "debug")
             if work_choice == '1':
                 if conversion_type == AstroConvType.WIN2STEAM:
-                    astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
-                    Logger.logPrint(f'Microsoft folder path: {astroneer_save_folder}', 'debug')
+                    try:
+                        astroneer_save_folder = AstroMicrosoftSaveFolder.get_microsoft_save_folder()
+                        Logger.logPrint(f'Microsoft folder path: {astroneer_save_folder}', 'debug')
+                        while True:
+                            save_path = ask_copy_target('MicrosoftAstroneerSavesBackup', 'Microsoft')
+                            try:
+                                utils.copy_files(astroneer_save_folder, save_path)
+                                Logger.logPrint(f'Save files copied to: {save_path}')
+                                break
+                            except (OSError, FileNotFoundError):
+                                Logger.logPrint('Invalid path; please choose another backup location')
+                    except FileNotFoundError:
+                        Logger.logPrint('No Microsoft folder detected. If you think this is a bug, please visit github.com/Tignus/AstroSaveConverter/')
+                        Logger.logPrint('Press any key to exit')
+                        utils.wait_and_exit(1)
                 else:
                     astroneer_save_folder = AstroSteamSaveFolder.get_steam_save_folder()
                     Logger.logPrint(f'Steam folder path: {astroneer_save_folder}', 'debug')
-
-                save_path = ask_copy_target('AstroSaveFolder')
-                utils.copy_files(astroneer_save_folder, save_path)
-
-                Logger.logPrint(f'Save files copied to: {save_path}')
+                    while True:
+                        save_path = ask_copy_target('SteamAstroSaveBackup', 'Steam')
+                        try:
+                            utils.copy_files(astroneer_save_folder, save_path)
+                            Logger.logPrint(f'Save files copied to: {save_path}')
+                            break
+                        except (OSError, FileNotFoundError):
+                            Logger.logPrint('Invalid path; please choose another backup location')
 
             elif work_choice == '2':
                 save_path = ask_custom_folder_path()
 
             return save_path
 
-        except MultipleFolderFoundError:
-            Logger.logPrint(f'\nToo many save folders found ! Please use custom folder mode.')
         except FileNotFoundError as e:
             Logger.logPrint('\nNo container found in path: ' + save_path)
             Logger.logPrint(e, 'exception')
 
 
-def ask_copy_target(folder_main_name: str):
-    ''' Requests a target folder to the user
-    TODO [doc] to explain the folder name format
-    Arguments:
-        folder_main_name:
+def ask_copy_target(folder_main_name: str, save_type: str) -> str:
+    """Request a destination folder for backups.
 
-    Returns
-        ...
-    '''
-    Logger.logPrint('Where would you like to copy your save folder ?')
+    Args:
+        folder_main_name: Base name for the created folder.
+        save_type: Label describing the platform (e.g. ``"Steam"``).
+
+    Returns:
+        str: Full path where the backup should be created.
+    """
+    Logger.logPrint(f'Where would you like to backup your {save_type.capitalize()} save folder ?')
     Logger.logPrint('\t1) New folder on my desktop')
     Logger.logPrint("\t2) New folder in a custom path")
 
     choice = input()
+    Logger.logPrint(f"User choice: {choice}", "debug")
     while choice not in ('1', '2'):
         Logger.logPrint(f'\nPlease choose 1 or 2')
         choice = input()
-        Logger.logPrint(f'copy_choice {choice}', 'debug')
+        Logger.logPrint(f"User choice: {choice}", "debug")
 
     if choice == '1':
         # Winpath is needed here because Windows user can have a custom Desktop location
         save_path = utils.get_windows_desktop_path()
-    elif choice == '2':
-        Logger.logPrint(f'\nEnter your custom folder path:')
-        save_path = input()
-        Logger.logPrint(f'save_path {save_path}', 'debug')
+    else:
+        # ``ask_custom_folder_path`` handles its own validation loop, so a
+        # simple call here is sufficient even for short inputs like "a".
+        save_path = ask_custom_folder_path()
 
     return utils.join_paths(save_path, utils.create_folder_name(folder_main_name))
 
 
 def ask_custom_folder_path() -> str:
-    Logger.logPrint(f'\nEnter your custom folder path:')
-    path = input()
-    Logger.logPrint(f'save_folder_path {path}', 'debug')
+    """Ask the user for a custom directory path.
 
-    if utils.is_folder_a_dir(path):
-        return path
-    else:
-        Logger.logPrint(f'\nWrong path for save folder, please enter a valid path : ')
-        return ask_custom_folder_path()
+    Returns:
+        str: A valid directory path provided by the user.
+    """
+    while True:
+        Logger.logPrint(f'\nEnter your custom folder path:')
+        input_path = input()
+
+        # Normalize and resolve the provided path
+        path = os.path.expanduser(input_path)
+        path = os.path.abspath(path)
+        path = os.path.normpath(path)
+        Logger.logPrint(f"User choice: {path}", "debug")
+
+        # Ensure the directory exists or try to create it
+        if not os.path.isdir(path):
+            try:
+                os.makedirs(path)
+            except OSError as e:
+                Logger.logPrint('Path cannot be created or drive not found.', 'error')
+                Logger.logPrint(e, 'exception')
+                Logger.logPrint('\nWrong path for save folder, please enter a valid path : ', 'error')
+                continue
+
+        if os.path.isdir(path):
+            return path
+
+        Logger.logPrint('\nWrong path for save folder, please enter a valid path : ', 'error')
 
 
-def print_save_from_container(save_list):
-    """ Displays the human readable saves of a container """
+def print_save_from_container(save_list: List[AstroSave]) -> None:
+    """Display saves contained in a container.
+
+    Args:
+        save_list: List of ``AstroSave`` objects to print.
+    """
     for i, save in enumerate(save_list):
         Logger.logPrint(f'\t {str(i+1)}) {save.name}')
 
 
-def ask_saves_to_export(save_list: List[AstroSave]) -> List[int]:
-    """TODO [doc] explain that this function returns the indexes in the save list and not a sublist of the save_list
+def ask_saves_to_export(save_list: List[AstroSave], platform_label: str) -> List[int]:
+    """Prompt the user to select saves for export.
+
+    Args:
+        save_list: List of available saves.
+        platform_label: Label for the originating platform.
+
+    Returns:
+        List[int]: Indexes of saves selected by the user.
     """
-    Logger.logPrint('Extracted save list :')
+    Logger.logPrint(f"{platform_label.capitalize()} saves list :")
     print_save_from_container(save_list)
     Logger.logPrint('\nWhich saves would you like to convert ? (Choose 0 for all of them)')
     Logger.logPrint('(Multi-convert is supported. Ex: "1,2,4")')
 
     maximum_save_number = len(save_list)
-    saves_to_export = ask_for_multiple_choices(maximum_save_number)
-
-    return saves_to_export
+    return ask_for_multiple_choices(maximum_save_number)
 
 
-def ask_for_multiple_choices(maximum_value) -> list:
-    """ Let the user choose multiple numbers between 0 and a maximum value
+def ask_for_multiple_choices(maximum_value: int) -> List[int]:
+    """Let the user choose multiple numbers between 0 and ``maximum_value``.
 
-    If the user choice is 0 then return an array with all values,
-    the user choices are reduce by 1 in order to match future array indexes
+    The user's input is validated and converted to zero-based indexes.
 
-    :Example:
+    Args:
+        maximum_value: Highest selectable value.
 
-    User choices:
-    -  [1,2,4]  - returns 0, 1, 2
-    -  [0]      - returns all choices
+    Returns:
+        List[int]: Selected indexes. ``[-1]`` indicates all values were chosen.
 
-    :return: The list of numbers
-    :exception: None (repeat until the choices are valid)
+    Raises:
+        ValueError: If input is malformed.
     """
-    choices = []
+    choices: List[int] = []
     while not choices:
         choices = input()
+        Logger.logPrint(f"User choice: {choices}", "debug")
         try:
             choices = process_multiple_choices_input(choices)
             verify_choices_input(choices, maximum_value)
         except ValueError:
             choices = []
-            Logger.logPrint(f'Please use only values between 1 and {maximum_value} or 0 alone')
+            Logger.logPrint(
+                f'Please use only values between 1 and {maximum_value} or 0 alone'
+            )
 
     if choices == [-1]:
         return list(range(0, maximum_value))
-    else:
-        return choices
-
-
-def process_multiple_choices_input(choices) -> list:
-    choices = choices.split(',')
-    choices = [int(x) - 1 for x in choices]
-
     return choices
 
 
-def verify_choices_input(choices, max_value):
+def process_multiple_choices_input(choices: str) -> List[int]:
+    """Convert a comma-separated string of numbers to a list of indexes.
+
+    Args:
+        choices: Comma-separated numbers provided by the user.
+
+    Returns:
+        List[int]: Parsed zero-based indexes.
+    """
+    split_choices = choices.split(',')
+    return [int(x) - 1 for x in split_choices]
+
+
+def verify_choices_input(choices: List[int], max_value: int) -> None:
+    """Validate a list of numeric choices.
+
+    Args:
+        choices: Parsed choices from ``process_multiple_choices_input``.
+        max_value: Maximum allowed value (exclusive).
+
+    Raises:
+        ValueError: If the choices list is empty or values are out of range.
+    """
     if len(choices) == 0:
         raise ValueError
 
@@ -210,21 +304,22 @@ def verify_choices_input(choices, max_value):
         raise ValueError
 
     for choice in choices:
-        if (choice > max_value - 1 or choice < -1):
+        if choice > max_value - 1 or choice < -1:
             raise ValueError
 
 
-def ask_rename_saves(saves_indexes, save_list):
-    """ Guide the user in order to rename a save
+def ask_rename_saves(saves_indexes: List[int], save_list: List[AstroSave]) -> None:
+    """Guide the user through optional save renaming.
 
-    :param save_indexes: List of the saves in the save_list you want to rename
-    :param save_list: List of the save objects you may rename
+    Args:
+        saves_indexes: Indexes of saves in ``save_list`` to consider.
+        save_list: Available saves.
     """
-
     do_rename = None
     while do_rename not in ('y', 'n'):
         Logger.logPrint('\nWould you like to rename a save ? (y/n)')
         do_rename = input().lower()
+        Logger.logPrint(f"User choice: {do_rename}", "debug")
 
     if do_rename == 'y':
         for index in saves_indexes:
@@ -232,24 +327,39 @@ def ask_rename_saves(saves_indexes, save_list):
             rename_save(save)
 
 
-def rename_save(save):
-    """ Rename a save
-    Rename can be skipped by pressing Enter directly
+def rename_save(save: AstroSave) -> None:
+    """Prompt the user for a new name for a save.
 
-    :param save: Save object to be renamed
+    Args:
+        save: Save object to rename.
+
+    Raises:
+        ValueError: If the provided name is invalid.
     """
     new_name = None
     while new_name is None:
-        new_name = input(f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > ').upper()
-        if (new_name != ''):
+        new_name = input(
+            f'\nNew name for {save.name.split("$")[0]}: [ENTER = unchanged] > '
+        ).upper()
+        Logger.logPrint(f"User choice: {new_name}", "debug")
+        if new_name != '':
             try:
                 save.rename(new_name)
             except ValueError:
                 new_name = None
-                Logger.logPrint(f'Please use only alphanum and a length < 30')
+                Logger.logPrint('Please use only alphanum and a length < 30')
 
 
 def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
+    """Ask the user whether to overwrite an existing file.
+
+    Args:
+        filename: Name of the file to check.
+        target: Directory where the file would be written.
+
+    Returns:
+        bool: ``True`` if the file may be overwritten, ``False`` otherwise.
+    """
     file_url = utils.join_paths(target, filename)
 
     if utils.is_path_exists(file_url):
@@ -257,22 +367,49 @@ def ask_overwrite_if_file_exists(filename: str, target: str) -> bool:
         while do_overwrite not in ('y', 'n'):
             Logger.logPrint(f'\nFile {filename} already exists, overwrite it ? (y/n)')
             do_overwrite = input().lower()
+            Logger.logPrint(f"User choice: {do_overwrite}", "debug")
 
         return do_overwrite == 'y'
-    else:
-        return True
+    return True
 
 
-def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> None:
+def export_save_to_steam(save: AstroSave, from_path: str, to_path: str) -> str:
+    """Export a Microsoft/Xbox save to the Steam format.
+
+    Args:
+        save: ``AstroSave`` instance to export.
+        from_path: Directory where the chunk files are located.
+        to_path: Destination directory for the Steam save.
+
+    Returns:
+        str: Full path to the exported save file.
+    """
     target_full_path = utils.join_paths(to_path, save.get_file_name())
     converted_save = save.convert_to_steam(from_path)
     utils.write_buffer_to_file(target_full_path, converted_save)
+    return target_full_path
 
 
-def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
+def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> str:
+    """Export a Steam save into multiple Xbox chunk files.
+
+    Args:
+        save: ``AstroSave`` instance to convert.
+        from_file: Path to the Steam ``.savegame`` file.
+        to_path: Destination directory for the Xbox chunks.
+
+    Returns:
+        str: Directory where the chunks and container are written.
+
+    Raises:
+        FileExistsError: If generated chunk names already exist and cannot be
+            regenerated.
+    """
     chunk_uuids, converted_chunks = save.convert_to_xbox(from_file)
 
     chunk_count = len(chunk_uuids)
+
+    utils.make_dir_if_doesnt_exists(to_path)
 
     if chunk_count >= 10:
         Logger.logPrint(
@@ -302,7 +439,11 @@ def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
         utils.write_buffer_to_file(target_full_path, converted_chunks[i])
 
     # Container is updated only after all the chunks of the save have been written successfully
-    container_file_name = Container.get_containers_list(to_path)[0]
+    try:
+        container_file_name = Container.get_containers_list(to_path)[0]
+    except FileNotFoundError:
+        Container.create_empty_container(to_path)
+        container_file_name = 'container.1'
 
     container_full_path = utils.join_paths(to_path, container_file_name)
 
@@ -338,8 +479,16 @@ def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> None:
     Logger.logPrint(f'Editing container: {container_full_path}', "debug")
     utils.append_buffer_to_file(container_full_path, chunks_buffer)
 
+    return to_path
+
 
 def ask_overwrite_save_while_file_exists(save: AstroSave, target: str) -> None:
+    """Prompt to overwrite a save file, renaming if necessary.
+
+    Args:
+        save: Save to potentially overwrite.
+        target: Directory where the save would be written.
+    """
     do_overwrite = None
     while not do_overwrite:
         do_overwrite = ask_overwrite_if_file_exists(save.get_file_name(), target)
@@ -348,26 +497,112 @@ def ask_overwrite_save_while_file_exists(save: AstroSave, target: str) -> None:
 
 
 def ask_conversion_type() -> AstroConvType:
+    """Ask the user which conversion direction to use.
+
+    Returns:
+        AstroConvType: Selected conversion type.
+    """
     Logger.logPrint(f'\nWhich conversion do you want to do ?')
     Logger.logPrint("\t1) Convert a Microsoft save into a Steam save")
     Logger.logPrint('\t2) Convert a Steam save into a Microsoft save')
 
     choice = input()
+    Logger.logPrint(f"User choice: {choice}", "debug")
     while choice not in ('1', '2'):
         Logger.logPrint(f'\nPlease choose 1 or 2')
         choice = input()
-        Logger.logPrint(f'convert_choice {choice}', 'debug')
-
+        Logger.logPrint(f"User choice: {choice}", "debug")
     if choice == '1':
         return AstroConvType.WIN2STEAM
-    else:
-        return AstroConvType.STEAM2WIN
+    return AstroConvType.STEAM2WIN
 
 
 def backup_win_before_steam_export() -> str:
+    """Prepare Microsoft save folders before exporting from Steam.
+
+    Returns:
+        str: Path to a Microsoft save folder to export to, or the directory
+        chosen by the user when no Microsoft save folders are detected.
+    """
     Logger.logPrint('\nFor safety reasons, we will now copy your current Microsoft Astroneer saves')
-    backup_path = ask_copy_target('MicrosoftAstroneerSavesBackup')
+    try:
+        folders = AstroMicrosoftSaveFolder.find_microsoft_save_folders()
+    except FileNotFoundError:
+        Logger.logPrint('No Microsoft save folders were found. Choose where to place the converted save files so you can manually move them later.')
+        Logger.logPrint('\t1) Place the converted save in a new folder on the Desktop')
+        Logger.logPrint('\t2) Place the converted save in a custom path folder')
+        Logger.logPrint('\t3) Cancel')
+        choice = input()
+        Logger.logPrint(f"User choice: {choice}", "debug")
+        while choice not in ('1', '2', '3'):
+            Logger.logPrint('\nPlease choose 1, 2 or 3')
+            choice = input()
+            Logger.logPrint(f"User choice: {choice}", "debug")
+        if choice == '3':
+            Logger.logPrint('Launch the Microsoft version of Astroneer once, then relaunch AstroSaveConverter.')
+            return ''
+        if choice == '1':
+            base_path = utils.get_windows_desktop_path()
+        else:
+            base_path = ask_custom_folder_path()
+        output_path = utils.join_paths(base_path, utils.create_folder_name('MicrosoftAstroneerSave'))
+        utils.make_dir_if_doesnt_exists(output_path)
+        return output_path
+    Logger.logPrint(f"{len(folders)} different Microsoft save folders have been detected. They will all be backed up.")
+    backup_path = ask_copy_target('MicrosoftAstroneerSave', 'Microsoft')
+    AstroMicrosoftSaveFolder.backup_microsoft_save_folders(folders, backup_path)
+    Logger.logPrint(f'Save files copied to: {backup_path}')
 
-    astroneer_save_folder = AstroMicrosoftSaveFolder.backup_microsoft_save_folder(backup_path)
+    return folders[0]
 
-    return astroneer_save_folder
+
+def ask_microsoft_target_folder() -> str:
+    """Ask the user which Microsoft save folder to use as target.
+
+    Returns:
+        str: Selected Microsoft save folder path.
+
+    Raises:
+        FileNotFoundError: If no Microsoft save folders are found.
+    """
+    save_folders: List[str] = []
+    try:
+        target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
+    except KeyError:
+        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
+        Logger.logPrint("Press any key to exit")
+        utils.wait_and_exit(1)
+
+    for path in glob.iglob(target):
+        save_folders.extend(AstroMicrosoftSaveFolder.get_save_folders_from_path(path))
+
+    if not save_folders:
+        raise FileNotFoundError
+
+    if len(save_folders) == 1:
+        return save_folders[0]
+
+    Logger.logPrint('\nWhich Microsoft save folder would you like to copy your Steam save to?')
+
+    for i, folder in enumerate(save_folders, 1):
+        Logger.logPrint(f"\t{i}) {folder}")
+        Logger.logPrint('\tFolder content:')
+        details = AstroMicrosoftSaveFolder.get_save_details(folder)
+        if details:
+            for name, date in details:
+                Logger.logPrint(f"\t\t{name} - {date}")
+        else:
+            Logger.logPrint("\t\t<vide>")
+
+    while True:
+        choice = input()
+        Logger.logPrint(f"User choice: {choice}", "debug")
+        try:
+            choice_int = int(choice)
+            if 1 <= choice_int <= len(save_folders):
+                break
+        except ValueError:
+            pass
+        Logger.logPrint(f'Please choose a number between 1 and {len(save_folders)}')
+
+    return save_folders[choice_int - 1]

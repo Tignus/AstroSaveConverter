@@ -125,6 +125,15 @@ Please feel free to look at [our TODO list !](https://github.com/Tignus/AstroSav
 Contributions are greatly appreciated. Do not hesitate to fork the project and open pull requests !
 This software is distributed under the [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/) license
 
+## Documentation
+
+To build the project documentation locally:
+
+```bash
+pip install -r requirements.txt
+sphinx-build -b html docs/ build/html
+```
+
 # Special thanks
 
 We (Tignus and EmptyProfile) would like to thanks everyone who helped us in the process of developping our tool:

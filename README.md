@@ -127,9 +127,10 @@ This software is distributed under the [GNU GPLv3](https://choosealicense.com/li
 
 ## Documentation
 
-To build the project documentation locally run:
+To build the project documentation locally:
 
 ```bash
+pip install -r requirements.txt
 sphinx-build -b html docs/ build/html
 ```
 

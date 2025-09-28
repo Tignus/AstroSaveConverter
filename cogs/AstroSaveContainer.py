@@ -16,7 +16,8 @@ class AstroSaveContainer:
     """Represent an Astroneer save container and its contents."""
 
     def __init__(self, container_file_path: str) -> None:
-        """Load saves from a container file.
+        """Reads the container file, divides it into chunks and
+        regroups the chunks into save objects
 
         Args:
             container_file_path: Path to the container file.

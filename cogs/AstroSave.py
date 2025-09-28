@@ -101,6 +101,12 @@ class AstroSave:
     def rename(self, new_name: str) -> None:
         """Rename the save, enforcing character and length limits.
 
+        We chosed to limit the characters to [a-zA-Z0-9] because we
+        have no idea what are the characters supported by Astroneer
+        Also the max length is 30 because somewhere above 30 won't fit
+        into the chunk name once the save becomes multi-chunks when it
+        grows and that might crash the game (test pending)
+
         Args:
             new_name: New base name for the save.
 

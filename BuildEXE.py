@@ -7,10 +7,8 @@ import shutil
 args = [
     '--name=AstroSaveConverter',
     '--onefile',
-    '--clean',
-    '--noconfirm',
-    '--add-data=assets/*;.',
-    '--icon=assets/astroconverterlogo.ico',
+    '--add-data=%s' % "assets/*;.",
+    '--icon=%s' % "assets/astroconverterlogo.ico",
     '--exclude-module=sphinx',
     '--exclude-module=sphinx_rtd_theme',
     'main.py'

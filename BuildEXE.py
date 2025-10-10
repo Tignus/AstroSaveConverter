@@ -4,12 +4,14 @@ import PyInstaller.__main__
 import os
 import shutil
 
+data_sep = ';' if os.name == 'nt' else ':'
+
 args = [
     '--name=AstroSaveConverter',
     '--onefile',
     '--clean',
     '--noconfirm',
-    '--add-data=assets/*;.',
+    f'--add-data=assets/*{data_sep}.',
     '--icon=assets/astroconverterlogo.ico',
     '--exclude-module=sphinx',
     '--exclude-module=sphinx_rtd_theme',

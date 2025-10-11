@@ -6,8 +6,8 @@
   <img src="https://raw.githubusercontent.com/Tignus/AstroSaveConverter/master/assets/astroconverterlogo.ico" width="128px">
   <h3 align="center">AstroSaveConverter - Switch from XBOX to Steam</h3>
 </p>
-
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Tignus/AstroSaveConverter)
+<p align="center">
+<a href="https://deepwiki.com/Tignus/AstroSaveConverter"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 
 <p align="center">
   <a href="https://github.com/Tignus/AstroSaveConverter/releases/latest">Latest release</a>

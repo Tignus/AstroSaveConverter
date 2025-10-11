@@ -127,10 +127,12 @@ This software is distributed under the [GNU GPLv3](https://choosealicense.com/li
 
 ## Generating the .exe (Windows + Git Bash)
 
-- From the project root (where main.py is located), run:
+- From the project root (where `main.py` is located), install the runtime
+  dependencies required by the converter and build pipeline:
 ``` bash
-pip install --upgrade pyinstaller
+pip install -r requirements.txt
 ```
+- Once the dependencies are installed, run PyInstaller via the helper script:
 ``` bash
 .venv/Scripts/python.exe BuildEXE.py
 ```
@@ -142,9 +144,13 @@ pip install --upgrade pyinstaller
 To build the project documentation locally:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-docs.txt
 sphinx-build -b html docs/ build/html
 ```
+
+The documentation dependencies are kept separate from the runtime
+requirements. Install them only when you need to work on or build the
+documentation locally.
 
 # Special thanks
 

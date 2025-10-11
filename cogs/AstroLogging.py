@@ -36,16 +36,18 @@ def setup_logging(astroPath: str, console_print: bool = True) -> None:
         console_print: Unused legacy flag to enable console output.
     """
     formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)-6s %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+        "%(asctime)s - %(levelname)-6s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+    )
     rootLogger = logging.getLogger()
     rootLogger.setLevel(logging.DEBUG)
 
-    logsPath = os.path.join(astroPath, 'logs')
+    logsPath = os.path.join(astroPath, "logs")
     if not os.path.exists(logsPath):
         os.makedirs(logsPath)
 
     fileLogHandler = TimedRotatingFileHandler(
-        os.path.join(astroPath, 'logs', "astro_converter.log"), 'midnight', 1)
+        os.path.join(astroPath, "logs", "astro_converter.log"), "midnight", 1
+    )
     fileLogHandler.setFormatter(formatter)
 
     rootLogger.addHandler(fileLogHandler)

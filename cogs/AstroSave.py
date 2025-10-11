@@ -1,7 +1,6 @@
-from __future__ import annotations
 """Representation of an Astroneer save and related helpers."""
 
-import os
+from __future__ import annotations
 import re
 import uuid
 from typing import List, Tuple
@@ -11,7 +10,7 @@ from cogs import AstroLogging as Logger
 from utils import is_a_file, list_folder_content, join_paths
 
 
-XBOX_CHUNK_SIZE = int.from_bytes(b'\x01\x00\x00\x00', byteorder='big')
+XBOX_CHUNK_SIZE = int.from_bytes(b"\x01\x00\x00\x00", byteorder="big")
 
 
 class AstroSave:
@@ -25,14 +24,16 @@ class AstroSave:
             chunks_names: Names of the chunks constituting the save.
         """
         self.name = save_name  # User-defined save name + '$' + YYYY.MM.dd-HH.mm.ss
-        self.chunks_names = chunks_names  # Names of the all the chunks composing the save
+        self.chunks_names = (
+            chunks_names  # Names of the all the chunks composing the save
+        )
 
     @staticmethod
-    def init_saves_list_from(steamsave_files_list: List[str]) -> List['AstroSave']:
+    def init_saves_list_from(steamsave_files_list: List[str]) -> List["AstroSave"]:
         """Create ``AstroSave`` objects for a list of Steam save files."""
         saves_list: List[AstroSave] = []
         for save_file in steamsave_files_list:
-            current_save_name = re.search(r'(.*)\.savegame', save_file).group(1)
+            current_save_name = re.search(r"(.*)\.savegame", save_file).group(1)
             saves_list.append(AstroSave(current_save_name, []))
         return saves_list
 
@@ -52,7 +53,7 @@ class AstroSave:
         for chunk_name in self.chunks_names:
             chunk_file_path = join_paths(source, chunk_name)
 
-            with open(chunk_file_path, 'rb') as chunk_file:
+            with open(chunk_file_path, "rb") as chunk_file:
                 buffer.write(chunk_file.read())
         return buffer
 
@@ -72,11 +73,11 @@ class AstroSave:
         len_read = XBOX_CHUNK_SIZE
         save_file_path = source
 
-        with open(save_file_path, 'rb') as save_file:
+        with open(save_file_path, "rb") as save_file:
             while len_read == XBOX_CHUNK_SIZE:
                 buffer = BytesIO()
                 file_uuid = uuid.uuid4()
-                Logger.logPrint(f'UUID generated: {file_uuid}', "debug")
+                Logger.logPrint(f"UUID generated: {file_uuid}", "debug")
 
                 buffer.write(save_file.read(XBOX_CHUNK_SIZE))
 
@@ -96,7 +97,7 @@ class AstroSave:
 
     def get_file_name(self) -> str:
         """Return the filename corresponding to this save."""
-        return self.name + '.savegame'
+        return self.name + ".savegame"
 
     def rename(self, new_name: str) -> None:
         """Rename the save, enforcing character and length limits.
@@ -113,18 +114,19 @@ class AstroSave:
         Raises:
             ValueError: If ``new_name`` is empty, non-alphanumeric or too long.
         """
-        if new_name == '' or re.search(r'[^a-zA-Z0-9]', new_name) or len(new_name) > 30:
+        if new_name == "" or re.search(r"[^a-zA-Z0-9]", new_name) or len(new_name) > 30:
             raise ValueError
 
         date_string = self.name.split("$")[1]
-        self.name = new_name + '$' + date_string
+        self.name = new_name + "$" + date_string
 
     @staticmethod
     def get_steamsaves_list(path: str) -> List[str]:
         """List all Steam saves in a folder."""
         folder_content = list_folder_content(path)
         steamsaves_list = [
-            file for file in folder_content
+            file
+            for file in folder_content
             if AstroSave.is_a_steamsave_file(join_paths(path, file))
         ]
 
@@ -136,4 +138,4 @@ class AstroSave:
     @staticmethod
     def is_a_steamsave_file(path: str) -> bool:
         """Return ``True`` if ``path`` refers to a Steam save file."""
-        return is_a_file(path) and path.rfind('.savegame') != -1
+        return is_a_file(path) and path.rfind(".savegame") != -1

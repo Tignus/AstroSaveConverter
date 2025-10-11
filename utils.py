@@ -3,9 +3,10 @@
 import os
 import shutil
 import sys
-import winpath
-from io import StringIO
 from datetime import datetime
+from io import StringIO
+
+import winpath
 
 
 def create_folder_name(prefix: str) -> str:
@@ -17,8 +18,8 @@ def create_folder_name(prefix: str) -> str:
     Returns:
         str: Generated folder name.
     """
-    now = datetime.now().strftime('%Y.%m.%d-%H.%M')
-    return f'{prefix}_{now}'
+    now = datetime.now().strftime("%Y.%m.%d-%H.%M")
+    return f"{prefix}_{now}"
 
 
 def is_folder_writable(path: str) -> bool:

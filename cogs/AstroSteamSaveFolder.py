@@ -1,5 +1,3 @@
-import os
-from cogs import AstroLogging as Logger
 """Helpers for locating Steam save folders."""
 
 import os
@@ -21,19 +19,17 @@ def get_steam_save_folder() -> str:
         MultipleFolderFoundError: If multiple folders are detected.
     """
 
+    target:str = ""
     try:
-        target = os.environ['LOCALAPPDATA'] + '\\Astro\\Saved\\SaveGames'
+        target = os.path.join(
+            os.environ['LOCALAPPDATA'], 'Astro', 'Saved', 'SaveGames'
+        )
     except KeyError:
         Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
         Logger.logPrint("Press any key to exit")
         utils.wait_and_exit(1)
 
-    steam_save_paths = list(glob.iglob(target))
-
-    for path in steam_save_paths:
-        Logger.logPrint(f'SES path found in appadata: {path}', 'debug')
-
-    return steam_save_paths[0]
+    return target
 
 
 def seek_microsoft_save_folder(appdata_path: str) -> str:

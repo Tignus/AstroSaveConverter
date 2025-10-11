@@ -49,7 +49,7 @@ def list_folder_content(path: str) -> list:
 def make_dir_if_doesnt_exists(path: str) -> None:
     """Create ``path`` if it does not already exist."""
     if not os.path.isdir(path):
-        os.mkdir(path)
+        os.makedirs(path, exist_ok=True)
 
 
 def get_dir_name(path: str) -> str:

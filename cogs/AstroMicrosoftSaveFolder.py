@@ -1,11 +1,12 @@
 """Utilities for locating and backing up Microsoft/Xbox save folders."""
 
-import os
-from cogs import AstroLogging as Logger
-import utils
-import re
 import glob
+import os
+import re
 from datetime import datetime
+
+import utils
+from cogs import AstroLogging as Logger
 
 
 def get_microsoft_save_folder() -> str:
@@ -19,7 +20,10 @@ def get_microsoft_save_folder() -> str:
     """
 
     try:
-        target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
+        target = (
+            os.environ["LOCALAPPDATA"]
+            + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
+        )
     except KeyError:
         Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
         Logger.logPrint("Press any key to exit")
@@ -28,7 +32,7 @@ def get_microsoft_save_folder() -> str:
     microsoft_save_paths = list(glob.iglob(target))
 
     for path in microsoft_save_paths:
-        Logger.logPrint(f'SES path found in appadata: {path}', 'debug')
+        Logger.logPrint(f"SES path found in appadata: {path}", "debug")
 
     if not microsoft_save_paths:
         raise FileNotFoundError("No Microsoft save folder detected")
@@ -55,7 +59,7 @@ def seek_microsoft_save_folder(appdata_path: str) -> str:
     folders = get_save_folders_from_path(appdata_path)
 
     if not folders:
-        Logger.logPrint(f'No save folder found.', 'debug')
+        Logger.logPrint(f"No save folder found.", "debug")
         raise FileNotFoundError
 
     if len(folders) == 1:
@@ -79,7 +83,7 @@ def seek_microsoft_save_folder(appdata_path: str) -> str:
                 break
         except ValueError:
             pass
-        Logger.logPrint('Invalid selection. Please enter a valid number.')
+        Logger.logPrint("Invalid selection. Please enter a valid number.")
 
     return folders[index - 1]
 
@@ -97,15 +101,15 @@ def get_save_folders_from_path(path: str) -> list:
 
     for root, _, files in os.walk(path):
         for file in files:
-            if re.search(r'^container\.', file):
+            if re.search(r"^container\.", file):
                 container_full_path = utils.join_paths(root, file)
 
-                Logger.logPrint(f'Container file found: {container_full_path}', 'debug')
+                Logger.logPrint(f"Container file found: {container_full_path}", "debug")
 
                 container_text = read_container_text_from_path(container_full_path)
 
                 if do_container_text_match_date(container_text):
-                    Logger.logPrint(f'Matching save folder: {root}', 'debug')
+                    Logger.logPrint(f"Matching save folder: {root}", "debug")
                     microsoft_save_folders.append(root)
 
     return microsoft_save_folders
@@ -113,20 +117,22 @@ def get_save_folders_from_path(path: str) -> list:
 
 def get_save_details(folder_path: str):
     """Return list of ``(save_name, date_str)`` for saves in ``folder_path``."""
-    container_files = glob.glob(utils.join_paths(folder_path, 'container.*'))
+    container_files = glob.glob(utils.join_paths(folder_path, "container.*"))
     if not container_files:
         return []
 
     container_path = container_files[0]
-    with open(container_path, 'rb') as container_file:
-        text = container_file.read().decode('utf-16le', errors='ignore')
+    with open(container_path, "rb") as container_file:
+        text = container_file.read().decode("utf-16le", errors="ignore")
 
-    pattern = re.compile(r'([A-Za-z0-9_]+)\$c?(\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2})')
+    pattern = re.compile(
+        r"([A-Za-z0-9_]+)\$c?(\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2})"
+    )
     details = []
     for name, date_str in pattern.findall(text):
         try:
-            dt = datetime.strptime(date_str, '%Y.%m.%d-%H.%M.%S')
-            formatted_date = dt.strftime('%Y-%m-%d %H:%M:%S')
+            dt = datetime.strptime(date_str, "%Y.%m.%d-%H.%M.%S")
+            formatted_date = dt.strftime("%Y-%m-%d %H:%M:%S")
         except ValueError:
             formatted_date = date_str
         details.append((name, formatted_date))
@@ -135,14 +141,14 @@ def get_save_details(folder_path: str):
 
 def read_container_text_from_path(path: str) -> str:
     """Read a container file and return its decoded text."""
-    with open(path, 'rb') as container_file:
+    with open(path, "rb") as container_file:
         binary_content = container_file.read()
-        return binary_content.decode('utf-16le', errors='ignore')
+        return binary_content.decode("utf-16le", errors="ignore")
 
 
 def do_container_text_match_date(text: str) -> bool:
     """Check whether container text contains a date pattern."""
-    return re.search(r'\$\d{4}\.\d{2}\.\d{2}', text)
+    return re.search(r"\$\d{4}\.\d{2}\.\d{2}", text)
 
 
 def backup_microsoft_save_folder(to_path: str) -> str:
@@ -165,7 +171,10 @@ def find_microsoft_save_folders() -> list:
     save_folders = []
 
     try:
-        target = os.environ['LOCALAPPDATA'] + '\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs'
+        target = (
+            os.environ["LOCALAPPDATA"]
+            + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
+        )
     except KeyError:
         Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
         Logger.logPrint("Press any key to exit")
@@ -174,9 +183,9 @@ def find_microsoft_save_folders() -> list:
     for path in glob.iglob(target):
         save_folders.extend(get_save_folders_from_path(path))
 
-    Logger.logPrint(f'{len(save_folders)} save folders found', 'debug')
+    Logger.logPrint(f"{len(save_folders)} save folders found", "debug")
     for folder in save_folders:
-        Logger.logPrint(f'Save folder found: {folder}', 'debug')
+        Logger.logPrint(f"Save folder found: {folder}", "debug")
 
     if not save_folders:
         raise FileNotFoundError
@@ -188,7 +197,7 @@ def backup_microsoft_save_folders(folders: list, to_path: str) -> list:
     """Backup multiple Microsoft save folders into numbered directories."""
     utils.make_dir_if_doesnt_exists(to_path)
     for i, folder in enumerate(folders, 1):
-        destination = utils.join_paths(to_path, f'Backup_{i}')
+        destination = utils.join_paths(to_path, f"Backup_{i}")
         utils.copy_files(folder, destination)
 
     return folders

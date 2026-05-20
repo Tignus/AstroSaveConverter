@@ -142,7 +142,41 @@ class WebGUIHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(data).encode("utf-8"))
 
+    def is_request_secure(self) -> bool:
+        """Validate request headers to prevent CSRF and DNS-rebinding attacks."""
+        host = self.headers.get("Host", "")
+        if not (host.startswith("127.0.0.1:") or host == "127.0.0.1" or
+                host.startswith("localhost:") or host == "localhost"):
+            Logger.logPrint(f"Security Warning: Blocked request with invalid Host header: {host}", "warning")
+            return False
+
+        origin = self.headers.get("Origin")
+        if origin:
+            if not (origin.startswith("http://127.0.0.1:") or origin == "http://127.0.0.1" or
+                    origin.startswith("http://localhost:") or origin == "http://localhost"):
+                Logger.logPrint(f"Security Warning: Blocked request with invalid Origin header: {origin}", "warning")
+                return False
+
+        referer = self.headers.get("Referer")
+        if referer:
+            if not (referer.startswith("http://127.0.0.1:") or referer == "http://127.0.0.1" or
+                    referer.startswith("http://localhost:") or referer == "http://localhost"):
+                Logger.logPrint(f"Security Warning: Blocked request with invalid Referer header: {referer}", "warning")
+                return False
+
+        return True
+
+    def send_forbidden(self):
+        self.send_response(403)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"Forbidden: Request origin validation failed.")
+
     def do_GET(self):
+        if not self.is_request_secure():
+            self.send_forbidden()
+            return
+            
         # 1. API Endpoints
         if self.path == "/api/status":
             self.send_json(get_status_json())
@@ -187,6 +221,10 @@ class WebGUIHandler(BaseHTTPRequestHandler):
         self.send_error(404, "Not Found")
 
     def do_POST(self):
+        if not self.is_request_secure():
+            self.send_forbidden()
+            return
+            
         # Parse JSON body
         content_length = int(self.headers.get('Content-Length', 0))
         post_data = self.rfile.read(content_length) if content_length > 0 else b""

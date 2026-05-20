@@ -21,13 +21,11 @@ def get_steam_save_folder() -> str:
 
     target: str = ""
     try:
-        target = os.path.join(os.environ["LOCALAPPDATA"], "Astro", "Saved", "SaveGames")
+        local_appdata = os.environ["LOCALAPPDATA"]
     except KeyError:
-        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
-        Logger.logPrint("Press any key to exit")
-        utils.wait_and_exit(1)
+        raise FileNotFoundError("LOCALAPPDATA environment variable is missing.")
 
-    return target
+    return os.path.join(local_appdata, "Astro", "Saved", "SaveGames")
 
 
 def seek_microsoft_save_folder(appdata_path: str) -> str:

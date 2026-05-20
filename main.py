@@ -117,7 +117,15 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     if not microsoft_target_folder:
         utils.wait_and_exit(1)
 
-    steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
+    try:
+        steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
+    except FileNotFoundError:
+        Logger.logPrint(
+            "No Steam saves found in the selected folder. Please choose another path."
+        )
+        original_save_path = Scenario.ask_for_save_folder(AstroConvType.STEAM2WIN)
+        Logger.logPrint(f"User selected new path: {original_save_path}", "debug")
+        steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
 
     saves_list = AstroSave.init_saves_list_from(steamsave_files_list)
 

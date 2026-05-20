@@ -20,15 +20,11 @@ def get_microsoft_save_folder() -> str:
     """
 
     try:
-        target = (
-            os.environ["LOCALAPPDATA"]
-            + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
-        )
+        local_appdata = os.environ["LOCALAPPDATA"]
     except KeyError:
-        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
-        Logger.logPrint("Press any key to exit")
-        utils.wait_and_exit(1)
+        raise FileNotFoundError("LOCALAPPDATA environment variable is missing.")
 
+    target = local_appdata + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
     microsoft_save_paths = list(glob.iglob(target))
 
     for path in microsoft_save_paths:
@@ -171,15 +167,11 @@ def find_microsoft_save_folders() -> list:
     save_folders = []
 
     try:
-        target = (
-            os.environ["LOCALAPPDATA"]
-            + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
-        )
+        local_appdata = os.environ["LOCALAPPDATA"]
     except KeyError:
-        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
-        Logger.logPrint("Press any key to exit")
-        utils.wait_and_exit(1)
+        raise FileNotFoundError("LOCALAPPDATA environment variable is missing.")
 
+    target = local_appdata + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
     for path in glob.iglob(target):
         save_folders.extend(get_save_folders_from_path(path))
 

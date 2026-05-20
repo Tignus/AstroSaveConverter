@@ -117,8 +117,12 @@ class AstroSave:
         if new_name == "" or re.search(r"[^a-zA-Z0-9]", new_name) or len(new_name) > 30:
             raise ValueError
 
-        date_string = self.name.split("$")[1]
-        self.name = new_name + "$" + date_string
+        parts = self.name.split("$")
+        date_string = parts[1] if len(parts) > 1 else ""
+        if date_string:
+            self.name = new_name + "$" + date_string
+        else:
+            self.name = new_name
 
     @staticmethod
     def get_steamsaves_list(path: str) -> List[str]:

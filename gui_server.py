@@ -304,13 +304,24 @@ class WebGUIHandler(BaseHTTPRequestHandler):
                         self.send_json({"success": False, "error": "Invalid save folders."}, 400)
                         return
                         
-                    containers_list = Container.get_containers_list(xbox_path)
+                    try:
+                        containers_list = Container.get_containers_list(xbox_path)
+                    except FileNotFoundError:
+                        self.send_json({"success": False, "error": "No Xbox save container found in the selected folder."}, 400)
+                        return
+                        
+                    if not containers_list:
+                        self.send_json({"success": False, "error": "No Xbox save profiles found in the selected folder."}, 400)
+                        return
                     container_url = utils.join_paths(xbox_path, containers_list[0])
                     container = Container(container_url)
                     
                     utils.make_dir_if_doesnt_exists(steam_path)
                     
                     for idx in save_indexes:
+                        if idx < 0 or idx >= len(container.save_list):
+                            self.send_json({"success": False, "error": f"Invalid Xbox save index: {idx}"}, 400)
+                            return
                         save = container.save_list[idx]
                         # Apply rename if requested
                         if str(idx) in renames:
@@ -343,10 +354,17 @@ class WebGUIHandler(BaseHTTPRequestHandler):
                         Logger.logPrint(f"Backup warning: {e}", "warning")
                         
                     # 2. Convert each steam save
-                    steamsave_files_list = AstroSave.get_steamsaves_list(steam_path)
+                    try:
+                        steamsave_files_list = AstroSave.get_steamsaves_list(steam_path)
+                    except FileNotFoundError:
+                        self.send_json({"success": False, "error": "No Steam save files found in the selected folder."}, 400)
+                        return
                     saves_list = AstroSave.init_saves_list_from(steamsave_files_list)
                     
                     for idx in save_indexes:
+                        if idx < 0 or idx >= len(saves_list):
+                            self.send_json({"success": False, "error": f"Invalid Steam save index: {idx}"}, 400)
+                            return
                         save = saves_list[idx]
                         if str(idx) in renames:
                             save.rename(renames[str(idx)])
@@ -379,23 +397,20 @@ class WebGUIHandler(BaseHTTPRequestHandler):
             
         self.send_error(404, "Not Found")
 
-def find_free_port():
-    """Find a random unused port on local system."""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("", 0))
-    port = s.getsockname()[1]
-    s.close()
-    return port
-
 def start_gui():
     """Launch HTTP Server and open browser."""
     # Auto detect folders first
     auto_detect_paths()
     
-    port = find_free_port()
     host = "127.0.0.1"
-    
-    server = HTTPServer((host, port), WebGUIHandler)
+    try:
+        server = HTTPServer((host, 0), WebGUIHandler)
+    except Exception as e:
+        Logger.logPrint(f"Could not bind to {host}, falling back to localhost: {e}", "warning")
+        host = "localhost"
+        server = HTTPServer((host, 0), WebGUIHandler)
+        
+    port = server.server_address[1]
     url = f"http://{host}:{port}"
     
     # Print clean instructions to console

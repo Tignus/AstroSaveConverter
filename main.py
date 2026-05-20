@@ -149,14 +149,15 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
         )
 
 
-if __name__ == "__main__":
+def run_cli() -> None:
+    """Run the application in Command-Line Interface (CLI) mode."""
     try:
         Logger.setup_logging(os.getcwd())
-        Logger.logPrint(f"Starting AstroSaveConverter version {APP_VERSION}")
+        Logger.logPrint(f"Starting AstroSaveConverter version {APP_VERSION} (CLI)")
 
         try:
             os.system(
-                f"title AstroSaveConverter {APP_VERSION} - Convert your Astroneer saves between Microsoft and Steam"
+                f"title AstroSaveConverter {APP_VERSION} (CLI) - Convert your Astroneer saves"
             )
         except:
             pass
@@ -191,3 +192,33 @@ if __name__ == "__main__":
         Logger.logPrint(e)
         Logger.logPrint("", "exception")
         utils.wait_and_exit(1)
+
+
+def run_gui() -> None:
+    """Run the application in Web GUI mode."""
+    try:
+        Logger.setup_logging(os.getcwd())
+        Logger.logPrint(f"Starting AstroSaveConverter version {APP_VERSION} (GUI)")
+
+        try:
+            os.system(
+                f"title AstroSaveConverter {APP_VERSION} (GUI) - Convert your Astroneer saves"
+            )
+        except:
+            pass
+
+        import gui_server
+        gui_server.start_gui()
+    except Exception as e:
+        Logger.logPrint(e)
+        Logger.logPrint("", "exception")
+        utils.wait_and_exit(1)
+
+
+if __name__ == "__main__":
+    import sys
+    # If the user runs the script with --cli, run CLI mode, otherwise run GUI mode.
+    if "--cli" in sys.argv:
+        run_cli()
+    else:
+        run_gui()

@@ -48,7 +48,7 @@ def test_ask_copy_target_logs_choices():
         assert _call_args_contains(
             log_mock, call(f"User choice: {invalid_path}", "debug")
         )
-        assert _call_args_contains(log_mock, call("User choice: /tmp", "debug"))
+        assert _call_args_contains(log_mock, call(f"User choice: {os.path.abspath('/tmp')}", "debug"))
 
 
 def test_ask_for_multiple_choices_logs():

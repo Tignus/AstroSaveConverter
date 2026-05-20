@@ -22,10 +22,10 @@ class LoadingBar:
     def start_loading(self) -> None:
         """Animate the loading bar until completion."""
 
-        print("[", end='')
+        print("[", end="")
         for _ in range(self.__bar_count):
-            print(" ", end='')
-        print("]", end='', flush=True)
+            print(" ", end="")
+        print("]", end="", flush=True)
 
         for i in range(self.__bar_count):
             time.sleep(self.__update_period)
@@ -35,15 +35,15 @@ class LoadingBar:
     def clean_bar(self) -> None:
         """Remove the bar from the console."""
         for _ in range(self.__bar_count + 2):
-            print("\b", end='')
-        print("", end='', flush=True)
+            print("\b", end="")
+        print("", end="", flush=True)
 
     def print_bar(self, progress: int) -> None:
         """Print the bar with a given progress state."""
-        print("[", end='')
+        print("[", end="")
         for i in range(self.__bar_count):
             if progress >= i:
-                print("■", end='')
+                print("■", end="")
             else:
-                print(" ", end='')
-        print("]", end='', flush=True)
+                print(" ", end="")
+        print("]", end="", flush=True)

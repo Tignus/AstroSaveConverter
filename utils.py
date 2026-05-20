@@ -3,9 +3,10 @@
 import os
 import shutil
 import sys
-import winpath
-from io import StringIO
 from datetime import datetime
+from io import StringIO
+
+import winpath
 
 
 def create_folder_name(prefix: str) -> str:
@@ -17,8 +18,8 @@ def create_folder_name(prefix: str) -> str:
     Returns:
         str: Generated folder name.
     """
-    now = datetime.now().strftime('%Y.%m.%d-%H.%M')
-    return f'{prefix}_{now}'
+    now = datetime.now().strftime("%Y.%m.%d-%H.%M")
+    return f"{prefix}_{now}"
 
 
 def is_folder_writable(path: str) -> bool:
@@ -49,7 +50,7 @@ def list_folder_content(path: str) -> list:
 def make_dir_if_doesnt_exists(path: str) -> None:
     """Create ``path`` if it does not already exist."""
     if not os.path.isdir(path):
-        os.mkdir(path)
+        os.makedirs(path, exist_ok=True)
 
 
 def get_dir_name(path: str) -> str:

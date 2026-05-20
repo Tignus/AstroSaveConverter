@@ -1,25 +1,25 @@
 """Helper script to build the standalone executable using PyInstaller."""
 
-import PyInstaller.__main__
 import os
 import shutil
 
-data_sep = ';' if os.name == 'nt' else ':'
+import PyInstaller.__main__
+
+data_sep = ";" if os.name == "nt" else ":"
 
 args = [
-    '--name=AstroSaveConverter',
-    '--onefile',
-    '--clean',
-    '--noconfirm',
-    f'--add-data=assets/*{data_sep}.',
-    '--icon=assets/astroconverterlogo.ico',
-    '--exclude-module=sphinx',
-    '--exclude-module=sphinx_rtd_theme',
-    'main.py'
+    "--name=AstroSaveConverter",
+    "--onefile",
+    "--clean",
+    "--noconfirm",
+    f"--add-data=assets/*{data_sep}.",
+    "--icon=assets/astroconverterlogo.ico",
+    "--exclude-module=sphinx",
+    "--exclude-module=sphinx_rtd_theme",
+    "main.py",
 ]
 
 PyInstaller.__main__.run(args)
-
 
 
 # Remove PyInstaller work subfolder
@@ -36,4 +36,3 @@ if os.path.isfile(spec_file):
 build_dir = "build"
 if os.path.isdir(build_dir) and not os.listdir(build_dir):
     os.rmdir(build_dir)
-

@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import socket
 import webbrowser
 import threading
 import time
@@ -19,7 +18,6 @@ from cogs import AstroLogging as Logger
 
 # Global state for GUI session
 state = {
-    "xbox_paths": [],
     "xbox_selected_path": "",
     "steam_path": "",
 }
@@ -28,12 +26,10 @@ def auto_detect_paths():
     """Detect default Xbox and Steam paths."""
     # 1. Xbox Detection
     try:
-        state["xbox_paths"] = AstroMicrosoftSaveFolder.find_microsoft_save_folders()
-        if state["xbox_paths"] and not state["xbox_selected_path"]:
-            state["xbox_selected_path"] = state["xbox_paths"][0]
+        detected_xbox_paths = AstroMicrosoftSaveFolder.find_microsoft_save_folders()
+        state["xbox_selected_path"] = detected_xbox_paths[0] if detected_xbox_paths else ""
     except Exception as e:
         Logger.logPrint(f"Xbox folders auto-detection failed: {e}", "debug")
-        state["xbox_paths"] = []
         state["xbox_selected_path"] = ""
 
     # 2. Steam Detection
@@ -66,7 +62,7 @@ def get_xbox_saves():
             # Extract date from name if possible (format: Name$YYYY.MM.dd-HH.mm.ss)
             parts = save.name.split("$")
             clean_name = parts[0]
-            date_str = "Inconnue"
+            date_str = "Unknown"
             if len(parts) > 1:
                 try:
                     dt = datetime.strptime(parts[1], "%Y.%m.%d-%H.%M.%S")
@@ -99,7 +95,7 @@ def get_steam_saves():
         saves_data = []
         for idx, save in enumerate(saves_list):
             full_path = utils.join_paths(path, steamsave_files_list[idx])
-            date_str = "Inconnue"
+            date_str = "Unknown"
             try:
                 mtime = os.path.getmtime(full_path)
                 dt = datetime.fromtimestamp(mtime)
@@ -121,7 +117,6 @@ def get_steam_saves():
 def get_status_json():
     """Assemble current system status."""
     return {
-        "xbox_paths": state["xbox_paths"],
         "xbox_selected_path": state["xbox_selected_path"],
         "xbox_saves": get_xbox_saves(),
         "steam_path": state["steam_path"],
@@ -244,9 +239,6 @@ class WebGUIHandler(BaseHTTPRequestHandler):
                 
             if folder_type == "xbox":
                 state["xbox_selected_path"] = folder_path
-                # Add to xbox_paths if not already there
-                if folder_path not in state["xbox_paths"]:
-                    state["xbox_paths"].append(folder_path)
             elif folder_type == "steam":
                 state["steam_path"] = folder_path
             else:
@@ -282,8 +274,6 @@ class WebGUIHandler(BaseHTTPRequestHandler):
                     selected_dir = os.path.normpath(selected_dir)
                     if folder_type == "xbox":
                         state["xbox_selected_path"] = selected_dir
-                        if selected_dir not in state["xbox_paths"]:
-                            state["xbox_paths"].append(selected_dir)
                     else:
                         state["steam_path"] = selected_dir
                     self.send_json({"success": True, "path": selected_dir, "status": get_status_json()})
@@ -303,12 +293,13 @@ class WebGUIHandler(BaseHTTPRequestHandler):
                     if paths:
                         selected_path = paths[0]
                         state["xbox_selected_path"] = selected_path
-                        state["xbox_paths"] = paths
                         self.send_json({"success": True, "path": selected_path, "status": get_status_json()})
                     else:
-                        self.send_json({"success": False, "error": "No Microsoft save folder detected automatically."})
+                        state["xbox_selected_path"] = ""
+                        self.send_json({"success": False, "error": "No Microsoft save folder detected automatically.", "status": get_status_json()})
                 except Exception as e:
-                    self.send_json({"success": False, "error": "No Microsoft save folder detected automatically."})
+                    state["xbox_selected_path"] = ""
+                    self.send_json({"success": False, "error": "No Microsoft save folder detected automatically.", "status": get_status_json()})
             elif folder_type == "steam":
                 try:
                     steam_path = AstroSteamSaveFolder.get_steam_save_folder()
@@ -316,9 +307,11 @@ class WebGUIHandler(BaseHTTPRequestHandler):
                         state["steam_path"] = steam_path
                         self.send_json({"success": True, "path": steam_path, "status": get_status_json()})
                     else:
-                        self.send_json({"success": False, "error": "No Steam save folder detected automatically."})
+                        state["steam_path"] = ""
+                        self.send_json({"success": False, "error": "No Steam save folder detected automatically.", "status": get_status_json()})
                 except Exception as e:
-                    self.send_json({"success": False, "error": "No Steam save folder detected automatically."})
+                    state["steam_path"] = ""
+                    self.send_json({"success": False, "error": "No Steam save folder detected automatically.", "status": get_status_json()})
             else:
                 self.send_json({"success": False, "error": "Invalid type."}, 400)
             return

@@ -22,6 +22,7 @@
 - [Convert your game saves](https://github.com/Tignus/AstroSaveConverter#convert-your-game-saves)
 	- [Microsoft XBOX to Steam](https://github.com/Tignus/AstroSaveConverter#microsoft-xbox-to-steam)
 	- [Steam to Microsoft XBOX](https://github.com/Tignus/AstroSaveConverter#steam-to-microsoft-xbox)
+	- [Available executables](https://github.com/Tignus/AstroSaveConverter#available-executables)
 	- [How to use](https://github.com/Tignus/AstroSaveConverter#how-to-use)
 - [Manual rollback procedure](https://github.com/Tignus/AstroSaveConverter#manual-rollback-procedure)
 	- [Steam saves](https://github.com/Tignus/AstroSaveConverter#steam-saves)
@@ -59,6 +60,16 @@ The tool is meant to convert *Microsoft XBOX* save files into Steam save files. 
 ## Steam to Microsoft XBOX
 
 AstroSaveConverter now allows you to convert your *Steam* saves into *Microsoft XBOX* format !
+
+## Available executables
+
+The release contains two Windows executables:
+
+- `AstroSaveConverterCLI.exe`: the historical command-line version. Use this if
+  you prefer the original terminal workflow.
+- `AstroSaveConverter.exe`: the new graphical version. It starts a local server
+  on your computer and opens the configuration interface in your web browser.
+  The server only runs locally while the application is open.
 
 ## How to use
 
@@ -138,7 +149,9 @@ pip install -r requirements.txt
 ``` bash
 .venv/Scripts/python.exe BuildEXE.py
 ```
-- The generated executable will be located at `dist/AstroSaveConverter.exe`
+- The generated executables will be located at:
+  - `dist/AstroSaveConverter.exe`
+  - `dist/AstroSaveConverterCLI.exe`
 
 
 ## Documentation

@@ -6,6 +6,7 @@ user interaction, file discovery and conversion workflows.
 """
 
 import os
+import sys
 from argparse import ArgumentParser, Namespace
 
 import AstroSaveScenario as Scenario
@@ -167,7 +168,7 @@ def run_cli() -> None:
             os.system(
                 f"title AstroSaveConverter {APP_VERSION} (CLI) - Convert your Astroneer saves"
             )
-        except:
+        except Exception:
             pass
 
         args = get_args()
@@ -212,7 +213,7 @@ def run_gui() -> None:
             os.system(
                 f"title AstroSaveConverter {APP_VERSION} (GUI) - Convert your Astroneer saves"
             )
-        except:
+        except Exception:
             pass
 
         import gui_server
@@ -224,7 +225,6 @@ def run_gui() -> None:
 
 
 if __name__ == "__main__":
-    import sys
     # If the user runs the script with --cli, run CLI mode, otherwise run GUI mode.
     if "--cli" in sys.argv:
         run_cli()

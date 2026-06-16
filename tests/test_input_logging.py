@@ -60,6 +60,20 @@ def test_ask_for_multiple_choices_logs():
         assert _call_args_contains(log_mock, call("User choice: 1,2", "debug"))
 
 
+def test_ask_for_save_folder_handles_missing_steam_folder():
+    with patch.object(builtins, "input", side_effect=["1", "2"]), patch(
+        "cogs.AstroSteamSaveFolder.get_steam_save_folder",
+        side_effect=FileNotFoundError("missing LOCALAPPDATA"),
+    ), patch(
+        "AstroSaveScenario.ask_custom_folder_path", return_value="C:\\tmp"
+    ), patch(
+        "cogs.AstroLogging.logPrint"
+    ) as log_mock:
+        result = scenario.ask_for_save_folder(AstroConvType.STEAM2WIN)
+        assert result == "C:\\tmp"
+        assert _call_args_contains(log_mock, call("\nNo container found in path: "))
+
+
 def test_ask_rename_saves_logs():
     save = AstroSave("OLD$2024.01.01-00.00.00", [])
     with patch.object(builtins, "input", side_effect=["n"]), patch(

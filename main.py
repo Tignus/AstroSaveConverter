@@ -7,6 +7,8 @@ user interaction, file discovery and conversion workflows.
 
 import os
 import sys
+import importlib
+import subprocess
 from argparse import ArgumentParser, Namespace
 
 import AstroSaveScenario as Scenario
@@ -203,30 +205,32 @@ def run_cli() -> None:
         utils.wait_and_exit(1)
 
 
-def run_gui() -> None:
-    """Run the application in Web GUI mode."""
-    try:
+def run_gui_from_cli_entry() -> None:
+    """Run the GUI when explicitly requested from the CLI entry point."""
+    if getattr(sys, "frozen", False):
+        gui_executable = os.path.join(
+            os.path.dirname(sys.executable), "AstroSaveConverterGUI.exe"
+        )
+        if os.path.isfile(gui_executable):
+            subprocess.Popen([gui_executable])
+            return
+
         Logger.setup_logging(os.getcwd())
-        Logger.logPrint(f"Starting AstroSaveConverter version {APP_VERSION} (GUI)")
-
-        try:
-            os.system(
-                f"title AstroSaveConverter {APP_VERSION} (GUI) - Convert your Astroneer saves"
-            )
-        except Exception:
-            pass
-
-        import gui_server
-        gui_server.start_gui()
-    except Exception as e:
-        Logger.logPrint(e)
-        Logger.logPrint("", "exception")
+        Logger.logPrint(
+            "GUI executable not found. Please run AstroSaveConverterGUI.exe directly.",
+            "error",
+        )
         utils.wait_and_exit(1)
+
+    importlib.import_module("main_gui").run_gui()
 
 
 if __name__ == "__main__":
-    # If the user runs the script with --cli, run CLI mode, otherwise run GUI mode.
-    if "--cli" in sys.argv:
-        run_cli()
+    # Preserve the historical CLI default; GUI mode is opt-in via --gui.
+    if "--gui" in sys.argv:
+        sys.argv.remove("--gui")
+        run_gui_from_cli_entry()
     else:
-        run_gui()
+        if "--cli" in sys.argv:
+            sys.argv.remove("--cli")
+        run_cli()

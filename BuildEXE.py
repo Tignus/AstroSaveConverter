@@ -21,11 +21,11 @@ COMMON_ARGS = [
 BUILD_TARGETS = [
     (
         "AstroSaveConverter",
-        [f"--add-data=web{DATA_SEPARATOR}web", "main.py"],
+        ["main.py"],
     ),
     (
-        "AstroSaveConverterCLI",
-        ["main_cli.py"],
+        "AstroSaveConverterGUI",
+        [f"--add-data=web{DATA_SEPARATOR}web", "main_gui.py"],
     ),
 ]
 

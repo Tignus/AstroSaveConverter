@@ -104,6 +104,7 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
         FileNotFoundError: If no save folder can be located automatically.
     """
     while 1:
+        save_path = ""
         try:
             Logger.logPrint("Which folder would you like to work with ?")
             Logger.logPrint(

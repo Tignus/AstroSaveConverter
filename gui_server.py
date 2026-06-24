@@ -462,3 +462,7 @@ def start_gui():
         pass
     finally:
         server.server_close()
+
+
+if __name__ == "__main__":
+    start_gui()

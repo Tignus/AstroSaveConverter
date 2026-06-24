@@ -479,7 +479,7 @@ def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> str:
         Container.create_empty_container(to_path)
         container_file_name = "container.1"
 
-    container_full_path = utils.join_paths(to_path, container_file_name)
+    container_full_path = utils.resolve_safe_path(utils.join_paths(to_path, container_file_name))
 
     with open(container_full_path, "r+b") as container:
         container.read(4)

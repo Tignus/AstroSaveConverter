@@ -1220,6 +1220,15 @@
             if (toggle) toggle.setAttribute('aria-expanded', 'false');
         });
 
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // Apply translations to static elements
         function applyLanguage() {
             const lang = state.language || 'en';
@@ -1357,10 +1366,14 @@
                 // Display name (clean up Xbox name containing $)
                 const cleanName = save.name.split('$')[0];
                 const displayName = state.renames[save.index] ? state.renames[save.index] : cleanName;
+                const safeIndex = parseInt(save.index, 10);
+                const safeDisplayName = escapeHtml(displayName);
+                const safeCleanName = escapeHtml(cleanName);
+                const safeDate = escapeHtml(save.date);
 
                 item.innerHTML = `
                     <label style="cursor:pointer; display:flex; align-items:center; flex-shrink:0;">
-                        <input type="checkbox" value="${save.index}" class="save-checkbox" onchange="onSaveSelectChange(${save.index})">
+                        <input type="checkbox" value="${safeIndex}" class="save-checkbox" onchange="onSaveSelectChange(${safeIndex})">
                         <span class="custom-checkbox">
                             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </span>
@@ -1372,24 +1385,24 @@
                             <polyline points="7 3 7 8 15 8"/>
                         </svg>
                     </div>
-                    <div class="save-info" id="save-info-${save.index}">
+                    <div class="save-info" id="save-info-${safeIndex}">
                         <div class="save-name-container">
-                            <span class="save-name" title="${displayName}">${displayName}</span>
-                            ${state.renames[save.index] ? `<span class="renamed-badge">${t.renamedBadge}</span>` : ''}
+                            <span class="save-name" title="${safeDisplayName}">${safeDisplayName}</span>
+                            ${state.renames[save.index] ? `<span class="renamed-badge">${escapeHtml(t.renamedBadge)}</span>` : ''}
                         </div>
-                        <span class="save-date">${t.modifiedOn}${save.date}</span>
+                        <span class="save-date">${escapeHtml(t.modifiedOn)}${safeDate}</span>
                     </div>
                     <!-- Inline Rename Group -->
-                    <div class="save-rename-group" id="rename-group-${save.index}">
-                        <input type="text" class="rename-input" id="rename-input-${save.index}" value="${cleanName}" maxlength="30">
-                        <button class="btn-mini confirm" onclick="confirmRename(${save.index})" title="${t.confirmRenameTooltip}">
+                    <div class="save-rename-group" id="rename-group-${safeIndex}">
+                        <input type="text" class="rename-input" id="rename-input-${safeIndex}" value="${safeCleanName}" maxlength="30">
+                        <button class="btn-mini confirm" onclick="confirmRename(${safeIndex})" title="${escapeHtml(t.confirmRenameTooltip)}">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </button>
-                        <button class="btn-mini cancel" onclick="cancelRename(${save.index})" title="${t.cancelRenameTooltip}">
+                        <button class="btn-mini cancel" onclick="cancelRename(${safeIndex})" title="${escapeHtml(t.cancelRenameTooltip)}">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
-                    <button class="btn-mini" onclick="showRenameInput(${save.index})" id="rename-trigger-${save.index}" title="${t.renameTooltip}">
+                    <button class="btn-mini" onclick="showRenameInput(${safeIndex})" id="rename-trigger-${safeIndex}" title="${escapeHtml(t.renameTooltip)}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                             <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -1677,8 +1690,8 @@
                     </svg>
                 </div>
                 <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
+                    <div class="toast-title">${escapeHtml(title)}</div>
+                    <div class="toast-message">${escapeHtml(message)}</div>
                 </div>
                 <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
             `;

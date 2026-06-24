@@ -94,6 +94,7 @@ def get_save_folders_from_path(path: str) -> list:
         list: Paths of detected save folders.
     """
     microsoft_save_folders = []
+    path = utils.resolve_safe_path(path)
 
     for root, _, files in os.walk(path):
         for file in files:
@@ -113,11 +114,12 @@ def get_save_folders_from_path(path: str) -> list:
 
 def get_save_details(folder_path: str):
     """Return list of ``(save_name, date_str)`` for saves in ``folder_path``."""
+    folder_path = utils.resolve_safe_path(folder_path)
     container_files = glob.glob(utils.join_paths(folder_path, "container.*"))
     if not container_files:
         return []
 
-    container_path = container_files[0]
+    container_path = utils.resolve_safe_path(container_files[0], folder_path)
     with open(container_path, "rb") as container_file:
         text = container_file.read().decode("utf-16le", errors="ignore")
 
@@ -137,6 +139,7 @@ def get_save_details(folder_path: str):
 
 def read_container_text_from_path(path: str) -> str:
     """Read a container file and return its decoded text."""
+    path = utils.resolve_safe_path(path)
     with open(path, "rb") as container_file:
         binary_content = container_file.read()
         return binary_content.decode("utf-16le", errors="ignore")

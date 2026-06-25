@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroSaveConverter - Astroneer Save Converter</title>
+    <style>
+        :root {
+            --bg-color: #438fc8;
+            --bubble-ink: #31506a;
+            --bubble-muted: #6f8aa0;
+            --bubble-blue: #249eea;
+            --bubble-blue-deep: #1266bf;
+            --bubble-card: rgba(239, 250, 255, 0.84);
+            --bubble-line: rgba(255, 255, 255, 0.86);
+            --bubble-shadow: 0 24px 70px rgba(33, 108, 158, 0.22);
+            --bubble-shadow-soft: 0 14px 32px rgba(33, 108, 158, 0.16);
+            --accent-primary: #249eea;
+            --accent-secondary: #64cfff;
+            --accent-gradient: linear-gradient(135deg, #27a8f0, #1266bf);
+            --success: #24a875;
+            --warning: #ff8f6b;
+            --danger: #d24d5d;
+            --font-main: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(18, 102, 191, 0.48) transparent;
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(18, 102, 191, 0.48);
+            border-radius: 999px;
+        }
+
+        body {
+            min-height: 100dvh;
+            padding: 18px;
+            overflow-x: hidden;
+            color: var(--bubble-ink);
+            font-family: var(--font-main);
+            font-weight: 700;
+            background:
+                radial-gradient(circle at 8% 8%, rgba(255, 255, 255, 0.18) 0 64px, transparent 65px),
+                radial-gradient(circle at 92% 10%, rgba(255, 255, 255, 0.16) 0 96px, transparent 97px),
+                radial-gradient(circle at 78% 92%, rgba(22, 116, 185, 0.34) 0 150px, transparent 151px),
+                linear-gradient(155deg, #9fd2ee 0%, #6fb5df 48%, #438fc8 100%);
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        a:focus-visible {
+            outline: 3px solid rgba(36, 158, 234, 0.48);
+            outline-offset: 4px;
+        }
+
+        .lang-selector-container,
+        .app-shell,
+        footer {
+            width: min(1120px, 100%);
+            margin-inline: auto;
+        }
+
+        .lang-selector-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 14px;
+        }
+
+        .language-picker {
+            position: relative;
+            z-index: 30;
+        }
+
+        .language-toggle,
+        .language-menu,
+        .btn-secondary,
+        .btn-mini,
+        .btn-quit,
+        .select-all-label {
+            border: 2px solid var(--bubble-line);
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: var(--bubble-shadow-soft);
+        }
+
+        .language-toggle {
+            min-width: 112px;
+            min-height: 44px;
+            padding: 9px 14px;
+            border-radius: 999px;
+            color: var(--bubble-ink);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-weight: 900;
+        }
+
+        .language-toggle:hover,
+        .language-toggle[aria-expanded="true"] {
+            background: #fff;
+            border-color: rgba(36, 158, 234, 0.28);
+        }
+
+        .language-chevron {
+            color: var(--bubble-blue-deep);
+        }
+
+        .language-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 136px;
+            padding: 8px;
+            border-radius: 22px;
+            background: rgba(238, 249, 255, 0.96);
+        }
+
+        .language-menu button {
+            width: 100%;
+            min-height: 38px;
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--bubble-ink);
+            cursor: pointer;
+            font-weight: 850;
+            text-align: left;
+        }
+
+        .language-menu button:hover {
+            background: #fff;
+            color: var(--bubble-blue-deep);
+        }
+
+        header {
+            padding: 20px 0 22px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .logo-icon {
+            flex: 0 0 auto;
+            width: 64px;
+            height: 64px;
+            border-radius: 24px;
+            background: linear-gradient(145deg, #ffffff, #d5f4ff);
+            border: 3px solid var(--bubble-line);
+            box-shadow: 0 18px 34px rgba(36, 158, 234, 0.2), inset 0 -8px 18px rgba(36, 158, 234, 0.1);
+            animation: bubbleFloat 5.5s ease-in-out infinite;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            will-change: transform;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-icon.is-dragging {
+            animation: none !important;
+            cursor: grabbing;
+            transition: none !important;
+            z-index: 12;
+        }
+
+        .logo-icon.is-returning {
+            animation: none !important;
+            transition: transform 460ms cubic-bezier(0.18, 1.35, 0.32, 1);
+        }
+
+        @keyframes bubbleFloat {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        header h1 {
+            max-width: 100%;
+            color: var(--bubble-ink);
+            font-size: clamp(2.25rem, 8vw, 4.7rem);
+            font-weight: 950;
+            line-height: 0.96;
+            overflow-wrap: anywhere;
+            text-shadow: 0 8px 0 rgba(255, 255, 255, 0.76);
+        }
+
+        header p {
+            width: 100%;
+            color: var(--bubble-muted);
+            font-size: clamp(1.02rem, 1.8vw, 1.18rem);
+            line-height: 1.55;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            padding-bottom: 28px;
+        }
+
+        .tabs {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding: 8px;
+            border: 3px solid var(--bubble-line);
+            border-radius: 999px;
+            background: rgba(232, 247, 255, 0.78);
+            box-shadow: var(--bubble-shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .tab-btn {
+            min-width: 0;
+            min-height: 58px;
+            padding: 12px 14px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--bubble-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 950;
+            text-align: center;
+            white-space: normal;
+        }
+
+        .tab-btn:hover {
+            color: var(--bubble-blue-deep);
+            background: rgba(255, 255, 255, 0.62);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: var(--accent-gradient);
+            box-shadow: 0 12px 24px rgba(18, 102, 191, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.38);
+        }
+
+        .folder-configs {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .folder-card,
+        .saves-section,
+        .warning-banner,
+        .toast,
+        .action-container {
+            min-width: 0;
+        }
+
+        .folder-card,
+        .saves-section,
+        .warning-banner,
+        .toast {
+            border: 3px solid var(--bubble-line);
+            border-radius: 34px;
+            background: var(--bubble-card);
+            box-shadow: var(--bubble-shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .folder-card {
+            height: 100%;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .folder-card.success {
+            box-shadow: var(--bubble-shadow), 0 0 0 5px rgba(85, 207, 160, 0.14);
+        }
+
+        .folder-card.warning {
+            box-shadow: var(--bubble-shadow), 0 0 0 5px rgba(255, 143, 107, 0.12);
+        }
+
+        .folder-card-header,
+        .folder-title-group,
+        .saves-header,
+        .save-name-container,
+        .warning-banner,
+        .toast {
+            display: flex;
+            align-items: center;
+        }
+
+        .folder-card-header,
+        .saves-header {
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .folder-card-header {
+            min-height: 38px;
+        }
+
+        .folder-title-group {
+            min-width: 0;
+            flex: 1 1 190px;
+            gap: 10px;
+        }
+
+        .folder-title-group h3,
+        .saves-section h2 {
+            color: var(--bubble-ink);
+            font-weight: 950;
+            overflow-wrap: anywhere;
+        }
+
+        .status-badge {
+            flex: 0 0 auto;
+            min-height: 34px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .status-badge.detected,
+        .status-badge.custom {
+            color: #19735e;
+            background: rgba(210, 255, 238, 0.9);
+        }
+
+        .status-badge.missing {
+            color: #bd4f56;
+            background: rgba(255, 232, 232, 0.92);
+        }
+
+        .path-input-group {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .path-text-input,
+        .rename-input {
+            width: 100%;
+            min-width: 0;
+            border: 2px solid rgba(36, 158, 234, 0.15);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.78);
+            color: var(--bubble-ink);
+            font-weight: 850;
+        }
+
+        .path-text-input {
+            min-height: 48px;
+            padding: 0 14px;
+        }
+
+        .path-text-input::placeholder {
+            color: #8fb0c7;
+        }
+
+        .btn-secondary,
+        .btn-mini,
+        .btn-quit,
+        .btn-primary {
+            cursor: pointer;
+            color: var(--bubble-blue-deep);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 950;
+        }
+
+        .btn-secondary {
+            min-height: 48px;
+            padding: 0 16px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .btn-secondary:hover,
+        .btn-mini:hover,
+        .select-all-label:hover {
+            background: #fff;
+            border-color: rgba(36, 158, 234, 0.26);
+        }
+
+        .saves-section {
+            min-height: 0;
+            padding: 26px;
+            overflow: visible;
+        }
+
+        .saves-header-left {
+            min-width: 0;
+            flex: 1 1 260px;
+        }
+
+        .saves-section h2 {
+            font-size: clamp(1.45rem, 2.6vw, 1.8rem);
+        }
+
+        .saves-count,
+        .save-date,
+        .toast-message {
+            color: var(--bubble-muted);
+            font-weight: 800;
+        }
+
+        .select-all-label {
+            min-height: 48px;
+            padding: 0 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            color: var(--bubble-blue-deep);
+            gap: 10px;
+            font-weight: 950;
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #9ed7ff;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.72);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        input[type="checkbox"]:checked + .custom-checkbox {
+            background: var(--accent-gradient);
+            border-color: transparent;
+        }
+
+        .custom-checkbox svg {
+            width: 14px;
+            height: 14px;
+            stroke: #fff;
+            stroke-width: 3;
+            fill: none;
+            opacity: 0;
+        }
+
+        input[type="checkbox"]:checked + .custom-checkbox svg {
+            opacity: 1;
+        }
+
+        .saves-list {
+            min-height: 320px;
+            max-height: min(48dvh, 520px);
+            overflow-y: auto;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 2px dashed rgba(36, 158, 234, 0.18);
+        }
+
+        .empty-saves {
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--bubble-muted);
+            text-align: center;
+        }
+
+        .empty-saves svg {
+            width: 72px;
+            height: 72px;
+            padding: 18px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.5);
+            stroke: #9ed7ff;
+        }
+
+        .save-item {
+            min-width: 0;
+            display: grid;
+            grid-template-columns: auto auto minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            padding: 16px;
+            border: 2px solid var(--bubble-line);
+            border-radius: 26px;
+            background: rgba(255, 255, 255, 0.64);
+            box-shadow: 0 10px 22px rgba(51, 122, 168, 0.08);
+        }
+
+        .save-item + .save-item {
+            margin-top: 12px;
+        }
+
+        .save-item.selected {
+            border-color: rgba(36, 158, 234, 0.38);
+            box-shadow: 0 14px 28px rgba(36, 158, 234, 0.14);
+        }
+
+        .save-icon,
+        .btn-mini {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            flex: 0 0 auto;
+        }
+
+        .save-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bubble-blue);
+            border: 2px solid var(--bubble-line);
+            background: rgba(255, 255, 255, 0.56);
+        }
+
+        .save-info {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .save-name-container {
+            min-width: 0;
+            gap: 8px;
+        }
+
+        .save-name {
+            display: block;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--bubble-ink);
+            font-size: 1rem;
+            font-weight: 950;
+        }
+
+        .renamed-badge {
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(210, 255, 238, 0.9);
+            color: #19735e;
+            font-size: 0.72rem;
+            font-weight: 950;
+        }
+
+        .save-rename-group {
+            grid-column: 3 / 5;
+            min-width: 0;
+            display: none;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .rename-input {
+            min-height: 44px;
+            padding: 0 12px;
+        }
+
+        .btn-mini {
+            padding: 0;
+            border-radius: 999px;
+        }
+
+        .btn-mini.confirm {
+            color: var(--success);
+        }
+
+        .btn-mini.cancel,
+        .btn-quit {
+            color: var(--danger);
+        }
+
+        .warning-banner {
+            padding: 18px;
+            gap: 12px;
+            color: #b24f38;
+            background: rgba(255, 244, 238, 0.82);
+        }
+
+        .warning-banner svg {
+            width: 22px;
+            flex: 0 0 auto;
+            color: var(--warning);
+        }
+
+        .action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            min-height: 64px;
+            padding: 14px 22px;
+            border: 3px solid var(--bubble-line);
+            border-radius: 999px;
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: 0 18px 34px rgba(18, 102, 191, 0.24), inset 0 3px 0 rgba(255, 255, 255, 0.3);
+            font-size: 1.04rem;
+        }
+
+        .btn-primary:disabled {
+            cursor: not-allowed;
+            color: rgba(49, 80, 106, 0.34);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: none;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-top-color: #fff;
+            border-radius: 50%;
+            display: none;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn-primary.loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            padding-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--bubble-muted);
+            font-weight: 850;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .footer-links a {
+            color: var(--bubble-blue-deep);
+            font-weight: 950;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-quit {
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 999px;
+        }
+
+        .toast-close {
+            border: 0;
+            background: transparent;
+            color: var(--bubble-muted);
+            cursor: pointer;
+            font-size: 1.6rem;
+        }
+
+        .toast-container {
+            position: fixed;
+            right: 12px;
+            bottom: 12px;
+            z-index: 120;
+            width: min(420px, calc(100% - 24px));
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 14px;
+            gap: 12px;
+            border-radius: 22px;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title {
+            color: var(--bubble-ink);
+            font-weight: 950;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 12px;
+            }
+
+            .lang-selector-container {
+                justify-content: flex-start;
+            }
+
+            .logo-container {
+                align-items: flex-start;
+            }
+
+            .logo-icon {
+                width: 54px;
+                height: 54px;
+                border-radius: 20px;
+            }
+
+            header h1 {
+                font-size: clamp(2.35rem, 15vw, 4rem);
+            }
+
+            header p {
+                white-space: normal;
+            }
+
+            .tabs,
+            .folder-configs,
+            .path-input-group {
+                grid-template-columns: 1fr;
+            }
+
+            .folder-card,
+            .saves-section {
+                border-radius: 30px;
+                padding: 20px;
+            }
+
+            .btn-secondary,
+            .btn-primary,
+            .language-toggle {
+                width: 100%;
+            }
+
+            .saves-header {
+                align-items: stretch;
+            }
+
+            .select-all-label {
+                justify-content: center;
+            }
+
+            .save-item {
+                grid-template-columns: auto minmax(0, 1fr) auto;
+            }
+
+            .save-icon {
+                display: none;
+            }
+
+            .save-rename-group {
+                grid-column: 2 / 4;
+            }
+
+            footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            footer .btn-quit {
+                order: -1;
+                width: 100%;
+            }
+
+            .footer-links {
+                order: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-selector-container">
+        <div class="language-picker">
+            <button type="button" class="language-toggle" id="lang-toggle" onclick="toggleLanguageMenu()" aria-expanded="false">
+                <span id="lang-current">English</span>
+                <span class="language-chevron">⌄</span>
+            </button>
+            <div class="language-menu" id="lang-menu" hidden>
+                <button type="button" onclick="chooseLanguage('en')">English</button>
+                <button type="button" onclick="chooseLanguage('fr')">Français</button>
+            </div>
+        </div>
+    </div>
+    <div class="app-shell">
+    <header>
+        <div>
+            <div class="logo-container">
+                <img src="/logo.ico" alt="AstroSaveConverter logo" class="logo-icon" id="draggable-logo" draggable="false">
+                <h1>AstroSaveConverter</h1>
+            </div>
+            <p id="app-subtitle">Easily convert your Astroneer saves between Microsoft Store (Xbox PC) and Steam</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- Direction Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-win2steam" onclick="switchDirection('win2steam')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="9" y1="3" x2="9" y2="21"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                </svg>
+                <span id="tab-win2steam-text">Microsoft ➔ Steam</span>
+            </button>
+            <button class="tab-btn" id="tab-steam2win" onclick="switchDirection('steam2win')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+                <span id="tab-steam2win-text">Steam ➔ Microsoft</span>
+            </button>
+        </div>
+
+        <!-- Folder Configuration -->
+        <div class="folder-configs">
+            <!-- Source Folder Card -->
+            <div class="folder-card" id="source-folder-card">
+                <div class="folder-card-header">
+                    <div class="folder-title-group">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary)">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <h3 id="source-folder-title">Source Folder (Microsoft)</h3>
+                    </div>
+                    <span class="status-badge" id="source-folder-status">Detecting...</span>
+                </div>
+                <div class="path-input-group" id="source-path-input-group">
+                    <input type="text" class="path-text-input" id="source-path-input" placeholder="Folder path..." onchange="saveCustomPath('source')">
+                    <button class="btn-secondary" onclick="autoDetectPath('source')" id="source-detect-btn" style="flex-shrink: 0;" title="Auto-detect path">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="22" y1="12" x2="18" y2="12"/>
+                            <line x1="6" y1="12" x2="2" y2="12"/>
+                            <line x1="12" y1="6" x2="12" y2="2"/>
+                            <line x1="12" y1="22" x2="12" y2="18"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                    <button class="btn-secondary" onclick="browseFolder('source')" style="flex-shrink: 0;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <span class="browse-text">Browse...</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Destination Folder Card -->
+            <div class="folder-card" id="dest-folder-card">
+                <div class="folder-card-header">
+                    <div class="folder-title-group">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-secondary)">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <h3 id="dest-folder-title">Target Folder (Steam)</h3>
+                    </div>
+                    <span class="status-badge" id="dest-folder-status">Detecting...</span>
+                </div>
+                <div class="path-input-group" id="dest-path-input-group">
+                    <input type="text" class="path-text-input" id="dest-path-input" placeholder="Folder path..." onchange="saveCustomPath('dest')">
+                    <button class="btn-secondary" onclick="autoDetectPath('dest')" id="dest-detect-btn" style="flex-shrink: 0;" title="Auto-detect path">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="22" y1="12" x2="18" y2="12"/>
+                            <line x1="6" y1="12" x2="2" y2="12"/>
+                            <line x1="12" y1="6" x2="12" y2="2"/>
+                            <line x1="12" y1="22" x2="12" y2="18"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                    <button class="btn-secondary" onclick="browseFolder('dest')" style="flex-shrink: 0;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <span class="browse-text">Browse...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saves List Section -->
+        <div class="saves-section">
+            <div class="saves-header">
+                <div class="saves-header-left">
+                    <h2 id="saves-section-title">Detected Microsoft Saves</h2>
+                    <span class="saves-count" id="saves-count">0 saves available</span>
+                </div>
+                <div>
+                    <label class="select-all-label">
+                        <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)">
+                        <span class="custom-checkbox">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                        <span id="select-all-text">Select All</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- List Container -->
+            <div class="saves-list" id="saves-list-container">
+                <!-- Template empty item -->
+                <div class="empty-saves" id="empty-saves-message">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    <span id="empty-saves-text">No saves found in this folder.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Panel -->
+        <div class="action-container">
+            <!-- Warning block for Steam -> Microsoft -->
+            <div class="warning-banner" id="warning-banner" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <div id="warning-banner-text">
+                    <strong>Important:</strong> Astroneer must be closed for at least 20 seconds before exporting saves to the Microsoft (Xbox) app. Your original Microsoft saves will be automatically backed up for safety.
+                </div>
+            </div>
+
+            <button class="btn-primary" id="convert-btn" onclick="startConversion()" disabled>
+                <div class="spinner" id="convert-spinner"></div>
+                <span id="convert-btn-text">Start Conversion</span>
+            </button>
+        </div>
+    </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="https://github.com/Mouchoir/AstroSaveConverter" target="_blank" id="doc-link-text">Documentation GitHub</a>
+            <span>&bull;</span>
+            <span>AstroSaveConverter v4.0</span>
+        </div>
+        <button class="btn-quit" onclick="shutdownApp()"><span id="btn-quit-text">Quit Application</span></button>
+    </footer>
+
+    <script>
+        // Localization Dictionary
+        const translations = {
+            en: {
+                subtitle: "Easily convert your Astroneer saves between Microsoft Store (Xbox PC) and Steam",
+                tabWin2Steam: "Microsoft ➔ Steam",
+                tabSteam2Win: "Steam ➔ Microsoft",
+                srcTitleMicrosoft: "Source Folder (Microsoft Store)",
+                srcTitleSteam: "Source Folder (Steam)",
+                destTitleSteam: "Target Folder (Steam)",
+                destTitleMicrosoft: "Target Folder (Microsoft Store)",
+                savesTitleMicrosoft: "Detected Microsoft Saves",
+                savesTitleSteam: "Detected Steam Saves",
+                placeholderPath: "Folder path...",
+                browse: "Browse...",
+                selectAll: "Select All",
+                emptySaves: "No saves found in this folder.",
+                savesCountSingular: "1 save available",
+                savesCountPlural: "saves available",
+                warningImportant: "Important:",
+                warningText: "Astroneer must be closed for at least 20 seconds before exporting saves to the Microsoft (Xbox) app. Your original Microsoft saves will be automatically backed up for safety.",
+                btnConvert: "Start Conversion",
+                btnQuit: "Quit Application",
+                docLinkText: "GitHub Documentation",
+                toastSuccessTitle: "Conversion Successful!",
+                toastSuccessMessage: "save(s) converted successfully.",
+                toastErrorTitle: "Conversion Failed",
+                toastErrorUnknown: "An unknown error occurred.",
+                toastNetworkError: "Unable to reach local server.",
+                toastBrowseError: "Failed to open file browser.",
+                toastUpdateSuccess: "Path updated successfully.",
+                toastUpdateError: "Unable to validate this folder.",
+                toastUpdateNetworkError: "Unable to contact the server.",
+                toastRenameEmpty: "Name cannot be empty.",
+                toastRenameAlphanumeric: "Please use only alphanumeric characters (letters and numbers).",
+                toastRenameTooLong: "Save name must not exceed 30 characters.",
+                renamedBadge: "Renamed",
+                quitTitle: "Application Closed",
+                quitSubtitle: "You can now close this tab.",
+                detected: "Detected",
+                custom: "Custom",
+                missing: "Missing",
+                modifiedOn: "Modified: ",
+                confirmRenameTooltip: "Confirm",
+                cancelRenameTooltip: "Cancel",
+                renameTooltip: "Rename",
+                toastDetectSuccess: "Save folder auto-detected.",
+                toastDetectFailed: "Could not find save folder automatically.",
+                tooltipAutoDetect: "Auto-detect path"
+            },
+            fr: {
+                subtitle: "Convertissez facilement vos sauvegardes Astroneer entre Microsoft Store (Xbox PC) et Steam",
+                tabWin2Steam: "Microsoft ➔ Steam",
+                tabSteam2Win: "Steam ➔ Microsoft",
+                srcTitleMicrosoft: "Dossier Source (Microsoft Store)",
+                srcTitleSteam: "Dossier Source (Steam)",
+                destTitleSteam: "Dossier Cible (Steam)",
+                destTitleMicrosoft: "Dossier Cible (Microsoft Store)",
+                savesTitleMicrosoft: "Sauvegardes Microsoft Détectées",
+                savesTitleSteam: "Sauvegardes Steam Détectées",
+                placeholderPath: "Chemin vers le dossier...",
+                browse: "Parcourir...",
+                selectAll: "Tout sélectionner",
+                emptySaves: "Aucune sauvegarde trouvée dans ce dossier.",
+                savesCountSingular: "1 sauvegarde disponible",
+                savesCountPlural: "sauvegarde(s) disponible(s)",
+                warningImportant: "Important :",
+                warningText: "Astroneer doit être fermé depuis au moins 20 secondes avant d'exporter des sauvegardes vers l'application Microsoft (Xbox). Vos sauvegardes Microsoft d'origine seront automatiquement sauvegardées par sécurité.",
+                btnConvert: "Lancer la conversion",
+                btnQuit: "Quitter l'application",
+                docLinkText: "Documentation GitHub",
+                toastSuccessTitle: "Conversion Réussie !",
+                toastSuccessMessage: "sauvegarde(s) convertie(s) avec succès.",
+                toastErrorTitle: "Échec de la conversion",
+                toastErrorUnknown: "Une erreur inconnue est survenue.",
+                toastNetworkError: "Impossible de joindre le serveur local.",
+                toastBrowseError: "Erreur lors de l'ouverture du sélecteur.",
+                toastUpdateSuccess: "Chemin mis à jour avec succès.",
+                toastUpdateError: "Impossible de valider ce dossier.",
+                toastUpdateNetworkError: "Impossible de contacter le serveur.",
+                toastRenameEmpty: "Le nom ne peut pas être vide.",
+                toastRenameAlphanumeric: "Veuillez utiliser uniquement des caractères alphanumériques (lettres et chiffres).",
+                toastRenameTooLong: "Le nom de la sauvegarde ne doit pas dépasser 30 caractères.",
+                renamedBadge: "Renommé",
+                quitTitle: "Application Fermée",
+                quitSubtitle: "Vous pouvez maintenant fermer cet onglet.",
+                detected: "Détecté",
+                custom: "Perso",
+                missing: "Introuvable",
+                modifiedOn: "Modifié le : ",
+                confirmRenameTooltip: "Valider",
+                cancelRenameTooltip: "Annuler",
+                renameTooltip: "Renommer",
+                toastDetectSuccess: "Dossier de sauvegarde auto-détecté.",
+                toastDetectFailed: "Aucun dossier de sauvegarde n'a été trouvé automatiquement.",
+                tooltipAutoDetect: "Détecter automatiquement"
+            }
+        };
+
+        // Application State
+        let state = {
+            direction: 'win2steam', // win2steam or steam2win
+            xbox_selected_path: '',
+            xbox_saves: [],
+            steam_path: '',
+            steam_saves: [],
+            custom_paths: {},
+            renames: {}, // index -> new name
+            language: 'en' // default language
+        };
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeLogoDrag();
+            applyLanguage();
+            refreshStatus();
+        });
+
+        function initializeLogoDrag() {
+            const logo = document.getElementById('draggable-logo');
+            if (!logo) return;
+
+            let startX = 0;
+            let startY = 0;
+            let pointerId = null;
+            let isDragging = false;
+
+            const returnHome = () => {
+                if (!isDragging && !logo.classList.contains('is-dragging')) return;
+
+                isDragging = false;
+                logo.classList.remove('is-dragging');
+                logo.classList.add('is-returning');
+                logo.style.transform = 'translate3d(0, 0, 0) rotate(0deg) scale(1)';
+
+                const resumeAnimation = () => {
+                    logo.classList.remove('is-returning');
+                    logo.style.transform = '';
+                };
+
+                logo.addEventListener('transitionend', resumeAnimation, { once: true });
+                window.setTimeout(resumeAnimation, 520);
+            };
+
+            logo.addEventListener('pointerdown', (event) => {
+                if (event.button !== undefined && event.button !== 0) return;
+
+                pointerId = event.pointerId;
+                startX = event.clientX;
+                startY = event.clientY;
+                isDragging = true;
+
+                logo.classList.remove('is-returning');
+                logo.classList.add('is-dragging');
+                logo.setPointerCapture(pointerId);
+                event.preventDefault();
+            });
+
+            logo.addEventListener('pointermove', (event) => {
+                if (!isDragging || event.pointerId !== pointerId) return;
+
+                const dx = event.clientX - startX;
+                const dy = event.clientY - startY;
+                const tilt = Math.max(-12, Math.min(12, dx * 0.08));
+
+                logo.style.transform = `translate3d(${dx}px, ${dy}px, 0) rotate(${tilt}deg) scale(1.04)`;
+            });
+
+            logo.addEventListener('pointerup', (event) => {
+                if (event.pointerId !== pointerId) return;
+                returnHome();
+            });
+
+            logo.addEventListener('pointercancel', returnHome);
+            logo.addEventListener('lostpointercapture', returnHome);
+        }
+
+        // Change App Language
+        function changeLanguage(lang) {
+            state.language = lang;
+            applyLanguage();
+            renderUI();
+        }
+
+        function toggleLanguageMenu() {
+            const menu = document.getElementById('lang-menu');
+            const toggle = document.getElementById('lang-toggle');
+            const willOpen = menu.hidden;
+            menu.hidden = !willOpen;
+            toggle.setAttribute('aria-expanded', String(willOpen));
+        }
+
+        function chooseLanguage(lang) {
+            document.getElementById('lang-menu').hidden = true;
+            document.getElementById('lang-toggle').setAttribute('aria-expanded', 'false');
+            changeLanguage(lang);
+        }
+
+        document.addEventListener('click', (event) => {
+            const picker = document.querySelector('.language-picker');
+            if (!picker || picker.contains(event.target)) return;
+            const menu = document.getElementById('lang-menu');
+            const toggle = document.getElementById('lang-toggle');
+            if (menu) menu.hidden = true;
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Apply translations to static elements
+        function applyLanguage() {
+            const lang = state.language || 'en';
+            const t = translations[lang];
+
+            document.getElementById('app-subtitle').innerText = t.subtitle;
+            document.getElementById('tab-win2steam-text').innerText = t.tabWin2Steam;
+            document.getElementById('tab-steam2win-text').innerText = t.tabSteam2Win;
+            document.getElementById('select-all-text').innerText = t.selectAll;
+            document.getElementById('empty-saves-text').innerText = t.emptySaves;
+            document.getElementById('convert-btn-text').innerText = t.btnConvert;
+            document.getElementById('btn-quit-text').innerText = t.btnQuit;
+            document.getElementById('doc-link-text').innerText = t.docLinkText;
+
+            // Input Placeholders
+            document.getElementById('source-path-input').placeholder = t.placeholderPath;
+            document.getElementById('dest-path-input').placeholder = t.placeholderPath;
+
+            // Browse button text labels
+            document.querySelectorAll('.browse-text').forEach(el => {
+                el.innerText = t.browse;
+            });
+
+            // Tooltips
+            document.getElementById('source-detect-btn').title = t.tooltipAutoDetect;
+            document.getElementById('dest-detect-btn').title = t.tooltipAutoDetect;
+
+            // Warning banner text
+            document.getElementById('warning-banner-text').innerHTML = `<strong>${t.warningImportant}</strong> ${t.warningText}`;
+
+            document.getElementById('lang-current').innerText = lang === 'fr' ? 'Français' : 'English';
+        }
+
+        // Update local state and refresh UI components
+        function updateState(status) {
+            state.xbox_selected_path = status.xbox_selected_path || '';
+            state.xbox_saves = status.xbox_saves || [];
+            state.steam_path = status.steam_path || '';
+            state.steam_saves = status.steam_saves || [];
+            
+            renderUI();
+        }
+
+        // Switch Conversion Tabs
+        function switchDirection(dir) {
+            if (state.direction === dir) return;
+            state.direction = dir;
+            state.renames = {}; // reset renames
+
+            // Update tabs layout
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${dir}`).classList.add('active');
+
+            renderUI();
+        }
+
+        // Render entire UI based on current state
+        function renderUI() {
+            const isWin2Steam = state.direction === 'win2steam';
+            const t = translations[state.language || 'en'];
+            
+            // Labels
+            document.getElementById('source-folder-title').innerText = isWin2Steam ? t.srcTitleMicrosoft : t.srcTitleSteam;
+            document.getElementById('dest-folder-title').innerText = isWin2Steam ? t.destTitleSteam : t.destTitleMicrosoft;
+            document.getElementById('saves-section-title').innerText = isWin2Steam ? t.savesTitleMicrosoft : t.savesTitleSteam;
+            
+            // Paths & Status
+            const srcPath = isWin2Steam ? state.xbox_selected_path : state.steam_path;
+            const destPath = isWin2Steam ? state.steam_path : state.xbox_selected_path;
+            const srcType = isWin2Steam ? 'xbox' : 'steam';
+            const destType = isWin2Steam ? 'steam' : 'xbox';
+            
+            document.getElementById('source-path-input').value = srcPath || '';
+            document.getElementById('dest-path-input').value = destPath || '';
+
+            // Status badges
+            updateBadge('source-folder-status', 'source-folder-card', !!srcPath, state.custom_paths[srcType] ? 'custom' : 'detected');
+            updateBadge('dest-folder-status', 'dest-folder-card', !!destPath, state.custom_paths[destType] ? 'custom' : 'detected');
+
+            // Warning banner for Steam to Microsoft conversions
+            document.getElementById('warning-banner').style.display = isWin2Steam ? 'none' : 'flex';
+
+            // Render saves list
+            renderSavesList();
+        }
+
+        function updateBadge(badgeId, cardId, isOk, mode = 'detected') {
+            const badge = document.getElementById(badgeId);
+            const card = document.getElementById(cardId);
+            const t = translations[state.language || 'en'];
+            if (isOk) {
+                badge.innerText = mode === 'custom' ? t.custom : t.detected;
+                badge.className = `status-badge ${mode === 'custom' ? 'custom' : 'detected'}`;
+                card.className = 'folder-card success';
+            } else {
+                badge.innerText = t.missing;
+                badge.className = 'status-badge missing';
+                card.className = 'folder-card warning';
+            }
+        }
+
+        // Render Saves List
+        function renderSavesList() {
+            const container = document.getElementById('saves-list-container');
+            const selectAllCheck = document.getElementById('select-all-checkbox');
+            const saves = state.direction === 'win2steam' ? state.xbox_saves : state.steam_saves;
+            const t = translations[state.language || 'en'];
+            
+            // Reset Select All
+            selectAllCheck.checked = false;
+            
+            // Remove existing save items
+            const oldItems = container.querySelectorAll('.save-item');
+            oldItems.forEach(item => item.remove());
+
+            if (!saves || saves.length === 0) {
+                document.getElementById('empty-saves-message').style.display = 'flex';
+                document.getElementById('saves-count').innerText = `0 ${t.savesCountPlural}`;
+                document.getElementById('convert-btn').disabled = true;
+                return;
+            }
+
+            document.getElementById('empty-saves-message').style.display = 'none';
+            if (saves.length === 1) {
+                document.getElementById('saves-count').innerText = t.savesCountSingular;
+            } else {
+                document.getElementById('saves-count').innerText = `${saves.length} ${t.savesCountPlural}`;
+            }
+
+            saves.forEach(save => {
+                const item = document.createElement('div');
+                item.className = 'save-item';
+                item.id = `save-item-${save.index}`;
+
+                // Display name (clean up Xbox name containing $)
+                const cleanName = save.name.split('$')[0];
+                const displayName = state.renames[save.index] ? state.renames[save.index] : cleanName;
+                const safeIndex = parseInt(save.index, 10);
+                const safeDisplayName = escapeHtml(displayName);
+                const safeCleanName = escapeHtml(cleanName);
+                const safeDate = escapeHtml(save.date);
+
+                item.innerHTML = `
+                    <label style="cursor:pointer; display:flex; align-items:center; flex-shrink:0;">
+                        <input type="checkbox" value="${safeIndex}" class="save-checkbox" onchange="onSaveSelectChange(${safeIndex})">
+                        <span class="custom-checkbox">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </span>
+                    </label>
+                    <div class="save-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                            <polyline points="17 21 17 13 7 13 7 21"/>
+                            <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                    </div>
+                    <div class="save-info" id="save-info-${safeIndex}">
+                        <div class="save-name-container">
+                            <span class="save-name" title="${safeDisplayName}">${safeDisplayName}</span>
+                            ${state.renames[save.index] ? `<span class="renamed-badge">${escapeHtml(t.renamedBadge)}</span>` : ''}
+                        </div>
+                        <span class="save-date">${escapeHtml(t.modifiedOn)}${safeDate}</span>
+                    </div>
+                    <!-- Inline Rename Group -->
+                    <div class="save-rename-group" id="rename-group-${safeIndex}">
+                        <input type="text" class="rename-input" id="rename-input-${safeIndex}" value="${safeCleanName}" maxlength="30">
+                        <button class="btn-mini confirm" onclick="confirmRename(${safeIndex})" title="${escapeHtml(t.confirmRenameTooltip)}">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </button>
+                        <button class="btn-mini cancel" onclick="cancelRename(${safeIndex})" title="${escapeHtml(t.cancelRenameTooltip)}">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <button class="btn-mini" onclick="showRenameInput(${safeIndex})" id="rename-trigger-${safeIndex}" title="${escapeHtml(t.renameTooltip)}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+            updateConvertButtonState();
+        }
+
+        // Toggle check states of all saves
+        function toggleSelectAll(master) {
+            const checkboxes = document.querySelectorAll('.save-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = master.checked;
+                const saveIndex = parseInt(cb.value);
+                const item = document.getElementById(`save-item-${saveIndex}`);
+                if (master.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            updateConvertButtonState();
+        }
+
+        // Handle single check state change
+        function onSaveSelectChange(index) {
+            const cb = document.querySelector(`.save-checkbox[value="${index}"]`);
+            const item = document.getElementById(`save-item-${index}`);
+            if (cb.checked) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+            updateConvertButtonState();
+        }
+
+        // Enable/Disable convert button based on selection
+        function updateConvertButtonState() {
+            const checked = document.querySelectorAll('.save-checkbox:checked');
+            const btn = document.getElementById('convert-btn');
+            
+            // Check if folders are also valid
+            const isWin2Steam = state.direction === 'win2steam';
+            const srcOk = isWin2Steam ? !!state.xbox_selected_path : !!state.steam_path;
+            const destOk = isWin2Steam ? !!state.steam_path : !!state.xbox_selected_path;
+            
+            btn.disabled = (checked.length === 0) || !srcOk || !destOk;
+        }
+
+        // Show Inline Rename Fields
+        function showRenameInput(index) {
+            document.getElementById(`save-info-${index}`).style.display = 'none';
+            document.getElementById(`rename-trigger-${index}`).style.display = 'none';
+            document.getElementById(`rename-group-${index}`).style.display = 'flex';
+            document.getElementById(`rename-input-${index}`).focus();
+        }
+
+        // Cancel Rename
+        function cancelRename(index) {
+            document.getElementById(`save-info-${index}`).style.display = 'flex';
+            document.getElementById(`rename-trigger-${index}`).style.display = 'inline-flex';
+            document.getElementById(`rename-group-${index}`).style.display = 'none';
+        }
+
+        // Confirm Rename in state
+        function confirmRename(index) {
+            const input = document.getElementById(`rename-input-${index}`);
+            const newName = input.value.trim().toUpperCase();
+            const t = translations[state.language || 'en'];
+            
+            // Validate name (alphanumeric, max length 30, identical to class rules)
+            if (newName === "") {
+                showToast(t.toastErrorTitle, t.toastRenameEmpty, "error");
+                return;
+            }
+            if (/[^A-Z0-9]/.test(newName)) {
+                showToast(t.toastErrorTitle, t.toastRenameAlphanumeric, "error");
+                return;
+            }
+            if (newName.length > 30) {
+                showToast(t.toastErrorTitle, t.toastRenameTooLong, "error");
+                return;
+            }
+
+            state.renames[index] = newName;
+            
+            document.getElementById(`save-info-${index}`).style.display = 'flex';
+            document.getElementById(`rename-trigger-${index}`).style.display = 'inline-flex';
+            document.getElementById(`rename-group-${index}`).style.display = 'none';
+            
+            renderSavesList();
+            
+            // Restore selection state
+            const cb = document.querySelector(`.save-checkbox[value="${index}"]`);
+            cb.checked = true;
+            onSaveSelectChange(index);
+        }
+
+        // Launch conversion process
+        async function startConversion() {
+            const checkedCbs = document.querySelectorAll('.save-checkbox:checked');
+            const selectedIndexes = Array.from(checkedCbs).map(cb => parseInt(cb.value));
+            const t = translations[state.language || 'en'];
+            
+            const btn = document.getElementById('convert-btn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            const requestBody = {
+                direction: state.direction,
+                save_indexes: selectedIndexes,
+                renames: state.renames
+            };
+
+            try {
+                const res = await fetch('/api/convert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    const successMessage = `${selectedIndexes.length} ${t.toastSuccessMessage}`;
+                    showToast(t.toastSuccessTitle, successMessage, 'success');
+                    // Reset renames and selections
+                    state.renames = {};
+                    await refreshStatus();
+                } else {
+                    showToast(t.toastErrorTitle, data.error || t.toastErrorUnknown, 'error');
+                }
+            } catch (err) {
+                showToast(t.toastErrorTitle, t.toastNetworkError, 'error');
+            } finally {
+                btn.classList.remove('loading');
+                updateConvertButtonState();
+            }
+        }
+
+        // Save a typed custom path
+        async function saveCustomPath(type) {
+            const inputVal = document.getElementById(`${type}-path-input`).value.trim();
+            if (!inputVal) return;
+
+            const t = translations[state.language || 'en'];
+            let pathType = '';
+            if (state.direction === 'win2steam') {
+                pathType = type === 'source' ? 'xbox' : 'steam';
+            } else {
+                pathType = type === 'source' ? 'steam' : 'xbox';
+            }
+
+            try {
+                const res = await fetch('/api/select_path', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: pathType, path: inputVal })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast(t.toastSuccessTitle, t.toastUpdateSuccess, 'success');
+                    state.custom_paths[pathType] = true;
+                    updateState(data.status);
+                } else {
+                    showToast(t.toastErrorTitle, data.error || t.toastUpdateError, 'error');
+                }
+            } catch (err) {
+                showToast(t.toastErrorTitle, t.toastUpdateNetworkError, 'error');
+            }
+        }
+
+        // Browse for directory via native system file chooser
+        async function browseFolder(type) {
+            const t = translations[state.language || 'en'];
+            let pathType = '';
+            if (state.direction === 'win2steam') {
+                pathType = type === 'source' ? 'xbox' : 'steam';
+            } else {
+                pathType = type === 'source' ? 'steam' : 'xbox';
+            }
+
+            try {
+                const res = await fetch('/api/browse_path', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: pathType })
+                });
+                const data = await res.json();
+                if (data.success && data.path) {
+                    showToast(t.toastSuccessTitle, t.toastUpdateSuccess, 'success');
+                    state.custom_paths[pathType] = true;
+                    updateState(data.status);
+                } else if (data.error) {
+                    showToast('Information', data.error, 'warning');
+                }
+            } catch (err) {
+                showToast(t.toastErrorTitle, t.toastBrowseError, 'error');
+            }
+        }
+
+        // Auto-detect a single platform folder path
+        async function autoDetectPath(type) {
+            const t = translations[state.language || 'en'];
+            let pathType = '';
+            if (state.direction === 'win2steam') {
+                pathType = type === 'source' ? 'xbox' : 'steam';
+            } else {
+                pathType = type === 'source' ? 'steam' : 'xbox';
+            }
+
+            try {
+                const res = await fetch('/api/detect_single', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: pathType })
+                });
+                const data = await res.json();
+                if (data.success && data.path) {
+                    showToast(t.toastSuccessTitle, t.toastDetectSuccess, 'success');
+                    state.custom_paths[pathType] = false;
+                    updateState(data.status);
+                } else {
+                    state.custom_paths[pathType] = false;
+                    if (data.status) updateState(data.status);
+                    showToast('Information', t.toastDetectFailed, 'warning');
+                }
+            } catch (err) {
+                showToast(t.toastErrorTitle, t.toastNetworkError, 'error');
+            }
+        }
+
+        // Fetch directory status and lists of saves
+        async function refreshStatus() {
+            const t = translations[state.language || 'en'];
+            try {
+                const res = await fetch('/api/status');
+                if (res.ok) {
+                    const status = await res.json();
+                    updateState(status);
+                }
+            } catch (err) {
+                showToast(t.toastErrorTitle, t.toastNetworkError, 'error');
+            }
+        }
+
+        // Request server shutdown
+        async function shutdownApp() {
+            const t = translations[state.language || 'en'];
+            try {
+                await fetch('/api/shutdown', { method: 'POST' });
+            } catch (err) {
+                // Ignore, server shuts down
+            }
+            // Display closing banner
+            document.body.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100dvh; gap:16px;">
+                    <h2 style="font-size:2rem; background: var(--accent-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${t.quitTitle}</h2>
+                    <p style="color:var(--bubble-muted);">${t.quitSubtitle}</p>
+                </div>
+            `;
+            window.close();
+        }
+
+        // Toast notifications logic
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let iconColor = 'var(--accent-primary)';
+            if (type === 'success') iconColor = 'var(--success)';
+            if (type === 'warning') iconColor = 'var(--warning)';
+            if (type === 'error') iconColor = 'var(--danger)';
+
+            toast.innerHTML = `
+                <div style="color: ${iconColor}; margin-top:2px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${escapeHtml(title)}</div>
+                    <div class="toast-message">${escapeHtml(message)}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 5000);
+        }
+
+    </script>
+</body>
+</html>

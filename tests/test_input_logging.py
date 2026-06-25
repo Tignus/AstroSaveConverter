@@ -48,7 +48,7 @@ def test_ask_copy_target_logs_choices():
         assert _call_args_contains(
             log_mock, call(f"User choice: {invalid_path}", "debug")
         )
-        assert _call_args_contains(log_mock, call("User choice: /tmp", "debug"))
+        assert _call_args_contains(log_mock, call(f"User choice: {os.path.abspath('/tmp')}", "debug"))
 
 
 def test_ask_for_multiple_choices_logs():
@@ -58,6 +58,20 @@ def test_ask_for_multiple_choices_logs():
         result = scenario.ask_for_multiple_choices(4)
         assert result == [0, 1]
         assert _call_args_contains(log_mock, call("User choice: 1,2", "debug"))
+
+
+def test_ask_for_save_folder_handles_missing_steam_folder():
+    with patch.object(builtins, "input", side_effect=["1", "2"]), patch(
+        "cogs.AstroSteamSaveFolder.get_steam_save_folder",
+        side_effect=FileNotFoundError("missing LOCALAPPDATA"),
+    ), patch(
+        "AstroSaveScenario.ask_custom_folder_path", return_value="C:\\tmp"
+    ), patch(
+        "cogs.AstroLogging.logPrint"
+    ) as log_mock:
+        result = scenario.ask_for_save_folder(AstroConvType.STEAM2WIN)
+        assert result == "C:\\tmp"
+        assert _call_args_contains(log_mock, call("\nNo container found in path: "))
 
 
 def test_ask_rename_saves_logs():

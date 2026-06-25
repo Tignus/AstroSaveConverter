@@ -63,8 +63,24 @@ def join_paths(path1: str, path2: str) -> str:
     return os.path.join(path1, path2)
 
 
+def resolve_safe_path(path: str, base: str | None = None) -> str:
+    """Resolve ``path`` to its real absolute form, optionally confined to ``base``.
+
+    Resolves symlinks and ``..`` sequences. When ``base`` is provided, raises
+    ``ValueError`` if the resolved path escapes outside ``base``.
+    """
+    resolved = os.path.realpath(os.path.abspath(path))
+    if base is not None:
+        resolved_base = os.path.realpath(os.path.abspath(base))
+        if not resolved.startswith(resolved_base + os.sep) and resolved != resolved_base:
+            raise ValueError(f"Path '{path}' is outside the allowed base directory.")
+    return resolved
+
+
 def copy_files(source: str, target: str) -> None:
     """Copy directory ``source`` to ``target``."""
+    source = resolve_safe_path(source)
+    target = resolve_safe_path(target)
     if os.path.isdir(target):
         shutil.rmtree(target)
     shutil.copytree(source, target)
@@ -82,12 +98,14 @@ def rcontains(rgexp: str, string: str) -> bool:
 
 def write_buffer_to_file(target: str, buffer: StringIO) -> None:
     """Write an in-memory buffer to disk."""
+    target = resolve_safe_path(target)
     with open(target, "wb") as target_save:
         target_save.write(buffer.getvalue())
 
 
 def append_buffer_to_file(target: str, buffer: StringIO) -> None:
     """Append an in-memory buffer to a file."""
+    target = resolve_safe_path(target)
     with open(target, "ab") as target_save:
         target_save.write(buffer.getvalue())
 

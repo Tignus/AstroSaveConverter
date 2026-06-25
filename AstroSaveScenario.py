@@ -104,6 +104,7 @@ def ask_for_save_folder(conversion_type: AstroConvType) -> str:
         FileNotFoundError: If no save folder can be located automatically.
     """
     while 1:
+        save_path = ""
         try:
             Logger.logPrint("Which folder would you like to work with ?")
             Logger.logPrint(
@@ -478,7 +479,7 @@ def export_save_to_xbox(save: AstroSave, from_file: str, to_path: str) -> str:
         Container.create_empty_container(to_path)
         container_file_name = "container.1"
 
-    container_full_path = utils.join_paths(to_path, container_file_name)
+    container_full_path = utils.resolve_safe_path(utils.join_paths(to_path, container_file_name))
 
     with open(container_full_path, "r+b") as container:
         container.read(4)

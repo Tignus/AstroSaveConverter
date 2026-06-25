@@ -20,15 +20,11 @@ def get_microsoft_save_folder() -> str:
     """
 
     try:
-        target = (
-            os.environ["LOCALAPPDATA"]
-            + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
-        )
+        local_appdata = os.environ["LOCALAPPDATA"]
     except KeyError:
-        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
-        Logger.logPrint("Press any key to exit")
-        utils.wait_and_exit(1)
+        raise FileNotFoundError("LOCALAPPDATA environment variable is missing.")
 
+    target = local_appdata + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
     microsoft_save_paths = list(glob.iglob(target))
 
     for path in microsoft_save_paths:
@@ -98,6 +94,7 @@ def get_save_folders_from_path(path: str) -> list:
         list: Paths of detected save folders.
     """
     microsoft_save_folders = []
+    path = utils.resolve_safe_path(path)
 
     for root, _, files in os.walk(path):
         for file in files:
@@ -117,11 +114,12 @@ def get_save_folders_from_path(path: str) -> list:
 
 def get_save_details(folder_path: str):
     """Return list of ``(save_name, date_str)`` for saves in ``folder_path``."""
+    folder_path = utils.resolve_safe_path(folder_path)
     container_files = glob.glob(utils.join_paths(folder_path, "container.*"))
     if not container_files:
         return []
 
-    container_path = container_files[0]
+    container_path = utils.resolve_safe_path(container_files[0], folder_path)
     with open(container_path, "rb") as container_file:
         text = container_file.read().decode("utf-16le", errors="ignore")
 
@@ -141,6 +139,7 @@ def get_save_details(folder_path: str):
 
 def read_container_text_from_path(path: str) -> str:
     """Read a container file and return its decoded text."""
+    path = utils.resolve_safe_path(path)
     with open(path, "rb") as container_file:
         binary_content = container_file.read()
         return binary_content.decode("utf-16le", errors="ignore")
@@ -171,15 +170,11 @@ def find_microsoft_save_folders() -> list:
     save_folders = []
 
     try:
-        target = (
-            os.environ["LOCALAPPDATA"]
-            + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
-        )
+        local_appdata = os.environ["LOCALAPPDATA"]
     except KeyError:
-        Logger.logPrint("Local Appdata are missing, maybe you're on linux ?")
-        Logger.logPrint("Press any key to exit")
-        utils.wait_and_exit(1)
+        raise FileNotFoundError("LOCALAPPDATA environment variable is missing.")
 
+    target = local_appdata + "\\Packages\\SystemEraSoftworks*\\SystemAppData\\wgs"
     for path in glob.iglob(target):
         save_folders.extend(get_save_folders_from_path(path))
 

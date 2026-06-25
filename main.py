@@ -6,6 +6,9 @@ user interaction, file discovery and conversion workflows.
 """
 
 import os
+import sys
+import importlib
+import subprocess
 from argparse import ArgumentParser, Namespace
 
 import AstroSaveScenario as Scenario
@@ -17,7 +20,7 @@ from cogs.AstroSave import AstroSave
 from cogs.AstroSaveContainer import AstroSaveContainer as Container
 from cogs.LoadingBar import LoadingBar
 
-APP_VERSION = "3.0"
+APP_VERSION = "4.0"
 
 
 def get_args() -> Namespace:
@@ -117,7 +120,15 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
     if not microsoft_target_folder:
         utils.wait_and_exit(1)
 
-    steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
+    try:
+        steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
+    except FileNotFoundError:
+        Logger.logPrint(
+            "No Steam saves found in the selected folder. Please choose another path."
+        )
+        original_save_path = Scenario.ask_for_save_folder(AstroConvType.STEAM2WIN)
+        Logger.logPrint(f"User selected new path: {original_save_path}", "debug")
+        steamsave_files_list = AstroSave.get_steamsaves_list(original_save_path)
 
     saves_list = AstroSave.init_saves_list_from(steamsave_files_list)
 
@@ -149,16 +160,17 @@ def steam_to_windows_conversion(original_save_path: str) -> None:
         )
 
 
-if __name__ == "__main__":
+def run_cli() -> None:
+    """Run the application in Command-Line Interface (CLI) mode."""
     try:
         Logger.setup_logging(os.getcwd())
-        Logger.logPrint(f"Starting AstroSaveConverter version {APP_VERSION}")
+        Logger.logPrint(f"Starting AstroSaveConverter version {APP_VERSION} (CLI)")
 
         try:
             os.system(
-                f"title AstroSaveConverter {APP_VERSION} - Convert your Astroneer saves between Microsoft and Steam"
+                f"title AstroSaveConverter {APP_VERSION} (CLI) - Convert your Astroneer saves"
             )
-        except:
+        except Exception:
             pass
 
         args = get_args()
@@ -191,3 +203,34 @@ if __name__ == "__main__":
         Logger.logPrint(e)
         Logger.logPrint("", "exception")
         utils.wait_and_exit(1)
+
+
+def run_gui_from_cli_entry() -> None:
+    """Run the GUI when explicitly requested from the CLI entry point."""
+    if getattr(sys, "frozen", False):
+        gui_executable = os.path.join(
+            os.path.dirname(sys.executable), "AstroSaveConverterGUI.exe"
+        )
+        if os.path.isfile(gui_executable):
+            subprocess.Popen([gui_executable])
+            return
+
+        Logger.setup_logging(os.getcwd())
+        Logger.logPrint(
+            "GUI executable not found. Please run AstroSaveConverterGUI.exe directly.",
+            "error",
+        )
+        utils.wait_and_exit(1)
+
+    importlib.import_module("main_gui").run_gui()
+
+
+if __name__ == "__main__":
+    # Preserve the historical CLI default; GUI mode is opt-in via --gui.
+    if "--gui" in sys.argv:
+        sys.argv.remove("--gui")
+        run_gui_from_cli_entry()
+    else:
+        if "--cli" in sys.argv:
+            sys.argv.remove("--cli")
+        run_cli()

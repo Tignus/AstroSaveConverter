@@ -1,0 +1,4 @@
+# Snyk (https://snyk.io) policy file
+# Tells Snyk to resolve Python dependencies under the correct runtime version.
+language-settings:
+  python: "3.12"
